@@ -63,6 +63,36 @@ async def upload_image(file: UploadFile = File(...), path: str = Form(...)):
 # ✅ JSON-datan tallennus → /app/data/
 @app.post("/upload-data")
 async def upload_data(data: dict = Body(...)):
+    # Tallennuskansio Railwayn kontissa (valinnainen)
+    save_dir = os.path.join(os.path.dirname(__file__), "data")
+    os.makedirs(save_dir, exist_ok=True)
+
+    huoneisto = data.get("huoneisto")
+    if not huoneisto:
+        return {"error": "Kenttä 'huoneisto' puuttuu."}
+
+    # ✅ Tallennus Railway-konttiin (valinnainen)
+    filepath = os.path.join(save_dir, f"{huoneisto}.json")
+    with open(filepath, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
+
+    # ✅ Muunna JSON -> bytes R2-tallennusta varten
+    json_bytes = json.dumps(data, ensure_ascii=False, indent=4).encode("utf-8")
+
+    # ✅ Tallennus Cloudflare R2:een
+    r2_key = f"huoneistot/{huoneisto}/data.json"
+    s3.put_object(
+        Bucket=R2_BUCKET,
+        Key=r2_key,
+        Body=json_bytes,
+        ContentType="application/json"
+    )
+
+    return {
+        "status": "ok",
+        "saved_as": filepath,
+        "r2_key": r2_key
+    }
 
     save_dir = os.path.join(os.path.dirname(__file__), "data")
     os.makedirs(save_dir, exist_ok=True)
