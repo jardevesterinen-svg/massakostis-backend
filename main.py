@@ -3,12 +3,13 @@ import boto3
 import os
 import json
 
-# ✅ Railway EI käytä .env-tiedostoa → EI load_dotenv
-# from dotenv import load_dotenv
-# dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
-# load_dotenv(dotenv_path)
+# ✅ Lataa .env vain paikallisesti (Railwayssa tiedostoa ei ole)
+dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
+if os.path.exists(dotenv_path):
+    from dotenv import load_dotenv
+    load_dotenv(dotenv_path)
 
-# ✅ Lue ympäristömuuttujat suoraan Railwayssa
+# ✅ Lue ympäristömuuttujat (Railway antaa nämä automaattisesti)
 CLOUDFLARE_ACCOUNT_ID = os.getenv("CLOUDFLARE_ACCOUNT_ID")
 R2_BUCKET = os.getenv("R2_BUCKET_NAME")
 R2_ACCESS_KEY_ID = os.getenv("R2_ACCESS_KEY_ID")
@@ -20,6 +21,10 @@ print("DEBUG: BUCKET =", R2_BUCKET)
 print("DEBUG: ACCESS_KEY_ID =", R2_ACCESS_KEY_ID)
 print("DEBUG: ENDPOINT =", R2_ENDPOINT)
 
+# ✅ Railway määrittää portin environment-muuttujassa PORT
+PORT = int(os.getenv("PORT", 8000))
+
+# ✅ FastAPI-app
 app = FastAPI()
 
 # ✅ R2-yhteys boto3:lla
@@ -31,7 +36,7 @@ s3 = session.client(
     aws_secret_access_key=R2_SECRET_ACCESS_KEY,
 )
 
-# ✅ Kuvan upload
+# ✅ Kuvan upload → R2
 @app.post("/upload-image")
 async def upload_image(file: UploadFile = File(...), path: str = Form(...)):
     data = await file.read()
@@ -45,7 +50,7 @@ async def upload_image(file: UploadFile = File(...), path: str = Form(...)):
 
     return {"status": "ok", "path": path}
 
-# ✅ JSON-datan tallennus
+# ✅ JSON-datan tallennus → /app/data/
 @app.post("/upload-data")
 async def upload_data(data: dict = Body(...)):
 
