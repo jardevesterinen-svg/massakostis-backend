@@ -27,6 +27,16 @@ PORT = int(os.getenv("PORT", 8000))
 # ✅ FastAPI-app
 app = FastAPI()
 
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],         # Salli Cloudflare Pages -domain
+    allow_credentials=True,
+    allow_methods=["*"],         # Salli POST / GET / OPTIONS
+    allow_headers=["*"],
+)
+
 # ✅ R2-yhteys boto3:lla
 session = boto3.session.Session()
 s3 = session.client(
