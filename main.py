@@ -5,7 +5,7 @@ import os
 import json
 
 # -----------------------------
-# YMPÄRISTÖMUUTTUJAT (Railway)
+#  ✅ YMPÄRISTÖMUUTTUJAT (Railway)
 # -----------------------------
 
 CLOUDFLARE_ACCOUNT_ID = os.getenv("CLOUDFLARE_ACCOUNT_ID")
@@ -17,7 +17,7 @@ R2_ENDPOINT = os.getenv("R2_ENDPOINT")
 print("DEBUG: BUCKET =", R2_BUCKET)
 print("DEBUG: ENDPOINT =", R2_ENDPOINT)
 
-# R2-yhteys (boto3)
+# R2-yhteys boto3:lla (täsmälleen oikein Cloudflare R2:lle)
 session = boto3.session.Session()
 s3 = session.client(
     service_name="s3",
@@ -27,45 +27,44 @@ s3 = session.client(
 )
 
 # -----------------------------
-# FASTAPI-APP + CORS
+# ✅ FASTAPI + CORS
 # -----------------------------
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],      # Cloudflare Pages domain hyväksytään
+    allow_origins=["*"],     # Cloudflare Pages sallitaan
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=True
 )
 
 # -----------------------------
-# HELPERS
+# ✅ APUFUNKTIOT R2:lle
 # -----------------------------
 
-def r2_put_json(bucket_key: str, data: dict):
-    """Tallenna JSON-objekti R2:een bytes-muodossa"""
+def r2_put_json(key: str, data: dict):
+    """Tallenna JSON tiedosto R2:een"""
     body = json.dumps(data, ensure_ascii=False, indent=4).encode("utf-8")
-
     s3.put_object(
         Bucket=R2_BUCKET,
-        Key=bucket_key,
+        Key=key,
         Body=body,
         ContentType="application/json"
     )
 
-def r2_get_json(bucket_key: str):
-    """Hae JSON R2:sta"""
+def r2_get_json(key: str):
+    """Lue JSON tiedosto R2:sta"""
     try:
-        obj = s3.get_object(Bucket=R2_BUCKET, Key=bucket_key)
+        obj = s3.get_object(Bucket=R2_BUCKET, Key=key)
         return json.loads(obj["Body"].read())
-    except Exception:
+    except:
         return None
 
-# -----------------------------
-# 1) METADATA (kohteen tiedot)
-# -----------------------------
+# ===========================================================
+# ✅ 1) KOHTEEN METADATA: metadata.json
+# ===========================================================
 
 @app.post("/save-metadata")
 async def save_metadata(body: dict = Body(...)):
@@ -80,36 +79,39 @@ async def save_metadata(body: dict = Body(...)):
 
     return {"status": "ok", "saved": key}
 
+
 @app.get("/get-metadata/{kohde_id}")
 async def get_metadata(kohde_id: str):
     key = f"kohteet/{kohde_id}/metadata.json"
     data = r2_get_json(key)
     if not data:
-        return {"error": "metadata not found"}
+        return {"error": "not found"}
     return data
 
-# -----------------------------
-# 2) KOHDE- KANSIKUVA
-# -----------------------------
+# ===========================================================
+# ✅ 2) KOHTEEN KANSIKUVA
+# ===========================================================
 
 @app.post("/upload-kansikuva")
-async def upload_kansikuva(kohde_id: str = Form(...), file: UploadFile = File(...)):
-
+async def upload_kansikuva(
+    kohde_id: str = Form(...),
+    file: UploadFile = File(...)
+):
     key = f"kohteet/{kohde_id}/kansikuva.jpg"
-    content = await file.read()
+    body = await file.read()
 
     s3.put_object(
         Bucket=R2_BUCKET,
         Key=key,
-        Body=content,
+        Body=body,
         ContentType=file.content_type
     )
 
-    return {"status": "ok", "key": key}
+    return {"status": "ok", "saved": key}
 
-# -----------------------------
-# 3) HUONEISTODATA (data.json)
-# -----------------------------
+# ===========================================================
+# ✅ 3) HUONEISTON DATA (data.json)
+# ===========================================================
 
 @app.post("/upload-data")
 async def upload_data(body: dict = Body(...)):
@@ -122,9 +124,11 @@ async def upload_data(body: dict = Body(...)):
         return {"error": "kohde_id tai huoneisto_slug puuttuu"}
 
     key = f"kohteet/{kohde_id}/huoneistot/{slug}/data.json"
+
     r2_put_json(key, data)
 
     return {"status": "ok", "saved": key}
+
 
 @app.get("/get-apartment/{kohde_id}/{huoneisto_slug}")
 async def get_apartment(kohde_id: str, huoneisto_slug: str):
@@ -133,35 +137,95 @@ async def get_apartment(kohde_id: str, huoneisto_slug: str):
     data = r2_get_json(key)
 
     if not data:
-        return {}  # palautetaan tyhjä → UI tyhjentää lomakkeen
+        return {}  # UI tyhjentää lomakkeen
 
     return data
 
-# -----------------------------
-# 4) HUONEISTON KUVAT (1-2 kpl)
-# -----------------------------
+# ===========================================================
+# ✅ 4) HUONEISTON KUVAT (kuva1.jpg, kuva2.jpg)
+# ===========================================================
 
 @app.post("/upload-image")
 async def upload_image(
     kohde_id: str = Form(...),
     huoneisto_slug: str = Form(...),
-    index: str = Form(...),              # "1" tai "2"
+    index: str = Form(...),                    # "1" tai "2"
     file: UploadFile = File(...)
 ):
     """
-    Tallentaa huoneistokohtaisen kuvan R2:een.
-    index=1 → kuva1.jpg
-    index=2 → kuva2.jpg
+    Tallennetaan huoneiston kuva:
+    /kohteet/<id>/huoneistot/<slug>/kuva1.jpg
     """
 
     key = f"kohteet/{kohde_id}/huoneistot/{huoneisto_slug}/kuva{index}.jpg"
-    content = await file.read()
+    body = await file.read()
 
     s3.put_object(
         Bucket=R2_BUCKET,
         Key=key,
-        Body=content,
+        Body=body,
         ContentType=file.content_type
     )
 
     return {"status": "ok", "saved": key}
+
+# ===========================================================
+# ✅ 5) KOHTEIDEN LISTAUS (hakutoimintoa varten)
+# ===========================================================
+
+@app.get("/list-kohteet")
+async def list_kohteet():
+    """
+    Palauttaa kaikki kohteet:
+    /kohteet/<kohde_id>/
+    """
+
+    resp = s3.list_objects_v2(
+        Bucket=R2_BUCKET,
+        Prefix="kohteet/",
+        Delimiter="/"
+    )
+
+    items = []
+    if "CommonPrefixes" in resp:
+        for p in resp["CommonPrefixes"]:
+            folder = p["Prefix"].replace("kohteet/", "").replace("/", "")
+            items.append(folder)
+
+    return {"kohteet": items}
+
+# ===========================================================
+# ✅ 6) HUONEISTOPOHJAT (OPTIONAALINEN, TULEVA OMINAISUUS)
+# ===========================================================
+
+@app.post("/save-template")
+async def save_template(body: dict = Body(...)):
+    kohde_id = body.get("kohde_id")
+    nimi = body.get("nimi")
+    pohja = body.get("pohja")
+
+    key = f"kohteet/{kohde_id}/pohjat/{nimi}.json"
+    r2_put_json(key, pohja)
+
+    return {"status": "ok", "saved": key}
+
+@app.get("/list-templates/{kohde_id}")
+async def list_templates(kohde_id: str):
+    resp = s3.list_objects_v2(
+        Bucket=R2_BUCKET,
+        Prefix=f"kohteet/{kohde_id}/pohjat/"
+    )
+
+    items = []
+    if "Contents" in resp:
+        for obj in resp["Contents"]:
+            name = obj["Key"].split("/")[-1].replace(".json", "")
+            items.append(name)
+
+    return {"pohjat": items}
+
+@app.get("/get-template/{kohde_id}/{nimi}")
+async def get_template(kohde_id: str, nimi: str):
+    key = f"kohteet/{kohde_id}/pohjat/{nimi}.json"
+    data = r2_get_json(key)
+    return data or {}
