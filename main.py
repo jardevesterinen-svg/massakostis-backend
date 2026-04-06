@@ -182,30 +182,39 @@ async def upload_image(
 
 @app.get("/list-kohteet")
 async def list_kohteet():
-    # Hae kaikki objektit prefixillä "kohteet/"
-    resp = s3.list_objects_v2(
-        Bucket=R2_BUCKET,
-        Prefix="kohteet/"
-    )
-
     kohteet = set()
 
-    if "Contents" in resp:
-        for obj in resp["Contents"]:
-            key = obj["Key"]
+    continuation = None
 
-            # Erottaa kohde_id ensimmäisestä polkuelementistä
-            # esim:
-            #   kohteet/asoy-merikotka-2026-04-05/metadata.json
-            # → asoy-merikotka-2026-04-05
+    while True:
+        if continuation:
+            resp = s3.list_objects_v2(
+                Bucket=R2_BUCKET,
+                Prefix="kohteet/",
+                ContinuationToken=continuation
+            )
+        else:
+            resp = s3.list_objects_v2(
+                Bucket=R2_BUCKET,
+                Prefix="kohteet/"
+            )
+
+        # Jos ei Contents -> ei kohteita
+        contents = resp.get("Contents", [])
+        for obj in contents:
+            key = obj["Key"]            # esim "kohteet/asoy-2026-02-01/metadata.json"
             parts = key.split("/")
-            if len(parts) >= 3:
+            if len(parts) >= 3:         # ["kohteet","<kohde_id>","tiedosto"]
                 kohde = parts[1]
-                if kohde:
+                if kohde.strip():
                     kohteet.add(kohde)
 
+        if resp.get("IsTruncated"):
+            continuation = resp.get("NextContinuationToken")
+        else:
+            break
+
     return {"kohteet": sorted(kohteet)}
-    print("R2 Contents:", resp.get("Contents"))
 # ==========================================================
 #  6) HUONEISTOPOHJAT (VALINNAINEN)
 # ==========================================================
