@@ -255,6 +255,19 @@ async def get_template(kohde_id: str, nimi: str):
 #  7) PDF RAPORTTI — /generate-report/<kohde_id>
 # ==========================================================
 
+from fastapi import Response
+
+@app.options("/generate-report/{kohde_id}")
+async def options_generate_report(kohde_id: str):
+    return Response(
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+        }
+    )
+
 @app.post("/generate-report/{kohde_id}")
 async def generate_report(kohde_id: str):
 
