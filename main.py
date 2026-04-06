@@ -1,12 +1,22 @@
+###############################################################################
+# MAIN.PY v4 — COMPLETE BACKEND with PDF REPORT GENERATOR
+###############################################################################
+
 from fastapi import FastAPI, UploadFile, File, Form, Body
 from fastapi.middleware.cors import CORSMiddleware
 import boto3
 import os
 import json
+import io
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.utils import ImageReader
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 
-# -----------------------------
-#  ✅ YMPÄRISTÖMUUTTUJAT (Railway)
-# -----------------------------
+# ==========================================================
+#  ENVIRONMENT (Railway environment variables)
+# ==========================================================
 
 CLOUDFLARE_ACCOUNT_ID = os.getenv("CLOUDFLARE_ACCOUNT_ID")
 R2_BUCKET = os.getenv("R2_BUCKET_NAME")
@@ -14,11 +24,14 @@ R2_ACCESS_KEY_ID = os.getenv("R2_ACCESS_KEY_ID")
 R2_SECRET_ACCESS_KEY = os.getenv("R2_SECRET_ACCESS_KEY")
 R2_ENDPOINT = os.getenv("R2_ENDPOINT")
 
-print("DEBUG: BUCKET =", R2_BUCKET)
-print("DEBUG: ENDPOINT =", R2_ENDPOINT)
+PUBLIC_URL = "https://pub-9f421e06dc9f4bd49ae0adcf5690c438.r2.dev"
 
-# R2-yhteys boto3:lla (täsmälleen oikein Cloudflare R2:lle)
+# ==========================================================
+#  CLIENT FOR CLOUDFLARE R2
+# ==========================================================
+
 session = boto3.session.Session()
+
 s3 = session.client(
     service_name="s3",
     endpoint_url=R2_ENDPOINT,
@@ -26,26 +39,31 @@ s3 = session.client(
     aws_secret_access_key=R2_SECRET_ACCESS_KEY
 )
 
-# -----------------------------
-# ✅ FASTAPI + CORS
-# -----------------------------
+# ==========================================================
+#  FASTAPI + CORS
+# ==========================================================
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],     # Cloudflare Pages sallitaan
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=True
 )
 
-# -----------------------------
-# ✅ APUFUNKTIOT R2:lle
-# -----------------------------
+# ==========================================================
+#  HELPER FUNCTIONS
+# ==========================================================
+
+def slugify(text: str):
+    import re
+    text = text.lower()
+    text = re.sub(r"[^a-z0-9]+", "-", text)
+    return text.strip("-")
 
 def r2_put_json(key: str, data: dict):
-    """Tallenna JSON tiedosto R2:een"""
     body = json.dumps(data, ensure_ascii=False, indent=4).encode("utf-8")
     s3.put_object(
         Bucket=R2_BUCKET,
@@ -55,42 +73,39 @@ def r2_put_json(key: str, data: dict):
     )
 
 def r2_get_json(key: str):
-    """Lue JSON tiedosto R2:sta"""
     try:
         obj = s3.get_object(Bucket=R2_BUCKET, Key=key)
         return json.loads(obj["Body"].read())
     except:
         return None
 
-# ===========================================================
-# ✅ 1) KOHTEEN METADATA: metadata.json
-# ===========================================================
+# ==========================================================
+#  1) SAVE METADATA
+# ==========================================================
 
 @app.post("/save-metadata")
 async def save_metadata(body: dict = Body(...)):
     kohde_id = body.get("kohde_id")
     metadata = body.get("metadata")
-
     if not kohde_id:
-        return {"error": "kohde_id puuttuu"}
+        return {"error": "kohde_id missing"}
 
     key = f"kohteet/{kohde_id}/metadata.json"
     r2_put_json(key, metadata)
 
     return {"status": "ok", "saved": key}
 
-
 @app.get("/get-metadata/{kohde_id}")
 async def get_metadata(kohde_id: str):
     key = f"kohteet/{kohde_id}/metadata.json"
     data = r2_get_json(key)
     if not data:
-        return {"error": "not found"}
+        return {"error": "metadata not found"}
     return data
 
-# ===========================================================
-# ✅ 2) KOHTEEN KANSIKUVA
-# ===========================================================
+# ==========================================================
+#  2) UPLOAD KANSIKUVA
+# ==========================================================
 
 @app.post("/upload-kansikuva")
 async def upload_kansikuva(
@@ -98,20 +113,20 @@ async def upload_kansikuva(
     file: UploadFile = File(...)
 ):
     key = f"kohteet/{kohde_id}/kansikuva.jpg"
-    body = await file.read()
+    content = await file.read()
 
     s3.put_object(
         Bucket=R2_BUCKET,
         Key=key,
-        Body=body,
+        Body=content,
         ContentType=file.content_type
     )
 
     return {"status": "ok", "saved": key}
 
-# ===========================================================
-# ✅ 3) HUONEISTON DATA (data.json)
-# ===========================================================
+# ==========================================================
+#  3) HUONEISTON DATA
+# ==========================================================
 
 @app.post("/upload-data")
 async def upload_data(body: dict = Body(...)):
@@ -121,14 +136,12 @@ async def upload_data(body: dict = Body(...)):
     data = body.get("data")
 
     if not kohde_id or not slug:
-        return {"error": "kohde_id tai huoneisto_slug puuttuu"}
+        return {"error": "missing fields"}
 
     key = f"kohteet/{kohde_id}/huoneistot/{slug}/data.json"
-
     r2_put_json(key, data)
 
     return {"status": "ok", "saved": key}
-
 
 @app.get("/get-apartment/{kohde_id}/{huoneisto_slug}")
 async def get_apartment(kohde_id: str, huoneisto_slug: str):
@@ -137,66 +150,55 @@ async def get_apartment(kohde_id: str, huoneisto_slug: str):
     data = r2_get_json(key)
 
     if not data:
-        return {}  # UI tyhjentää lomakkeen
-
+        return {}
     return data
 
-# ===========================================================
-# ✅ 4) HUONEISTON KUVAT (kuva1.jpg, kuva2.jpg)
-# ===========================================================
+# ==========================================================
+#  4) HUONEISTON KUVIEN TALLENNUS
+# ==========================================================
 
 @app.post("/upload-image")
 async def upload_image(
     kohde_id: str = Form(...),
     huoneisto_slug: str = Form(...),
-    index: str = Form(...),                    # "1" tai "2"
+    index: str = Form(...),
     file: UploadFile = File(...)
 ):
-    """
-    Tallennetaan huoneiston kuva:
-    /kohteet/<id>/huoneistot/<slug>/kuva1.jpg
-    """
-
     key = f"kohteet/{kohde_id}/huoneistot/{huoneisto_slug}/kuva{index}.jpg"
-    body = await file.read()
+    content = await file.read()
 
     s3.put_object(
         Bucket=R2_BUCKET,
         Key=key,
-        Body=body,
+        Body=content,
         ContentType=file.content_type
     )
 
     return {"status": "ok", "saved": key}
 
-# ===========================================================
-# ✅ 5) KOHTEIDEN LISTAUS (hakutoimintoa varten)
-# ===========================================================
+# ==========================================================
+#  5) KOHDELISTA (HAKU)
+# ==========================================================
 
 @app.get("/list-kohteet")
 async def list_kohteet():
-    """
-    Palauttaa kaikki kohteet:
-    /kohteet/<kohde_id>/
-    """
-
     resp = s3.list_objects_v2(
         Bucket=R2_BUCKET,
         Prefix="kohteet/",
         Delimiter="/"
     )
 
-    items = []
+    out = []
     if "CommonPrefixes" in resp:
         for p in resp["CommonPrefixes"]:
             folder = p["Prefix"].replace("kohteet/", "").replace("/", "")
-            items.append(folder)
+            out.append(folder)
 
-    return {"kohteet": items}
+    return {"kohteet": out}
 
-# ===========================================================
-# ✅ 6) HUONEISTOPOHJAT (OPTIONAALINEN, TULEVA OMINAISUUS)
-# ===========================================================
+# ==========================================================
+#  6) HUONEISTOPOHJAT (VALINNAINEN)
+# ==========================================================
 
 @app.post("/save-template")
 async def save_template(body: dict = Body(...)):
@@ -227,118 +229,189 @@ async def list_templates(kohde_id: str):
 @app.get("/get-template/{kohde_id}/{nimi}")
 async def get_template(kohde_id: str, nimi: str):
     key = f"kohteet/{kohde_id}/pohjat/{nimi}.json"
-    data = r2_get_json(key)
-    return data or {}
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.utils import ImageReader
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-import io
+    return r2_get_json(key) or {}
+
+# ==========================================================
+#  7) PDF RAPORTTI — /generate-report/<kohde_id>
+# ==========================================================
 
 @app.post("/generate-report/{kohde_id}")
 async def generate_report(kohde_id: str):
 
-    # 1. Lataa metadata.json R2:sta
+    # 1. METADATA
     meta_key = f"kohteet/{kohde_id}/metadata.json"
     metadata = r2_get_json(meta_key)
     if not metadata:
-        return {"error": "metadata.json puuttuu"}
+        return {"error": "metadata missing"}
 
-    # 2. Lataa kaikki huoneistot
-    huoneistot = metadata.get("huoneistot", [])
+    tilaaja = metadata["tilaaja"]
+    kohde = metadata["kohde"]
+    huoneistot = metadata["huoneistot"]
 
-    huoneistodata = {}
+    # 2. HUONEISTODATA
+    apt_data = {}
     for apt in huoneistot:
         slug = slugify(apt)
         key = f"kohteet/{kohde_id}/huoneistot/{slug}/data.json"
-        data = r2_get_json(key)
-        huoneistodata[apt] = data or {}
+        apt_data[apt] = r2_get_json(key) or {}
 
-    # 3. Lataa logo R2:sta jos halutaan
-    # Logo on ladattu frontista → voit myös lukea sen paikallisena tiedostona
-    # Tässä käytämme paikallista logoa (jolle teen slotin)
-    LOGO_PATH = "rakmentor-logo.png"  # Lataa tämä viereen
-    logo = ImageReader(LOGO_PATH)
-
-    # 4. Valmistele PDF canvas
-    buffer = io.BytesIO()
-    pdf = canvas.Canvas(buffer, pagesize=A4)
-
-    # Rekisteröi Arial fontit
+    # 3. REKISTERÖI ARIAL-FONTIT
     pdfmetrics.registerFont(TTFont("Arial", "Arial.ttf"))
     pdfmetrics.registerFont(TTFont("Arial-Bold", "ArialBold.ttf"))
 
-    # ============  KANSI  ================
-    pdf.setFont("Arial-Bold", 24)
-    pdf.drawString(50, 780, "Kuntoarvioraportti")
+    # 4. CANVAS
+    buff = io.BytesIO()
+    pdf = canvas.Canvas(buff, pagesize=A4)
+    w, h = A4
 
-    # Kohteen tiedot
-    pdf.setFont("Arial", 14)
-    pdf.drawString(50, 750, metadata["kohde"]["nimi"])
-    pdf.drawString(50, 730, metadata["kohde"]["osoite"])
-    pdf.drawString(50, 710, f"{metadata['kohde']['postinumero']} {metadata['kohde']['postitoimipaikka']}")
+    # =======================================================
+    #   PAGE 1 — KANSI
+    # =======================================================
 
-    # Tarkastuspäivä
-    pdf.drawString(50, 680, f"Tarkastuspäivä: {metadata['kohde']['paiva']}")
-
-    # Tilaaja
-    tilaaja = metadata["tilaaja"]
-    pdf.drawString(50, 650, f"Tilaaja: {tilaaja['etunimi']} {tilaaja['sukunimi']}")
-
-    # Logo oikeaan yläkulmaan
-    pdf.drawImage(logo, 400, 730, width=150, height=40, mask="auto")
-
-    # Kansikuva
+    # Logo vasemmalle
     try:
-        kansikuva_bytes = s3.get_object(
-            Bucket=R2_BUCKET,
-            Key=f"kohteet/{kohde_id}/kansikuva.jpg"
-        )["Body"].read()
-
-        kansi_img = ImageReader(io.BytesIO(kansikuva_bytes))
-        pdf.drawImage(kansi_img, 50, 400, width=500, height=220)
+        logo = ImageReader("rakmentor-logo.png")
+        pdf.drawImage(logo, 40, h - 120, width=180, height=50, mask="auto")
     except:
         pass
 
+    pdf.setFont("Arial-Bold", 26)
+    pdf.drawString(40, h - 180, "Kuntoarvioraportti")
+
+    pdf.setFont("Arial-Bold", 20)
+    pdf.drawString(40, h - 220, kohde["nimi"])
+
+    pdf.setFont("Arial", 14)
+    pdf.drawString(40, h - 245, kohde["osoite"])
+    pdf.drawString(40, h - 265, f"{kohde['postinumero']} {kohde['postitoimipaikka']}")
+    pdf.drawString(40, h - 295, f"Tarkastuspäivä: {kohde['paiva']}")
+    pdf.drawString(40, h - 315, f"Tarkastaja: {kohde['tarkastaja']}")
+
+    # Kansikuva
+    try:
+        img_bytes = s3.get_object(
+            Bucket=R2_BUCKET,
+            Key=f"kohteet/{kohde_id}/kansikuva.jpg"
+        )["Body"].read()
+        img = ImageReader(io.BytesIO(img_bytes))
+        pdf.drawImage(img, 40, h - 580, width=500, height=260)
+    except:
+        pass
+
+    # Footer
+    pdf.setFont("Arial", 10)
+    pdf.drawString(
+        40, 30,
+        "Rakmentor Oy | 010 739 8770 | asiakaspalvelu@rakmentor.fi | rakmentor.fi"
+    )
+
     pdf.showPage()
 
-    # ============ HUONEISTOT ================
+    # =======================================================
+    #  PAGE 2 — PERUSTIEDOT
+    # =======================================================
+
+    pdf.setFont("Arial-Bold", 22)
+    pdf.drawString(40, h - 60, "Perustiedot")
+
+    y = h - 120
+
+    pdf.setFont("Arial-Bold", 14)
+    pdf.drawString(40, y, "Tilaajan tiedot:")
+    y -= 25
+    pdf.setFont("Arial", 12)
+
+    for field in [
+        f"{tilaaja['etunimi']} {tilaaja['sukunimi']}",
+        tilaaja["yritys"],
+        tilaaja["osoite"],
+        f"{tilaaja['postinumero']} {tilaaja['postitoimipaikka']}",
+        tilaaja["sahkoposti"],
+        tilaaja["puhelin"]
+    ]:
+        pdf.drawString(40, y, field)
+        y -= 18
+
+    pdf.showPage()
+
+    # =======================================================
+    #  PAGE 3 — RAPPU & HUONEISTOLISTA
+    # =======================================================
+
+    pdf.setFont("Arial-Bold", 22)
+    pdf.drawString(40, h - 60, "Raput ja huoneistot")
+
+    y = h - 120
+
+    rappu_map = {}
+    import re
     for apt in huoneistot:
+        m = re.match(r"([^0-9]+)", apt)
+        rappu = m.group(1).strip() if m else "Rappu"
+        rappu_map.setdefault(rappu, []).append(apt)
+
+    for rappu, asunnot in rappu_map.items():
+        pdf.setFont("Arial-Bold", 14)
+        pdf.drawString(40, y, rappu)
+        y -= 25
+
+        pdf.setFont("Arial", 12)
+        for a in asunnot:
+            pdf.drawString(60, y, a)
+            y -= 18
+
+            if y < 60:
+                pdf.showPage()
+                y = h - 60
+
+    pdf.showPage()
+
+    # =======================================================
+    #  HUONEISTO SIVUT
+    # =======================================================
+
+    for apt in huoneistot:
+        slug = slugify(apt)
+        data = apt_data.get(apt, {})
+
         pdf.setFont("Arial-Bold", 22)
-        pdf.drawString(50, 800, f"Huoneisto {apt}")
+        pdf.drawString(40, h - 60, f"Huoneisto {apt}")
 
-        data = huoneistodata.get(apt, {})
-
-        y = 760
+        y = h - 120
         pdf.setFont("Arial", 12)
 
         for k, v in data.items():
             if isinstance(v, str):
-                pdf.drawString(50, y, f"{k}: {v}")
-                y -= 20
+                pdf.drawString(40, y, f"{k}: {v}")
+                y -= 18
+
+                if y < 80:
+                    pdf.showPage()
+                    y = h - 60
 
         # Kuvat
-        slug = slugify(apt)
-        for idx in [1,2]:
+        for idx in [1, 2]:
             try:
                 img_bytes = s3.get_object(
                     Bucket=R2_BUCKET,
                     Key=f"kohteet/{kohde_id}/huoneistot/{slug}/kuva{idx}.jpg"
                 )["Body"].read()
-                rimg = ImageReader(io.BytesIO(img_bytes))
-                pdf.drawImage(rimg, 50 + ((idx-1)*260), 450, width=250, height=250)
+
+                img = ImageReader(io.BytesIO(img_bytes))
+                x = 40 + (idx - 1) * 260
+                pdf.drawImage(img, x, 300, width=250, height=250)
             except:
                 pass
 
         pdf.showPage()
 
-    # 5. Sulje PDF
+    # =======================================================
+    #  SAVE PDF → R2
+    # =======================================================
+
     pdf.save()
+    pdf_bytes = buff.getvalue()
 
-    pdf_bytes = buffer.getvalue()
-
-    # 6. Tallenna PDF R2:een
     r2_key = f"kohteet/{kohde_id}/raportti.pdf"
 
     s3.put_object(
@@ -348,7 +421,11 @@ async def generate_report(kohde_id: str):
         ContentType="application/pdf"
     )
 
-    # 7. Palauta URL frontendiin
-    pdf_url = f"{PUBLIC_URL}/{r2_key}"
+    url = f"{PUBLIC_URL}/{r2_key}"
 
-    return {"status": "ok", "url": pdf_url}
+    return {"status": "ok", "url": url}
+
+###############################################################################
+# END OF FILE
+###############################################################################
+``
