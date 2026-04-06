@@ -182,19 +182,29 @@ async def upload_image(
 
 @app.get("/list-kohteet")
 async def list_kohteet():
+    # Hae kaikki objektit prefixillä "kohteet/"
     resp = s3.list_objects_v2(
         Bucket=R2_BUCKET,
-        Prefix="kohteet/",
-        Delimiter="/"
+        Prefix="kohteet/"
     )
 
-    out = []
-    if "CommonPrefixes" in resp:
-        for p in resp["CommonPrefixes"]:
-            folder = p["Prefix"].replace("kohteet/", "").replace("/", "")
-            out.append(folder)
+    kohteet = set()
 
-    return {"kohteet": out}
+    if "Contents" in resp:
+        for obj in resp["Contents"]:
+            key = obj["Key"]
+
+            # Erottaa kohde_id ensimmäisestä polkuelementistä
+            # esim:
+            #   kohteet/asoy-merikotka-2026-04-05/metadata.json
+            # → asoy-merikotka-2026-04-05
+            parts = key.split("/")
+            if len(parts) >= 3:
+                kohde = parts[1]
+                if kohde:
+                    kohteet.add(kohde)
+
+    return {"kohteet": sorted(kohteet)}
 
 # ==========================================================
 #  6) HUONEISTOPOHJAT (VALINNAINEN)
