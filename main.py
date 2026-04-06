@@ -229,3 +229,126 @@ async def get_template(kohde_id: str, nimi: str):
     key = f"kohteet/{kohde_id}/pohjat/{nimi}.json"
     data = r2_get_json(key)
     return data or {}
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.utils import ImageReader
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+import io
+
+@app.post("/generate-report/{kohde_id}")
+async def generate_report(kohde_id: str):
+
+    # 1. Lataa metadata.json R2:sta
+    meta_key = f"kohteet/{kohde_id}/metadata.json"
+    metadata = r2_get_json(meta_key)
+    if not metadata:
+        return {"error": "metadata.json puuttuu"}
+
+    # 2. Lataa kaikki huoneistot
+    huoneistot = metadata.get("huoneistot", [])
+
+    huoneistodata = {}
+    for apt in huoneistot:
+        slug = slugify(apt)
+        key = f"kohteet/{kohde_id}/huoneistot/{slug}/data.json"
+        data = r2_get_json(key)
+        huoneistodata[apt] = data or {}
+
+    # 3. Lataa logo R2:sta jos halutaan
+    # Logo on ladattu frontista → voit myös lukea sen paikallisena tiedostona
+    # Tässä käytämme paikallista logoa (jolle teen slotin)
+    LOGO_PATH = "rakmentor-logo.png"  # Lataa tämä viereen
+    logo = ImageReader(LOGO_PATH)
+
+    # 4. Valmistele PDF canvas
+    buffer = io.BytesIO()
+    pdf = canvas.Canvas(buffer, pagesize=A4)
+
+    # Rekisteröi Arial fontit
+    pdfmetrics.registerFont(TTFont("Arial", "Arial.ttf"))
+    pdfmetrics.registerFont(TTFont("Arial-Bold", "ArialBold.ttf"))
+
+    # ============  KANSI  ================
+    pdf.setFont("Arial-Bold", 24)
+    pdf.drawString(50, 780, "Kuntoarvioraportti")
+
+    # Kohteen tiedot
+    pdf.setFont("Arial", 14)
+    pdf.drawString(50, 750, metadata["kohde"]["nimi"])
+    pdf.drawString(50, 730, metadata["kohde"]["osoite"])
+    pdf.drawString(50, 710, f"{metadata['kohde']['postinumero']} {metadata['kohde']['postitoimipaikka']}")
+
+    # Tarkastuspäivä
+    pdf.drawString(50, 680, f"Tarkastuspäivä: {metadata['kohde']['paiva']}")
+
+    # Tilaaja
+    tilaaja = metadata["tilaaja"]
+    pdf.drawString(50, 650, f"Tilaaja: {tilaaja['etunimi']} {tilaaja['sukunimi']}")
+
+    # Logo oikeaan yläkulmaan
+    pdf.drawImage(logo, 400, 730, width=150, height=40, mask="auto")
+
+    # Kansikuva
+    try:
+        kansikuva_bytes = s3.get_object(
+            Bucket=R2_BUCKET,
+            Key=f"kohteet/{kohde_id}/kansikuva.jpg"
+        )["Body"].read()
+
+        kansi_img = ImageReader(io.BytesIO(kansikuva_bytes))
+        pdf.drawImage(kansi_img, 50, 400, width=500, height=220)
+    except:
+        pass
+
+    pdf.showPage()
+
+    # ============ HUONEISTOT ================
+    for apt in huoneistot:
+        pdf.setFont("Arial-Bold", 22)
+        pdf.drawString(50, 800, f"Huoneisto {apt}")
+
+        data = huoneistodata.get(apt, {})
+
+        y = 760
+        pdf.setFont("Arial", 12)
+
+        for k, v in data.items():
+            if isinstance(v, str):
+                pdf.drawString(50, y, f"{k}: {v}")
+                y -= 20
+
+        # Kuvat
+        slug = slugify(apt)
+        for idx in [1,2]:
+            try:
+                img_bytes = s3.get_object(
+                    Bucket=R2_BUCKET,
+                    Key=f"kohteet/{kohde_id}/huoneistot/{slug}/kuva{idx}.jpg"
+                )["Body"].read()
+                rimg = ImageReader(io.BytesIO(img_bytes))
+                pdf.drawImage(rimg, 50 + ((idx-1)*260), 450, width=250, height=250)
+            except:
+                pass
+
+        pdf.showPage()
+
+    # 5. Sulje PDF
+    pdf.save()
+
+    pdf_bytes = buffer.getvalue()
+
+    # 6. Tallenna PDF R2:een
+    r2_key = f"kohteet/{kohde_id}/raportti.pdf"
+
+    s3.put_object(
+        Bucket=R2_BUCKET,
+        Key=r2_key,
+        Body=pdf_bytes,
+        ContentType="application/pdf"
+    )
+
+    # 7. Palauta URL frontendiin
+    pdf_url = f"{PUBLIC_URL}/{r2_key}"
+
+    return {"status": "ok", "url": pdf_url}
