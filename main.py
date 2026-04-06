@@ -205,7 +205,7 @@ async def list_kohteet():
                     kohteet.add(kohde)
 
     return {"kohteet": sorted(kohteet)}
-
+    print("R2 Contents:", resp.get("Contents"))
 # ==========================================================
 #  6) HUONEISTOPOHJAT (VALINNAINEN)
 # ==========================================================
