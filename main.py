@@ -363,25 +363,24 @@ async def generate_report(kohde_id: str):
     except:
         pass
 
-        # ---- Blue Border (6 pt) OVER EVERYTHING ----
-    pdf.setLineWidth(6)
-    pdf.setStrokeColor(COLOR_BORDER)   # #C3D9E8
-    pdf.rect(3, 3, w - 6, h - 6, stroke=1, fill=0)
-
     # ---- Logo on top of Glacier shape (correct aspect ratio) ----
     try:
         logo = ImageReader("rakmentor-logo.png")
-        desired_w = 140
         pdf.drawImage(
             logo,
             30,
-            h - HEADER_HEIGHT + 5,
-            width=desired_w,
-            preserveAspectRatio=True,
-            mask="auto"
+        h - HEADER_HEIGHT + 8,   # ✅ sisällä, EI yläpuolella
+        width=140,
+        height=HEADER_HEIGHT - 12,  # ✅ pakota korkeus
+        preserveAspectRatio=True,
+        mask="auto"
         )
     except:
         pass
+    # ---- Blue Border (6 pt) OVER EVERYTHING ----
+    pdf.setLineWidth(6)
+    pdf.setStrokeColor(COLOR_BORDER)   # #C3D9E8
+    pdf.rect(3, 3, w - 6, h - 6, stroke=1, fill=0)
 
     # ---- Title Block ----
     pdf.setFillColor(COLOR_TEXT)
