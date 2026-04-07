@@ -429,6 +429,15 @@ async def generate_report(kohde_id: str):
     # ======================================================
     # ==========  PAGE 2 — PERUSTIEDOT  =====================
     # ======================================================
+
+    # Draw Stone header + logo + border
+    draw_stone_header(pdf, w, h)
+
+    pdf.setFillColor(COLOR_TEXT)
+    pdf.setFont("Arial-Bold", 22)
+    pdf.drawString(40, h - HEADER_HEIGHT - 40, "Perustiedot")
+
+    current_page = 2
     try:
         logo = ImageReader("rakmentor-logo.png")
         pdf.drawImage(
@@ -442,14 +451,6 @@ async def generate_report(kohde_id: str):
         )
     except:
         pass
-    # Draw Stone header + logo + border
-    draw_stone_header(pdf, w, h)
-
-    pdf.setFillColor(COLOR_TEXT)
-    pdf.setFont("Arial-Bold", 22)
-    pdf.drawString(40, h - HEADER_HEIGHT - 40, "Perustiedot")
-
-    current_page = 2
     # ======================================================
     #  TABLE DRAW FUNCTION (PTS STYLE)
     # ======================================================
