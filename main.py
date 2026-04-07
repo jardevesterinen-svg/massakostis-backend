@@ -368,9 +368,9 @@ async def generate_report(kohde_id: str):
         logo = ImageReader("rakmentor-logo.png")
         pdf.drawImage(
             logo,
-            30,
+            15,
         h - HEADER_HEIGHT + 8,   # ✅ sisällä, EI yläpuolella
-        height=HEADER_HEIGHT - 12,
+        height=HEADER_HEIGHT - 50,
         preserveAspectRatio=True,
         mask="auto"
         )
