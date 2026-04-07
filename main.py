@@ -357,7 +357,7 @@ async def generate_report(kohde_id: str):
             6,
             h - HEADER_HEIGHT,     # slightly above stone header overlap
             width=150
-            height=HEADER_HEIGHT + 6,
+            height=56,
             mask="auto"
         )
     except:
