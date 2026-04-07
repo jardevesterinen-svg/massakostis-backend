@@ -356,7 +356,7 @@ async def generate_report(kohde_id: str):
             glacier,
             0,
             h - HEADER_HEIGHT,     # slightly above stone header overlap
-            width=150,
+            width=220,
             height=HEADER_HEIGHT,
             mask="auto"
         )
