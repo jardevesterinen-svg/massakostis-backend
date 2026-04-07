@@ -355,7 +355,7 @@ async def generate_report(kohde_id: str):
         pdf.drawImage(
             glacier,
             6,
-            h - HEADER_HEIGHT - 12,     # slightly above stone header overlap
+            h - HEADER_HEIGHT - 14,     # slightly above stone header overlap
             width=160,
             height=58,
             mask="auto"
@@ -369,9 +369,9 @@ async def generate_report(kohde_id: str):
         pdf.drawImage(
         logo,
         30,
-        h - HEADER_HEIGHT + 4,   # ✅ sisällä, EI yläpuolella
+        h - HEADER_HEIGHT + 6,   # ✅ sisällä, EI yläpuolella
         width=140,
-        height=HEADER_HEIGHT - 20,  # ✅ pakota korkeus    
+        height=HEADER_HEIGHT - 28,  # ✅ pakota korkeus    
         preserveAspectRatio=True,
         mask="auto"
         )
