@@ -289,14 +289,14 @@ def draw_stone_header(pdf, w, h):
     # --- Logo (correct aspect ratio)
     try:
         logo = ImageReader("rakmentor-logo.png")
-        desired_w = 120
         pdf.drawImage(
-            logo,
-            25,                    # left margin
-            h - HEADER_HEIGHT + 10,
-            width=desired_w,
-            preserveAspectRatio=True,
-            mask="auto"
+        logo,
+        14,
+        h - HEADER_HEIGHT + 12,   # ✅ sisällä, EI yläpuolella
+        width=140,
+        height=HEADER_HEIGHT - 30,  # ✅ pakota korkeus    
+        preserveAspectRatio=True,
+        mask="auto"
         )
     except:
         pass
