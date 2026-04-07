@@ -345,7 +345,7 @@ async def generate_report(kohde_id: str):
     # ======================================================
 
     # ---- Stone Header (full width, 17 mm ≈ 48 pt) ----
-    HEADER_HEIGHT = 48
+    HEADER_HEIGHT = 50
     pdf.setFillColor(COLOR_HEADER)   # #ECECE7 (Stone Lighter)
     pdf.rect(0, h - HEADER_HEIGHT, w, HEADER_HEIGHT, fill=1, stroke=0)
 
@@ -354,8 +354,8 @@ async def generate_report(kohde_id: str):
         glacier = ImageReader("corner-small-left-glacier.png")
         pdf.drawImage(
             glacier,
-            0,
-            h - HEADER_HEIGHT + 6,     # slightly above stone header overlap
+            6,
+            h - HEADER_HEIGHT,     # slightly above stone header overlap
             width=150
             height=HEADER_HEIGHT + 6,
             mask="auto"
