@@ -355,9 +355,9 @@ async def generate_report(kohde_id: str):
         pdf.drawImage(
             glacier,
             0,
-            h - HEADER_HEIGHT - 40,     # slightly above stone header overlap
-            width=240,
-            height=90,
+            h - HEADER_HEIGHT - 24,     # slightly above stone header overlap
+            width=165,
+            height=62,
             mask="auto"
         )
     except:
