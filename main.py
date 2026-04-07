@@ -357,7 +357,7 @@ async def generate_report(kohde_id: str):
             6,
             h - HEADER_HEIGHT - 15,     # slightly above stone header overlap
             width=160,
-            height=58,
+            height=59,
             mask="auto"
         )
     except:
@@ -368,8 +368,8 @@ async def generate_report(kohde_id: str):
         logo = ImageReader("rakmentor-logo.png")
         pdf.drawImage(
         logo,
-        24,
-        h - HEADER_HEIGHT + 6,   # ✅ sisällä, EI yläpuolella
+        14,
+        h - HEADER_HEIGHT + 10,   # ✅ sisällä, EI yläpuolella
         width=140,
         height=HEADER_HEIGHT - 32,  # ✅ pakota korkeus    
         preserveAspectRatio=True,
