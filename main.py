@@ -370,8 +370,7 @@ async def generate_report(kohde_id: str):
             logo,
             30,
         h - HEADER_HEIGHT + 8,   # ✅ sisällä, EI yläpuolella
-        width=140,
-        height=HEADER_HEIGHT - 12,  # ✅ pakota korkeus
+        width=100,
         preserveAspectRatio=True,
         mask="auto"
         )
