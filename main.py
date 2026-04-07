@@ -86,37 +86,6 @@ def r2_get_json(key: str):
         return None
 
 # ==========================================================
-#  PDF HEADER HELPERS
-# ==========================================================
-
-def draw_inner_page_header(pdf, w, h):
-  
-    # Stone header
-    HEADER_HEIGHT = 50
-    pdf.setFillColor(COLOR_HEADER)   # #ECECE7 (Stone Lighter)
-    pdf.rect(0, h - HEADER_HEIGHT, w, HEADER_HEIGHT, fill=1, stroke=0)
-
-    # Logo inside stone header
-    try:
-        logo = ImageReader("rakmentor-logo.png")
-        pdf.drawImage(
-        logo,
-        14,
-        h - HEADER_HEIGHT + 12,   # ✅ sisällä, EI yläpuolella
-        width=140,
-        height=HEADER_HEIGHT - 30,  # ✅ pakota korkeus    
-        preserveAspectRatio=True,
-        mask="auto"
-        )
-    except:
-        pass
-
-    # Blue border last
-    pdf.setLineWidth(6)
-    pdf.setStrokeColor(COLOR_BORDER)
-    pdf.rect(3, 3, w - 6, h - 6, stroke=1, fill=0)
-
-# ==========================================================
 #  1) SAVE METADATA
 # ==========================================================
 
@@ -461,7 +430,7 @@ async def generate_report(kohde_id: str):
     # ======================================================
 
     # Draw Stone header + logo + border
-    draw_inner_page_header(pdf, w, h)
+    draw_stone_header(pdf, w, h)
 
     pdf.setFillColor(COLOR_TEXT)
     pdf.setFont("Arial-Bold", 22)
@@ -563,7 +532,7 @@ async def generate_report(kohde_id: str):
         data = apt_data.get(apt, {})
 
         # ---- Stone Header + Logo + 6 pt Border ----
-        draw_inner_page_header(pdf, w, h)
+        draw_stone_header(pdf, w, h)
 
         # ---- Huoneiston Otsikko ----
         pdf.setFont("Arial-Bold", 22)
