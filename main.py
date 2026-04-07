@@ -369,9 +369,9 @@ async def generate_report(kohde_id: str):
         pdf.drawImage(
         logo,
         14,
-        h - HEADER_HEIGHT + 10,   # ✅ sisällä, EI yläpuolella
+        h - HEADER_HEIGHT + 12,   # ✅ sisällä, EI yläpuolella
         width=140,
-        height=HEADER_HEIGHT - 32,  # ✅ pakota korkeus    
+        height=HEADER_HEIGHT - 30,  # ✅ pakota korkeus    
         preserveAspectRatio=True,
         mask="auto"
         )
@@ -429,7 +429,19 @@ async def generate_report(kohde_id: str):
     # ======================================================
     # ==========  PAGE 2 — PERUSTIEDOT  =====================
     # ======================================================
-
+    try:
+        logo = ImageReader("rakmentor-logo.png")
+        pdf.drawImage(
+        logo,
+        14,
+        h - HEADER_HEIGHT + 12,   # ✅ sisällä, EI yläpuolella
+        width=140,
+        height=HEADER_HEIGHT - 30,  # ✅ pakota korkeus    
+        preserveAspectRatio=True,
+        mask="auto"
+        )
+    except:
+        pass
     # Draw Stone header + logo + border
     draw_stone_header(pdf, w, h)
 
