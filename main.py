@@ -356,8 +356,8 @@ async def generate_report(kohde_id: str):
             glacier,
             6,
             h - HEADER_HEIGHT - 12,     # slightly above stone header overlap
-            width=150,
-            height=50,
+            width=160,
+            height=58,
             mask="auto"
         )
     except:
@@ -371,7 +371,7 @@ async def generate_report(kohde_id: str):
         30,
         h - HEADER_HEIGHT + 4,   # ✅ sisällä, EI yläpuolella
         width=140,
-        height=HEADER_HEIGHT - 16,  # ✅ pakota korkeus    
+        height=HEADER_HEIGHT - 20,  # ✅ pakota korkeus    
         preserveAspectRatio=True,
         mask="auto"
         )
