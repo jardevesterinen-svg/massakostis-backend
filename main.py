@@ -27,7 +27,7 @@ R2_BUCKET = os.getenv("R2_BUCKET_NAME")
 R2_ACCESS_KEY_ID = os.getenv("R2_ACCESS_KEY_ID")
 R2_SECRET_ACCESS_KEY = os.getenv("R2_SECRET_ACCESS_KEY")
 R2_ENDPOINT = os.getenv("R2_ENDPOINT")
-
+HEADER_HEIGHT = 48
 PUBLIC_URL = "https://pub-9f421e06dc9f4bd49ae0adcf5690c438.r2.dev"
 
 # ==========================================================
@@ -280,8 +280,7 @@ async def pdf_options(kohde_id: str):
 # ==========================================================
 
 def draw_stone_header(pdf, w, h):
-    HEADER_HEIGHT = 48  # 17 mm ≈ 48.19 pt → rounded
-
+    
     # --- Stone background (full width)
     pdf.setFillColor(COLOR_HEADER)
     pdf.rect(0, h - HEADER_HEIGHT, w, HEADER_HEIGHT, fill=1, stroke=0)
@@ -344,7 +343,7 @@ async def generate_report(kohde_id: str):
     # ======================================================
 
     # ---- Stone Header (full width, 17 mm ≈ 48 pt) ----
-    HEADER_HEIGHT = 50
+    
     pdf.setFillColor(COLOR_HEADER)   # #ECECE7 (Stone Lighter)
     pdf.rect(0, h - HEADER_HEIGHT, w, HEADER_HEIGHT, fill=1, stroke=0)
 
