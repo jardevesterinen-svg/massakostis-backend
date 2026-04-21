@@ -413,7 +413,19 @@ async def generate_report(kohde_id: str):
         )["Body"].read()
 
         img = ImageReader(io.BytesIO(img_bytes))
-        pdf.drawImage(img, 40, h - 550, width=500, height=260)
+        orig_w, orig_h = img.getSize()
+
+        target_w = 500
+        target_h = target_w * orig_h / orig_w
+        
+        pdf.drawImage(
+            img,
+            40,
+            h - 300 - target_h,  # siisti sijainti
+            width=target_w,
+            height=target_h,
+            mask="auto"
+        )
     except:
         pass
 
@@ -582,23 +594,30 @@ async def generate_report(kohde_id: str):
 
         # ---- Render images ----
         if img1 and img2:
-            pdf.drawImage(img1, 40, y_pointer - img_h, width=img_w,
-                          height=img_h, mask="auto")
-            pdf.drawImage(img2, 40 + img_w + gap, y_pointer - img_h,
-                          width=img_w, height=img_h, mask="auto")
-            y_pointer -= (img_h + 50)
+MAX_IMG_W = (w - 40*2 - 20) / 2  # kaksi kuvaa + väli
+y_img = y_pointer
 
-        elif img1 and not img2:
-            center_x = (w - img_w) / 2
-            pdf.drawImage(img1, center_x, y_pointer - img_h,
-                          width=img_w, height=img_h, mask="auto")
-            y_pointer -= (img_h + 50)
+def draw_scaled_image(img, x, y, max_w):
+    orig_w, orig_h = img.getSize()
+    scale = max_w / orig_w
+    new_w = max_w
+    new_h = orig_h * scale
+    pdf.drawImage(img, x, y - new_h, width=new_w, height=new_h, mask="auto")
+    return new_h
 
-        elif img2 and not img1:
-            center_x = (w - img_w) / 2
-            pdf.drawImage(img2, center_x, y_pointer - img_h,
-                          width=img_w, height=img_h, mask="auto")
-            y_pointer -= (img_h + 50)
+
+        if img1 and img2:
+            h1 = draw_scaled_image(img1, 40, y_img, MAX_IMG_W)
+            h2 = draw_scaled_image(img2, 40 + MAX_IMG_W + 20, y_img, MAX_IMG_W)
+            y_pointer -= max(h1, h2) + 30
+        
+        elif img1:
+            h1 = draw_scaled_image(img1, 40, y_img, MAX_IMG_W*2 + 20)
+            y_pointer -= h1 + 30
+        
+        elif img2:
+            h2 = draw_scaled_image(img2, 40, y_img, MAX_IMG_W*2 + 20)
+            y_pointer -= h2 + 30
 
         else:
             y_pointer -= 20
