@@ -608,7 +608,7 @@ async def generate_report(kohde_id: str):
         if img1 and img2:
             h1 = draw_scaled_image(pdf, img1, 40, y_img, MAX_IMG_W)
             h2 = draw_scaled_image(pdf, img2, 40 + MAX_IMG_W + 20, y_img, MAX_IMG_W)
-            y_pointer -= max(h1, h2) + 30
+            y_pointer -= max(h1, h2) + 10
         
         elif img1:
             h1 = draw_scaled_image(pdf, img1, 40, y_img, MAX_IMG_W*2 + 20)
