@@ -532,7 +532,51 @@ async def generate_report(kohde_id: str):
         data = apt_data.get(apt, {})
 
         # ---- Stone Header + Logo + 6 pt Border ----
-        draw_stone_header(pdf, w, h)
+        def draw_apartment_header(pdf, w, h, *,
+                          logo_path,
+                          huoneisto,
+                          tarkastuspaiva,
+                          osoite,
+                          sivunumero):
+    HEADER_HEIGHT = 40  # pt
+
+    # --- Vaalea erotinviiva headerin alle ---
+    pdf.setStrokeColorRGB(0.8, 0.8, 0.8)
+    pdf.setLineWidth(0.5)
+    pdf.line(40, h - HEADER_HEIGHT, w - 40, h - HEADER_HEIGHT)
+
+    # --- Logo vasemmalle ---
+    try:
+        pdf.drawImage(
+            logo_path,
+            40,
+            h - HEADER_HEIGHT + 6,
+            width=90,
+            height=26,
+            preserveAspectRatio=True,
+            mask="auto"
+        )
+    except:
+        pass
+
+    pdf.setFont("Helvetica", 9)
+    pdf.setFillColorRGB(0, 0, 0)
+
+    # === OIKEAN REUNAN TEKSTIT ===
+
+    info_x = w - 120   # oikean reunan infosarakkeen x
+    page_x = w - 40    # sivunumeron ÄÄRIOIKEA
+
+    y = h - 14
+    pdf.drawRightString(info_x, y, f"Huoneisto {huoneisto}")
+    y -= 11
+    pdf.drawRightString(info_x, y, f"Tarkastuspäivä: {tarkastuspaiva}")
+    y -= 11
+    pdf.drawRightString(info_x, y, osoite)
+
+    # --- Sivunumero erikseen aivan oikealle ---
+    pdf.drawRightString(page_x, h - 14, f"Sivu {sivunumero}")
+
 
         # ---- Huoneiston Otsikko ----
         pdf.setFont("Arial-Bold", 22)
