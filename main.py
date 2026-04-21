@@ -539,33 +539,26 @@ async def generate_report(kohde_id: str):
         pdf.setFillColor(COLOR_TEXT)
         pdf.drawString(40, h - HEADER_HEIGHT - 40, f"Huoneisto {apt}")
     
-    # ---- Headerin oikean reunan lisätiedot ----
-    pdf.setFont("Arial", 9)
-    pdf.setFillColor(COLOR_TEXT)
-    
-    right_x = w - 40
-    y = h - 18
-    
-    pdf.drawRightString(right_x, y, f"Huoneisto {apt}")
-    y -= 11
-    pdf.drawRightString(right_x, y, f"Tarkastuspäivä: {kohde['paiva']}")
-    y -= 11
-    pdf.drawRightString(
-        right_x,
-        y,
-        f"{kohde['osoite']}, {kohde['postitoimipaikka']}"
-    )
-    
-    # Sivunumero aivan oikeaan yläkulmaan
-    pdf.drawRightString(right_x, h - 10, f"Sivu {current_page}")
-
-
-        # ---- Huoneiston Otsikko ----
-        pdf.setFont("Arial-Bold", 22)
+        # ---- Headerin oikean reunan lisätiedot ----
+        pdf.setFont("Arial", 9)
         pdf.setFillColor(COLOR_TEXT)
-        pdf.drawString(40, h - HEADER_HEIGHT - 40, f"Huoneisto {apt}")
+        
+        right_x = w - 40
+        y = h - 18
+        
+        pdf.drawRightString(right_x, y, f"Huoneisto {apt}")
+        y -= 11
+        pdf.drawRightString(right_x, y, f"Tarkastuspäivä: {kohde['paiva']}")
+        y -= 11
+        pdf.drawRightString(
+            right_x,
+            y,
+            f"{kohde['osoite']}, {kohde['postitoimipaikka']}"
+        )
+        
+        # Sivunumero aivan oikeaan yläkulmaan
+        pdf.drawRightString(right_x, h - 10, f"Sivu {current_page}")
 
-        y_pointer = h - HEADER_HEIGHT - 110
 
         # ==================================================
         #  LOAD IMAGES (two side-by-side)
