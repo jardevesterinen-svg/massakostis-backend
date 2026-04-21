@@ -539,22 +539,24 @@ async def generate_report(kohde_id: str):
         # ---- Headerin oikean reunan lisätiedot ----
         pdf.setFont("Arial", 9)
         pdf.setFillColor(COLOR_TEXT)
-    
-        right_x = w - 40
+        
+        info_x = w - 120   # infosarakkeen oikea reuna
+        page_x = w - 40    # sivunumeron äärioikea
+        
         y = h - 18
-    
-        pdf.drawRightString(right_x, y, f"Huoneisto {apt}")
+        
+        pdf.drawRightString(info_x, y, f"Huoneisto {apt}")
         y -= 11
-        pdf.drawRightString(right_x, y, f"Tarkastuspäivä: {kohde['paiva']}")
+        pdf.drawRightString(info_x, y, f"Tarkastuspäivä: {kohde['paiva']}")
         y -= 11
         pdf.drawRightString(
-            right_x,
+            info_x,
             y,
             f"{kohde['osoite']}, {kohde['postitoimipaikka']}"
         )
-    
-        # Sivunumero
-        pdf.drawRightString(right_x, h - 10, f"Sivu {current_page}")
+        
+        # Sivunumero ERIKSEEN aivan oikealle
+        pdf.drawRightString(page_x, h - 10, f"Sivu {current_page}")
     
         # ---- Sisällön alku ----
         y_pointer = h - HEADER_HEIGHT - 110
