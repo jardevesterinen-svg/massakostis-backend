@@ -316,12 +316,13 @@ def draw_stone_header(pdf, w, h):
 async def generate_report(kohde_id: str):
     
     def draw_scaled_image(pdf, img, x, y, max_w):
-    orig_w, orig_h = img.getSize()
-    scale = max_w / orig_w
-    new_w = max_w
-    new_h = orig_h * scale
-    pdf.drawImage(img, x, y - new_h, width=new_w, height=new_h, mask="auto")
-    return new_h
+        orig_w, orig_h = img.getSize()
+        scale = max_w / orig_w
+        new_w = max_w
+        new_h = orig_h * scale
+        pdf.drawImage(img, x, y - new_h, width=new_w, height=new_h, mask="auto")
+        return new_h
+        
     # ---- LOAD METADATA ----
     meta_key = f"kohteet/{kohde_id}/metadata.json"
     metadata = r2_get_json(meta_key)
