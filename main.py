@@ -559,7 +559,7 @@ async def generate_report(kohde_id: str):
         pdf.drawRightString(page_x, h - 10, f"Sivu {current_page}")
     
         # ---- Sisällön alku ----
-        y_pointer = h - HEADER_HEIGHT - 110
+        y_pointer = h - HEADER_HEIGHT
     
         # (tähän kuvat, materiaalit, taulukko...)
     
