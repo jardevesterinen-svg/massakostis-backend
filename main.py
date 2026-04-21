@@ -314,7 +314,14 @@ def draw_stone_header(pdf, w, h):
 
 @app.post("/generate-report/{kohde_id}")
 async def generate_report(kohde_id: str):
-
+    
+    def draw_scaled_image(pdf, img, x, y, max_w):
+    orig_w, orig_h = img.getSize()
+    scale = max_w / orig_w
+    new_w = max_w
+    new_h = orig_h * scale
+    pdf.drawImage(img, x, y - new_h, width=new_w, height=new_h, mask="auto")
+    return new_h
     # ---- LOAD METADATA ----
     meta_key = f"kohteet/{kohde_id}/metadata.json"
     metadata = r2_get_json(meta_key)
@@ -593,32 +600,23 @@ async def generate_report(kohde_id: str):
         img2 = load_img(f"kohteet/{kohde_id}/huoneistot/{slug}/kuva2.jpg")
 
         # ---- Render images ----
+       
+        MAX_IMG_W = (w - 40*2 - 20) / 2
+        y_img = y_pointer
+        
         if img1 and img2:
-MAX_IMG_W = (w - 40*2 - 20) / 2  # kaksi kuvaa + väli
-y_img = y_pointer
-
-def draw_scaled_image(img, x, y, max_w):
-    orig_w, orig_h = img.getSize()
-    scale = max_w / orig_w
-    new_w = max_w
-    new_h = orig_h * scale
-    pdf.drawImage(img, x, y - new_h, width=new_w, height=new_h, mask="auto")
-    return new_h
-
-
-        if img1 and img2:
-            h1 = draw_scaled_image(img1, 40, y_img, MAX_IMG_W)
-            h2 = draw_scaled_image(img2, 40 + MAX_IMG_W + 20, y_img, MAX_IMG_W)
+            h1 = draw_scaled_image(pdf, img1, 40, y_img, MAX_IMG_W)
+            h2 = draw_scaled_image(pdf, img2, 40 + MAX_IMG_W + 20, y_img, MAX_IMG_W)
             y_pointer -= max(h1, h2) + 30
         
         elif img1:
-            h1 = draw_scaled_image(img1, 40, y_img, MAX_IMG_W*2 + 20)
+            h1 = draw_scaled_image(pdf, img1, 40, y_img, MAX_IMG_W*2 + 20)
             y_pointer -= h1 + 30
         
         elif img2:
-            h2 = draw_scaled_image(img2, 40, y_img, MAX_IMG_W*2 + 20)
+            h2 = draw_scaled_image(pdf, img2, 40, y_img, MAX_IMG_W*2 + 20)
             y_pointer -= h2 + 30
-
+        
         else:
             y_pointer -= 20
 
