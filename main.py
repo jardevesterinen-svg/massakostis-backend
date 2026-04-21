@@ -540,7 +540,7 @@ async def generate_report(kohde_id: str):
         pdf.setFont("Arial", 9)
         pdf.setFillColor(COLOR_TEXT)
         
-        info_x = w - 100   # infosarakkeen oikea reuna
+        info_x = w - 80   # infosarakkeen oikea reuna
         page_x = w - 40    # sivunumeron äärioikea
         
         y = h - 18
@@ -556,10 +556,10 @@ async def generate_report(kohde_id: str):
         )
         
         # Sivunumero ERIKSEEN aivan oikealle
-        pdf.drawRightString(page_x, h , f"Sivu {current_page}")
+        pdf.drawRightString(page_x, h + 10 , f"Sivu {current_page}")
     
         # ---- Sisällön alku ----
-        y_pointer = h - HEADER_HEIGHT + 20
+        y_pointer = h - HEADER_HEIGHT - 20
     
         # (tähän kuvat, materiaalit, taulukko...)
     
