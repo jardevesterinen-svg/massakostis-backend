@@ -579,7 +579,7 @@ async def generate_report(kohde_id: str):
         pdf.drawRightString(page_x, h + 10 , f"Sivu {current_page}")
     
         # ---- Sisällön alku ----
-        y_pointer = h - HEADER_HEIGHT + 20
+        y_pointer = h - HEADER_HEIGHT - 80
     
         # (tähän kuvat, materiaalit, taulukko...)
     
@@ -603,7 +603,7 @@ async def generate_report(kohde_id: str):
         # ---- Render images ----
        
         MAX_IMG_W = (w - 40*2 - 20) / 2
-        y_img = y_pointer - 30
+        y_img = y_pointer
         
         if img1 and img2:
             h1 = draw_scaled_image(pdf, img1, 40, y_img, MAX_IMG_W)
