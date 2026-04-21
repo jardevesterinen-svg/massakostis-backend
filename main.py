@@ -536,17 +536,13 @@ async def generate_report(kohde_id: str):
         # ---- Stone header + logo + border ----
         draw_stone_header(pdf, w, h)
     
-        pdf.setFont("Arial-Bold", 22)
-        pdf.setFillColor(COLOR_TEXT)
-        pdf.drawString(40, h - HEADER_HEIGHT - 40, f"Huoneisto {apt}")
-    
         # ---- Headerin oikean reunan lisätiedot ----
         pdf.setFont("Arial", 9)
         pdf.setFillColor(COLOR_TEXT)
-        
+    
         right_x = w - 40
         y = h - 18
-        
+    
         pdf.drawRightString(right_x, y, f"Huoneisto {apt}")
         y -= 11
         pdf.drawRightString(right_x, y, f"Tarkastuspäivä: {kohde['paiva']}")
@@ -556,10 +552,17 @@ async def generate_report(kohde_id: str):
             y,
             f"{kohde['osoite']}, {kohde['postitoimipaikka']}"
         )
-        
-        # Sivunumero aivan oikeaan yläkulmaan
+    
+        # Sivunumero
         pdf.drawRightString(right_x, h - 10, f"Sivu {current_page}")
-
+    
+        # ---- Sisällön alku ----
+        y_pointer = h - STONE_HEADER_HEIGHT - 110
+    
+        # (tähän kuvat, materiaalit, taulukko...)
+    
+        pdf.showPage()
+        current_page += 1
 
         # ==================================================
         #  LOAD IMAGES (two side-by-side)
