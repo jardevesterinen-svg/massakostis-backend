@@ -563,9 +563,6 @@ async def generate_report(kohde_id: str):
     
         # (tähän kuvat, materiaalit, taulukko...)
     
-        pdf.showPage()
-        current_page += 1
-
         # ==================================================
         #  LOAD IMAGES (two side-by-side)
         # ==================================================
