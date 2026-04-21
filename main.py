@@ -626,6 +626,74 @@ async def generate_report(kohde_id: str):
         # ==================================================
 
         rows = [["Huoneiston tiedot", ""]]
+        # ======================
+        # PINTARAKENTEIDEN MATERIAALIT
+        # ======================
+        
+        pdf.setFont("Arial-Bold", 14)
+        pdf.setFillColor(COLOR_TEXT)
+        pdf.drawString(40, y_pointer, "Pintarakenteiden materiaalit")
+        
+        y_pointer -= 20
+        
+        COL_GAP = 20
+        COL_W = (w - 40*2 - COL_GAP*2) / 3
+        
+        def draw_material_block(title, items, x, y):
+            pdf.setFont("Arial-Bold", 11)
+            pdf.drawString(x, y, title)
+            y -= 14
+        
+            pdf.setFont("Arial", 11)
+            for item in items:
+                pdf.drawString(x + 10, y, f"• {item}")
+                y -= 13
+        
+            return y
+        
+        # Pilko putket listaksi
+        vesiputket = [s.strip() for s in data.get("materiaalit_vesiputket", "").split(",") if s.strip()]
+        lampoputket = [s.strip() for s in data.get("materiaalit_lampoputket", "").split(",") if s.strip()]
+        
+        col1_y = draw_material_block(
+            "Seinien pintamateriaali",
+            [data.get("materiaalit_seinat_valinta", "–")],
+            40,
+            y_pointer
+        )
+        
+        col2_y = draw_material_block(
+            "Lattian pintamateriaali",
+            [data.get("materiaalit_lattia_valinta", "–")],
+            40 + COL_W + COL_GAP,
+            y_pointer
+        )
+        
+        col3_y = draw_material_block(
+            "Vesiputket",
+            vesiputket or ["–"],
+            40 + (COL_W + COL_GAP) * 2,
+            y_pointer
+        )
+        
+        y_pointer = min(col1_y, col2_y, col3_y) - 10
+        
+        # Toinen rivi
+        col1_y = draw_material_block(
+            "Katon pintamateriaali",
+            [data.get("materiaalit_katto_valinta", "–")],
+            40,
+            y_pointer
+        )
+        
+        col2_y = draw_material_block(
+            "Lämpöputket",
+            lampoputket or ["–"],
+            40 + COL_W + COL_GAP,
+            y_pointer
+        )
+        
+        y_pointer = min(col1_y, col2_y) - 20
 
         # Fixed order A:
         if "kuntoluokka" in data:
