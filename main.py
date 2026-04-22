@@ -28,11 +28,8 @@ R2_ACCESS_KEY_ID = os.getenv("R2_ACCESS_KEY_ID")
 R2_SECRET_ACCESS_KEY = os.getenv("R2_SECRET_ACCESS_KEY")
 R2_ENDPOINT = os.getenv("R2_ENDPOINT")
 HEADER_HEIGHT = 48
-IMAGES_TOP_Y = h - HEADER_HEIGHT - 20
 IMAGES_MAX_HEIGHT = 220
-MATERIALS_TOP_Y = IMAGES_TOP_Y - IMAGES_MAX_HEIGHT - 30
 MATERIALS_HEIGHT = 120
-TABLE_TOP_Y = MATERIALS_TOP_Y - MATERIALS_HEIGHT - 30
 PUBLIC_URL = "https://pub-9f421e06dc9f4bd49ae0adcf5690c438.r2.dev"
 
 # ==========================================================
@@ -359,14 +356,11 @@ async def generate_report(kohde_id: str):
     # ==========================
     
     HEADER_BOTTOM_Y = h - HEADER_HEIGHT
-    
+         
     IMAGES_TOP_Y = HEADER_BOTTOM_Y - 40
-    IMAGES_MAX_HEIGHT = 220
-    
     MATERIALS_TOP_Y = IMAGES_TOP_Y - IMAGES_MAX_HEIGHT - 30
-    MATERIALS_BLOCK_HEIGHT = 120
-    
-    TABLE_TOP_Y = MATERIALS_TOP_Y - MATERIALS_BLOCK_HEIGHT - 30
+    TABLE_TOP_Y = MATERIALS_TOP_Y - MATERIALS_HEIGHT - 30
+
     # ======================================================
     # =============  PAGE 1 — KANSILEHTI  ==================
     # ======================================================
