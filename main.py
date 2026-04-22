@@ -624,12 +624,8 @@ async def generate_report(kohde_id: str):
                     
         elif img2:
             draw_scaled_image(pdf, img2, 40, y_img, MAX_IMG_W*2 + 20)
-       
-        # ==================================================
-        #  HUONEISTON TIEDOT (PTS TABLE)
-        # ==================================================
-
-        rows = [["Huoneiston tiedot", ""]]
+      
+        
         # ======================
         # PINTARAKENTEIDEN MATERIAALIT
         # ======================
@@ -693,7 +689,12 @@ async def generate_report(kohde_id: str):
             40 + COL_W + COL_GAP,
             col1_y - 10
         )
-                   
+        
+        # ==================================================
+        #  HUONEISTON TIEDOT (PTS TABLE)
+        # ==================================================
+        
+        rows = [["Huoneiston tiedot", ""]]           
         draw_pts_table(pdf, 40, TABLE_TOP_Y, rows, col_widths, w)
 
         # Fixed order A:
