@@ -693,7 +693,7 @@ async def generate_report(kohde_id: str):
             40 + COL_W + COL_GAP,
             MAT_ROW2_Y
         )
-        
+        TABLE_START_Y = MAT_ROW2_Y - 50
         # ==================================================
         #  HUONEISTON TIEDOT (PTS TABLE)
         # ==================================================
@@ -742,7 +742,16 @@ async def generate_report(kohde_id: str):
             ])
         
         # ✅ PIIRRETÄÄN TAULUKKO VASTA TÄSSÄ
-        def draw_pts_table_3col(pdf, x, y, rows, col_widths, w):
+        
+        draw_pts_table_3col(
+            pdf,
+            40,
+            TABLE_START_Y,
+            rows,
+            col_widths,
+            w
+        )
+
             """
             Draws a 3-column PTS-style table:
             cols = [label, condition, notes]
