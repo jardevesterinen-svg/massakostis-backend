@@ -776,6 +776,26 @@ async def generate_report(kohde_id: str):
                 pdf.setFont("Arial-Bold" if is_header else "Arial", 11)
         
                 col_x = x
+                from reportlab.pdfbase.pdfmetrics import stringWidth
+
+                def wrap_text(text, font_name, font_size, max_width):
+                    words = text.split(" ")
+                    lines = []
+                    current = ""
+                
+                    for word in words:
+                        test = current + (" " if current else "") + word
+                        if stringWidth(test, font_name, font_size) <= max_width:
+                            current = test
+                        else:
+                            lines.append(current)
+                            current = word
+                
+                    if current:
+                        lines.append(current)
+                
+                    return lines
+
                 for i, cell in enumerate(row):
                     if i == 1 and not is_header:  # kuntoluokka-sarake
                         if cell == "3":
@@ -788,7 +808,23 @@ async def generate_report(kohde_id: str):
                             pdf.setFillColor(COLOR_TEXT)
                     else:
                         pdf.setFillColor(COLOR_TEXT)
-                
+                    if i == 2:  # Havainnot ja toimenpiteet
+                        lines = wrap_text(
+                            str(cell),
+                            "Arial",
+                            11,
+                            col_widths[i] - 12
+                        )
+                    
+                        text_y = cur_y - 15
+                        for line in lines:
+                            pdf.drawString(col_x + 6, text_y, line)
+                            text_y -= 13
+                    
+                        row_height = max(row_height, 13 * len(lines))
+                    else:
+                        pdf.drawString(col_x + 6, cur_y - 15, str(cell))
+                        
                     pdf.drawString(col_x + 6, cur_y - 15, str(cell))
                     col_x += col_widths[i]
         
