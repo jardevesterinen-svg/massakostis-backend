@@ -787,7 +787,14 @@ async def generate_report(kohde_id: str):
                 cur_y -= row_h
         
             return cur_y
-        
+            draw_pts_table_3col(
+                pdf,
+                40,
+                TABLE_START_Y,
+                rows,
+                col_widths,
+                w
+            )
         # ==================================================
         # FOOTER + PAGE NUMBER
         # ==================================================
