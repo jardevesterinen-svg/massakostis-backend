@@ -28,6 +28,11 @@ R2_ACCESS_KEY_ID = os.getenv("R2_ACCESS_KEY_ID")
 R2_SECRET_ACCESS_KEY = os.getenv("R2_SECRET_ACCESS_KEY")
 R2_ENDPOINT = os.getenv("R2_ENDPOINT")
 HEADER_HEIGHT = 48
+IMAGES_TOP_Y = h - HEADER_HEIGHT - 20
+IMAGES_MAX_HEIGHT = 220
+MATERIALS_TOP_Y = IMAGES_TOP_Y - IMAGES_MAX_HEIGHT - 30
+MATERIALS_HEIGHT = 120
+TABLE_TOP_Y = MATERIALS_TOP_Y - MATERIALS_HEIGHT - 30
 PUBLIC_URL = "https://pub-9f421e06dc9f4bd49ae0adcf5690c438.r2.dev"
 
 # ==========================================================
@@ -545,7 +550,7 @@ async def generate_report(kohde_id: str):
     pdf.showPage()
     current_page += 1
     # ======================================================
-    # =========  HUONEISTO-SIVUT (Susteran layout) =========
+    # ===============  HUONEISTO-SIVUT  ====================
     # ======================================================
 
 
@@ -603,7 +608,7 @@ async def generate_report(kohde_id: str):
         # ---- Render images ----
        
         MAX_IMG_W = (w - 40*2 - 20) / 2
-        y_img = y_pointer
+        y_img = IMAGES_TOP_Y
         
         if img1 and img2:
             h1 = draw_scaled_image(pdf, img1, 40, y_img, MAX_IMG_W)
@@ -629,10 +634,10 @@ async def generate_report(kohde_id: str):
         # ======================
         # PINTARAKENTEIDEN MATERIAALIT
         # ======================
-        
+        y_mat = MATERIALS_TOP_Y
         pdf.setFont("Arial-Bold", 14)
         pdf.setFillColor(COLOR_TEXT)
-        pdf.drawString(40, y_pointer, "Pintarakenteiden materiaalit")
+        pdf.drawString(40, y_mat, "Pintarakenteiden materiaalit")
         
         y_pointer -= 20
         
@@ -693,7 +698,10 @@ async def generate_report(kohde_id: str):
             y_pointer
         )
         
-        y_pointer = min(col1_y, col2_y) - 20
+               
+        y_table = TABLE_TOP_Y
+        
+        y_table = draw_pts_table(pdf, 40, y_table, rows, col_widths, w)
 
         # Fixed order A:
         if "kuntoluokka" in data:
