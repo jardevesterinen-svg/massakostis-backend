@@ -694,27 +694,29 @@ async def generate_report(kohde_id: str):
         #  HUONEISTON TIEDOT (PTS TABLE)
         # ==================================================
         
-        rows = [["Huoneiston tiedot", ""]]           
-        draw_pts_table(pdf, 40, TABLE_TOP_Y, rows, col_widths, w)
-
+        rows = []
+        
+        # Otsikkorivi (PTS-tyyli)
+        rows.append(["Huoneiston tiedot", ""])
+        
         # Fixed order A:
-        if "kuntoluokka" in data:
+        if data.get("kuntoluokka"):
             rows.append(["Kuntoluokka", str(data["kuntoluokka"])])
-
-        if "huomio" in data:
+        
+        if data.get("huomio"):
             rows.append(["Välitön huomio", str(data["huomio"])])
-
-        if "havainnot" in data:
+        
+        if data.get("havainnot"):
             rows.append(["Havainnot", data["havainnot"]])
-
-        if "toimenpiteet" in data:
+        
+        if data.get("toimenpiteet"):
             rows.append(["Toimenpiteet", data["toimenpiteet"]])
-
-        if "kommentit" in data:
+        
+        if data.get("kommentit"):
             rows.append(["Kommentit", data["kommentit"]])
-
-        table_x = 40
-        col_widths = [180, 300]
+        
+        # ✅ VASTA NYT piirretään taulukko
+        draw_pts_table(pdf, 40, TABLE_TOP_Y, rows, col_widths, w)
         
         # ==================================================
         # FOOTER + PAGE NUMBER
