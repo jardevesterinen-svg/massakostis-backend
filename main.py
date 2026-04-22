@@ -698,31 +698,37 @@ async def generate_report(kohde_id: str):
         # ==================================================
         
         col_widths = [160, 80, 240]
-        
-        rows = [
-            ["Tarkastuskohde", "Kuntoluokka", "Havainnot ja toimenpiteet"]
-        ]
-        
+       
         TARKASTUSKOHTEET = [
-            ("lattian_kosteus", "Lattian kosteus"),
             ("seinien_kosteus", "Seinien kosteus"),
-            ("lapiviennit", "Läpiviennit"),
-            ("pinnat_saumat", "Pinnat, saumat, silikoni"),
+            ("läpiviennit", "Läpiviennit"),
+            ("pinnat", "Pinnat, saumat, silikoni"),
             ("vesikalusteet", "Vesikalusteet"),
             ("ilmanvaihto", "Ilmanvaihto"),
             ("ovikynnys", "Ovikynnys"),
             ("lattiakaivo", "Lattiakaivo"),
             ("lattiakallistukset", "Lattiakallistukset"),
         ]
-        
-        tarkastukset = data.get("tarkastukset", {})
-        
+      
+        rows = [
+            ["Tarkastuskohde", "Kuntoluokka", "Havainnot ja toimenpiteet"]
+        ]
+
         for key, label in TARKASTUSKOHTEET:
-            item = tarkastukset.get(key, {})
-            kuntoluokka = item.get("kuntoluokka", "–")
+            # Kuntoluokka (★★, ★ jne.)
+            kuntoluokka = data.get(f"{key}_kuntoluokka", "–")
         
-            havainnot = item.get("havainnot", "").strip()
-            toimenpiteet = item.get("toimenpiteet", "").strip()
+            # Havainnot
+            havainnot = (
+                data.get(f"{key}_havainnot_textarea", "") or
+                data.get(f"{key}_havainnot_select", "")
+            ).strip()
+        
+            # Toimenpiteet
+            toimenpiteet = (
+                data.get(f"{key}_toimenpiteet_textarea", "") or
+                data.get(f"{key}_toimenpiteet_select", "")
+            ).strip()
         
             if not havainnot and not toimenpiteet:
                 teksti = "Havainnot: Ei havaittu puutteita"
@@ -736,7 +742,7 @@ async def generate_report(kohde_id: str):
         
             rows.append([
                 label,
-                str(kuntoluokka),
+                kuntoluokka,
                 teksti
             ])
         
