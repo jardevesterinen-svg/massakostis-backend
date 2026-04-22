@@ -738,14 +738,58 @@ async def generate_report(kohde_id: str):
             ])
         
         # ✅ PIIRRETÄÄN TAULUKKO VASTA TÄSSÄ
-        draw_pts_table(
-            pdf,
-            40,
-            TABLE_TOP_Y,
-            rows,
-            col_widths,
-            w
-        )
+        def draw_pts_table_3col(pdf, x, y, rows, col_widths, w):
+            """
+            Draws a 3-column PTS-style table:
+            cols = [label, condition, notes]
+            """
+        
+            row_h = 22
+            cur_y = y
+        
+            for idx, row in enumerate(rows):
+                is_header = (idx == 0)
+        
+                # Background
+                if is_header:
+                    pdf.setFillColor(COLOR_TABLE_HEADER)
+                else:
+                    pdf.setFillColor(COLOR_ROW_ALT if idx % 2 == 1 else COLOR_ROW_WHITE)
+        
+                pdf.rect(
+                    x,
+                    cur_y - row_h,
+                    sum(col_widths),
+                    row_h,
+                    fill=1,
+                    stroke=0
+                )
+        
+                # Text
+                pdf.setFillColor(COLOR_TEXT)
+                if is_header:
+                    pdf.setFont("Arial-Bold", 11)
+                else:
+                    pdf.setFont("Arial", 11)
+        
+                col_x = x
+                for i, cell in enumerate(row):
+                    pdf.drawString(col_x + 6, cur_y - 15, str(cell))
+                    col_x += col_widths[i]
+        
+                # Gridline
+                pdf.setStrokeColor(COLOR_GRID)
+                pdf.setLineWidth(0.5)
+                pdf.line(
+                    x,
+                    cur_y - row_h,
+                    x + sum(col_widths),
+                    cur_y - row_h
+                )
+        
+                cur_y -= row_h
+        
+            return cur_y
         
         # ==================================================
         # FOOTER + PAGE NUMBER
