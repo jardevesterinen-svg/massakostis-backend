@@ -771,74 +771,83 @@ async def generate_report(kohde_id: str):
                 )
         
                 # Text
-                from reportlab.lib.colors import red, green, orange
-                pdf.setFillColor(COLOR_TEXT)
-                pdf.setFont("Arial-Bold" if is_header else "Arial", 11)
+        from reportlab.pdfbase.pdfmetrics import stringWidth
+        from reportlab.lib.colors import red, green, orange
+        
+        def wrap_text(text, font_name, font_size, max_width):
+            words = text.split(" ")
+            lines = []
+            current = ""
+        
+            for word in words:
+                test = current + (" " if current else "") + word
+                if stringWidth(test, font_name, font_size) <= max_width:
+                    current = test
+                else:
+                    lines.append(current)
+                    current = word
+        
+            if current:
+                lines.append(current)
+        
+            return lines
+        
+        
+        def draw_pts_table_3col(pdf, x, y, rows, col_widths, w):
+            cur_y = y
+        
+            for idx, row in enumerate(rows):
+                is_header = (idx == 0)
+                row_height = 22
+        
+                # Taustaväri
+                if is_header:
+                    pdf.setFillColor(COLOR_TABLE_HEADER)
+                else:
+                    pdf.setFillColor(COLOR_ROW_ALT if idx % 2 == 1 else COLOR_ROW_WHITE)
+        
+                pdf.rect(x, cur_y - row_height, sum(col_widths), row_height, fill=1, stroke=0)
         
                 col_x = x
-                from reportlab.pdfbase.pdfmetrics import stringWidth
-
-                def wrap_text(text, font_name, font_size, max_width):
-                    words = text.split(" ")
-                    lines = []
-                    current = ""
-                
-                    for word in words:
-                        test = current + (" " if current else "") + word
-                        if stringWidth(test, font_name, font_size) <= max_width:
-                            current = test
-                        else:
-                            lines.append(current)
-                            current = word
-                
-                    if current:
-                        lines.append(current)
-                
-                    return lines
-
+        
                 for i, cell in enumerate(row):
-                    if i == 1 and not is_header:  # kuntoluokka-sarake
+                    pdf.setFillColor(COLOR_TEXT)
+                    pdf.setFont("Arial-Bold" if is_header else "Arial", 11)
+        
+                    # Kuntoluokan väritys (vain jos numerot)
+                    if i == 1 and not is_header:
                         if cell == "3":
                             pdf.setFillColor(green)
                         elif cell == "2":
                             pdf.setFillColor(orange)
                         elif cell == "1":
                             pdf.setFillColor(red)
-                        else:
-                            pdf.setFillColor(COLOR_TEXT)
-                    else:
-                        pdf.setFillColor(COLOR_TEXT)
-                    if i == 2:  # Havainnot ja toimenpiteet
+        
+                    # Rivitys oikeassa sarakkeessa
+                    if i == 2 and not is_header:
                         lines = wrap_text(
                             str(cell),
                             "Arial",
                             11,
                             col_widths[i] - 12
                         )
-                    
                         text_y = cur_y - 15
                         for line in lines:
                             pdf.drawString(col_x + 6, text_y, line)
                             text_y -= 13
-                    
+        
                         row_height = max(row_height, 13 * len(lines))
                     else:
                         pdf.drawString(col_x + 6, cur_y - 15, str(cell))
-                        
-                    pdf.drawString(col_x + 6, cur_y - 15, str(cell))
+        
                     col_x += col_widths[i]
         
-                # Gridline
+                # Ruudukko
                 pdf.setStrokeColor(COLOR_GRID)
                 pdf.setLineWidth(0.5)
-                pdf.line(
-                    x,
-                    cur_y - row_h,
-                    x + sum(col_widths),
-                    cur_y - row_h
-                )
+                pdf.line(x, cur_y - row_height, x + sum(col_widths), cur_y - row_height)
         
-                cur_y -= row_h
+                cur_y -= row_height
         
             return cur_y
           
