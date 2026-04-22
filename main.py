@@ -693,7 +693,9 @@ async def generate_report(kohde_id: str):
         # ==================================================
         #  HUONEISTON TIEDOT (PTS TABLE)
         # ==================================================
+        
         col_widths = [160, 80, 240]
+        
         rows = [
             ["Tarkastuskohde", "Kuntoluokka", "Havainnot ja toimenpiteet"]
         ]
@@ -709,8 +711,9 @@ async def generate_report(kohde_id: str):
             ("lattiakaivo", "Lattiakaivo"),
             ("lattiakallistukset", "Lattiakallistukset"),
         ]
+        
         tarkastukset = data.get("tarkastukset", {})
-
+        
         for key, label in TARKASTUSKOHTEET:
             item = tarkastukset.get(key, {})
             kuntoluokka = item.get("kuntoluokka", "–")
@@ -721,27 +724,28 @@ async def generate_report(kohde_id: str):
             if not havainnot and not toimenpiteet:
                 teksti = "Havainnot: Ei havaittu puutteita"
             else:
-                parts = []
+                osat = []
                 if havainnot:
-                    parts.append(f"Havainnot: {havainnot}")
+                    osat.append(f"Havainnot: {havainnot}")
                 if toimenpiteet:
-                    parts.append(f"Toimenpiteet: {toimenpiteet}")
-                teksti = " ".join(parts)
+                    osat.append(f"Toimenpiteet: {toimenpiteet}")
+                teksti = " ".join(osat)
         
             rows.append([
                 label,
                 str(kuntoluokka),
                 teksti
             ])
-             
-            draw_pts_table(
-                pdf,
-                40,
-                TABLE_TOP_Y,
-                rows,
-                col_widths,
-                w
-            )
+        
+        # ✅ PIIRRETÄÄN TAULUKKO VASTA TÄSSÄ
+        draw_pts_table(
+            pdf,
+            40,
+            TABLE_TOP_Y,
+            rows,
+            col_widths,
+            w
+        )
         
         # ==================================================
         # FOOTER + PAGE NUMBER
