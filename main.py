@@ -359,7 +359,7 @@ async def generate_report(kohde_id: str):
          
     IMAGES_TOP_Y = HEADER_BOTTOM_Y - 40
     MATERIALS_TOP_Y = IMAGES_TOP_Y - IMAGES_MAX_HEIGHT - 30
-    TABLE_TOP_Y = 100
+    TABLE_TOP_Y = MAT_ROW2_Y
 
     # ======================================================
     # =============  PAGE 1 — KANSILEHTI  ==================
