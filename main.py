@@ -693,6 +693,7 @@ async def generate_report(kohde_id: str):
             MAT_ROW2_Y
         )
         TABLE_START_Y = MAT_ROW2_Y
+        DEBUG_TABLE_Y = h - 120
         # ==================================================
         #  HUONEISTON TIEDOT (PTS TABLE)
         # ==================================================
@@ -789,7 +790,7 @@ async def generate_report(kohde_id: str):
             draw_pts_table_3col(
                 pdf,
                 40,
-                TABLE_START_Y,
+                DEBUG_TABLE_Y,
                 rows,
                 col_widths,
                 w
