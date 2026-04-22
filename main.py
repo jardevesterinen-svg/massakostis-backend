@@ -353,6 +353,20 @@ async def generate_report(kohde_id: str):
     buff = io.BytesIO()
     pdf = canvas.Canvas(buff, pagesize=A4)
     w, h = A4
+    
+    # ==========================
+    # KIINTEÄ HUONEISTOLAYOUT
+    # ==========================
+    
+    HEADER_BOTTOM_Y = h - HEADER_HEIGHT
+    
+    IMAGES_TOP_Y = HEADER_BOTTOM_Y - 40
+    IMAGES_MAX_HEIGHT = 220
+    
+    MATERIALS_TOP_Y = IMAGES_TOP_Y - IMAGES_MAX_HEIGHT - 30
+    MATERIALS_BLOCK_HEIGHT = 120
+    
+    TABLE_TOP_Y = MATERIALS_TOP_Y - MATERIALS_BLOCK_HEIGHT - 30
     # ======================================================
     # =============  PAGE 1 — KANSILEHTI  ==================
     # ======================================================
@@ -582,10 +596,7 @@ async def generate_report(kohde_id: str):
         
         # Sivunumero ERIKSEEN aivan oikealle
         pdf.drawRightString(page_x, h + 10 , f"Sivu {current_page}")
-    
-        # ---- Sisällön alku ----
-        y_pointer = h - HEADER_HEIGHT - 80
-    
+       
         # (tähän kuvat, materiaalit, taulukko...)
     
         # ==================================================
@@ -611,21 +622,15 @@ async def generate_report(kohde_id: str):
         y_img = IMAGES_TOP_Y
         
         if img1 and img2:
-            h1 = draw_scaled_image(pdf, img1, 40, y_img, MAX_IMG_W)
-            h2 = draw_scaled_image(pdf, img2, 40 + MAX_IMG_W + 20, y_img, MAX_IMG_W)
-            y_pointer -= max(h1, h2) + 30
-        
+            draw_scaled_image(pdf, img1, 40, y_img, MAX_IMG_W)
+            draw_scaled_image(pdf, img2, 40 + MAX_IMG_W + 20, y_img, MAX_IMG_W)
+                    
         elif img1:
-            h1 = draw_scaled_image(pdf, img1, 40, y_img, MAX_IMG_W*2 + 20)
-            y_pointer -= h1 + 30
-        
+            draw_scaled_image(pdf, img1, 40, y_img, MAX_IMG_W*2 + 20)
+                    
         elif img2:
-            h2 = draw_scaled_image(pdf, img2, 40, y_img, MAX_IMG_W*2 + 20)
-            y_pointer -= h2 + 30
-        
-        else:
-            y_pointer -= 20
-
+            draw_scaled_image(pdf, img2, 40, y_img, MAX_IMG_W*2 + 20)
+       
         # ==================================================
         #  HUONEISTON TIEDOT (PTS TABLE)
         # ==================================================
@@ -637,10 +642,8 @@ async def generate_report(kohde_id: str):
         y_mat = MATERIALS_TOP_Y
         pdf.setFont("Arial-Bold", 14)
         pdf.setFillColor(COLOR_TEXT)
-        pdf.drawString(40, y_mat, "Pintarakenteiden materiaalit")
-        
-        y_pointer -= 20
-        
+        pdf.drawString(40, MATERIALS_TOP_Y, "Pintarakenteiden materiaalit")
+                    
         COL_GAP = 20
         COL_W = (w - 40*2 - COL_GAP*2) / 3
         
@@ -663,45 +666,36 @@ async def generate_report(kohde_id: str):
         col1_y = draw_material_block(
             "Seinien pintamateriaali",
             [data.get("materiaalit_seinat_valinta", "–")],
-            40,
-            y_pointer
+            40            
         )
         
         col2_y = draw_material_block(
             "Lattian pintamateriaali",
             [data.get("materiaalit_lattia_valinta", "–")],
-            40 + COL_W + COL_GAP,
-            y_pointer
+            40 + COL_W + COL_GAP
         )
         
         col3_y = draw_material_block(
             "Vesiputket",
             vesiputket or ["–"],
-            40 + (COL_W + COL_GAP) * 2,
-            y_pointer
+            40 + (COL_W + COL_GAP) * 2
         )
-        
-        y_pointer = min(col1_y, col2_y, col3_y) - 10
+               
         
         # Toinen rivi
         col1_y = draw_material_block(
             "Katon pintamateriaali",
             [data.get("materiaalit_katto_valinta", "–")],
-            40,
-            y_pointer
+            40
         )
         
         col2_y = draw_material_block(
             "Lämpöputket",
             lampoputket or ["–"],
-            40 + COL_W + COL_GAP,
-            y_pointer
+            40 + COL_W + COL_GAP
         )
-        
-               
-        y_table = TABLE_TOP_Y
-        
-        y_table = draw_pts_table(pdf, 40, y_table, rows, col_widths, w)
+                   
+        draw_pts_table(pdf, 40, TABLE_TOP_Y, rows, col_widths, w)
 
         # Fixed order A:
         if "kuntoluokka" in data:
@@ -721,10 +715,7 @@ async def generate_report(kohde_id: str):
 
         table_x = 40
         col_widths = [180, 300]
-
-        y_pointer = draw_pts_table(pdf, table_x, y_pointer,
-                                   rows, col_widths, w)
-
+        
         # ==================================================
         # FOOTER + PAGE NUMBER
         # ==================================================
