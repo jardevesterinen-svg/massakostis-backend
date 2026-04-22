@@ -787,6 +787,12 @@ async def generate_report(kohde_id: str):
                 cur_y -= row_h
         
             return cur_y
+            
+            # DEBUG: näkyvä testiteksti
+            pdf.setFont("Helvetica-Bold", 16)
+            pdf.setFillColorRGB(1, 0, 0)   # kirkkaan punainen
+            pdf.drawString(40, h - 80, "DEBUG: TULLAAN TAULUKKOON")
+
             draw_pts_table_3col(
                 pdf,
                 40,
