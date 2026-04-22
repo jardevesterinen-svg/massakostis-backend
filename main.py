@@ -771,11 +771,24 @@ async def generate_report(kohde_id: str):
                 )
         
                 # Text
+                from reportlab.lib.colors import red, green, orange
                 pdf.setFillColor(COLOR_TEXT)
                 pdf.setFont("Arial-Bold" if is_header else "Arial", 11)
         
                 col_x = x
                 for i, cell in enumerate(row):
+                    if i == 1 and not is_header:  # kuntoluokka-sarake
+                        if cell == "3":
+                            pdf.setFillColor(green)
+                        elif cell == "2":
+                            pdf.setFillColor(orange)
+                        elif cell == "1":
+                            pdf.setFillColor(red)
+                        else:
+                            pdf.setFillColor(COLOR_TEXT)
+                    else:
+                        pdf.setFillColor(COLOR_TEXT)
+                
                     pdf.drawString(col_x + 6, cur_y - 15, str(cell))
                     col_x += col_widths[i]
         
