@@ -693,7 +693,6 @@ async def generate_report(kohde_id: str):
             MAT_ROW2_Y
         )
         TABLE_START_Y = MAT_ROW2_Y
-        DEBUG_TABLE_Y = h - 120
         # ==================================================
         #  HUONEISTON TIEDOT (PTS TABLE)
         # ==================================================
@@ -787,16 +786,11 @@ async def generate_report(kohde_id: str):
                 cur_y -= row_h
         
             return cur_y
-            
-        # DEBUG: näkyvä testiteksti
-        pdf.setFont("Helvetica-Bold", 16)
-        pdf.setFillColorRGB(1, 0, 0)   # kirkkaan punainen
-        pdf.drawString(40, h - 80, "DEBUG: TULLAAN TAULUKKOON")
-
+          
         draw_pts_table_3col(
             pdf,
             40,
-            DEBUG_TABLE_Y,
+            TABLE_START_Y,
             rows,
             col_widths,
             w
