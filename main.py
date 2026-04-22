@@ -743,20 +743,7 @@ async def generate_report(kohde_id: str):
         
         # ✅ PIIRRETÄÄN TAULUKKO VASTA TÄSSÄ
         
-        draw_pts_table_3col(
-            pdf,
-            40,
-            TABLE_START_Y,
-            rows,
-            col_widths,
-            w
-        )
-
-            """
-            Draws a 3-column PTS-style table:
-            cols = [label, condition, notes]
-            """
-        
+        def draw_pts_table_3col(pdf, x, y, rows, col_widths, w):
             row_h = 22
             cur_y = y
         
@@ -780,10 +767,7 @@ async def generate_report(kohde_id: str):
         
                 # Text
                 pdf.setFillColor(COLOR_TEXT)
-                if is_header:
-                    pdf.setFont("Arial-Bold", 11)
-                else:
-                    pdf.setFont("Arial", 11)
+                pdf.setFont("Arial-Bold" if is_header else "Arial", 11)
         
                 col_x = x
                 for i, cell in enumerate(row):
