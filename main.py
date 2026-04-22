@@ -660,19 +660,22 @@ async def generate_report(kohde_id: str):
         col1_y = draw_material_block(
             "Seinien pintamateriaali",
             [data.get("materiaalit_seinat_valinta", "–")],
-            40            
+            40,
+            MATERIALS_TOP_Y - 20
         )
         
         col2_y = draw_material_block(
             "Lattian pintamateriaali",
             [data.get("materiaalit_lattia_valinta", "–")],
-            40 + COL_W + COL_GAP
+            40 + COL_W + COL_GAP,
+            MATERIALS_TOP_Y - 20
         )
         
         col3_y = draw_material_block(
             "Vesiputket",
             vesiputket or ["–"],
-            40 + (COL_W + COL_GAP) * 2
+            40 + (COL_W + COL_GAP) * 2,
+            MATERIALS_TOP_Y - 20
         )
                
         
@@ -680,13 +683,15 @@ async def generate_report(kohde_id: str):
         col1_y = draw_material_block(
             "Katon pintamateriaali",
             [data.get("materiaalit_katto_valinta", "–")],
-            40
+            40,
+            col1_y - 10
         )
         
         col2_y = draw_material_block(
             "Lämpöputket",
             lampoputket or ["–"],
-            40 + COL_W + COL_GAP
+            40 + COL_W + COL_GAP,
+            col1_y - 10
         )
                    
         draw_pts_table(pdf, 40, TABLE_TOP_Y, rows, col_widths, w)
