@@ -693,30 +693,55 @@ async def generate_report(kohde_id: str):
         # ==================================================
         #  HUONEISTON TIEDOT (PTS TABLE)
         # ==================================================
+        col_widths = [160, 80, 240]
+        rows = [
+            ["Tarkastuskohde", "Kuntoluokka", "Havainnot ja toimenpiteet"]
+        ]
         
-        rows = []
+        TARKASTUSKOHTEET = [
+            ("lattian_kosteus", "Lattian kosteus"),
+            ("seinien_kosteus", "Seinien kosteus"),
+            ("lapiviennit", "Läpiviennit"),
+            ("pinnat_saumat", "Pinnat, saumat, silikoni"),
+            ("vesikalusteet", "Vesikalusteet"),
+            ("ilmanvaihto", "Ilmanvaihto"),
+            ("ovikynnys", "Ovikynnys"),
+            ("lattiakaivo", "Lattiakaivo"),
+            ("lattiakallistukset", "Lattiakallistukset"),
+        ]
+        tarkastukset = data.get("tarkastukset", {})
+
+        for key, label in TARKASTUSKOHTEET:
+            item = tarkastukset.get(key, {})
+            kuntoluokka = item.get("kuntoluokka", "–")
         
-        # Otsikkorivi (PTS-tyyli)
-        rows.append(["Huoneiston tiedot", ""])
+            havainnot = item.get("havainnot", "").strip()
+            toimenpiteet = item.get("toimenpiteet", "").strip()
         
-        # Fixed order A:
-        if data.get("kuntoluokka"):
-            rows.append(["Kuntoluokka", str(data["kuntoluokka"])])
+            if not havainnot and not toimenpiteet:
+                teksti = "Havainnot: Ei havaittu puutteita"
+            else:
+                parts = []
+                if havainnot:
+                    parts.append(f"Havainnot: {havainnot}")
+                if toimenpiteet:
+                    parts.append(f"Toimenpiteet: {toimenpiteet}")
+                teksti = " ".join(parts)
         
-        if data.get("huomio"):
-            rows.append(["Välitön huomio", str(data["huomio"])])
-        
-        if data.get("havainnot"):
-            rows.append(["Havainnot", data["havainnot"]])
-        
-        if data.get("toimenpiteet"):
-            rows.append(["Toimenpiteet", data["toimenpiteet"]])
-        
-        if data.get("kommentit"):
-            rows.append(["Kommentit", data["kommentit"]])
-        
-        # ✅ VASTA NYT piirretään taulukko
-        draw_pts_table(pdf, 40, TABLE_TOP_Y, rows, col_widths, w)
+            rows.append([
+                label,
+                str(kuntoluokka),
+                teksti
+            ])
+             
+            draw_pts_table(
+                pdf,
+                40,
+                TABLE_TOP_Y,
+                rows,
+                col_widths,
+                w
+            )
         
         # ==================================================
         # FOOTER + PAGE NUMBER
