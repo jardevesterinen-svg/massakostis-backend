@@ -812,7 +812,7 @@ async def generate_report(kohde_id: str):
         
                 for i, cell in enumerate(row):
                     pdf.setFillColor(COLOR_TEXT)
-                    pdf.setFont("Arial-Bold" if is_header else "Arial", 11)
+                    pdf.setFont("Arial-Bold" if is_header else "Arial", 10)
         
                     # Kuntoluokan väritys (vain jos numerot)
                     if i == 1 and not is_header:
