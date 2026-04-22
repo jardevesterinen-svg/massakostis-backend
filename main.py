@@ -629,10 +629,14 @@ async def generate_report(kohde_id: str):
         # ======================
         # PINTARAKENTEIDEN MATERIAALIT
         # ======================
-        y_mat = MATERIALS_TOP_Y
+        
+        MAT_TITLE_Y = MATERIALS_TOP_Y
+        MAT_ROW1_Y  = MAT_TITLE_Y - 24
+        MAT_ROW2_Y  = MAT_ROW1_Y - 44
+
         pdf.setFont("Arial-Bold", 14)
         pdf.setFillColor(COLOR_TEXT)
-        pdf.drawString(40, MATERIALS_TOP_Y, "Pintarakenteiden materiaalit")
+        pdf.drawString(40, MAT_TITLE_Y, "Pintarakenteiden materiaalit")
                     
         COL_GAP = 20
         COL_W = (w - 40*2 - COL_GAP*2) / 3
@@ -653,41 +657,41 @@ async def generate_report(kohde_id: str):
         vesiputket = [s.strip() for s in data.get("materiaalit_vesiputket", "").split(",") if s.strip()]
         lampoputket = [s.strip() for s in data.get("materiaalit_lampoputket", "").split(",") if s.strip()]
         
-        col1_y = draw_material_block(
+        # --- RIVI 1 ---
+        draw_material_block(
             "Seinien pintamateriaali",
             [data.get("materiaalit_seinat_valinta", "–")],
             40,
-            MATERIALS_TOP_Y - 20
+            MAT_ROW1_Y
         )
         
-        col2_y = draw_material_block(
+        draw_material_block(
             "Lattian pintamateriaali",
             [data.get("materiaalit_lattia_valinta", "–")],
             40 + COL_W + COL_GAP,
-            MATERIALS_TOP_Y - 20
+            MAT_ROW1_Y
         )
         
-        col3_y = draw_material_block(
+        draw_material_block(
             "Vesiputket",
             vesiputket or ["–"],
             40 + (COL_W + COL_GAP) * 2,
-            MATERIALS_TOP_Y - 20
+            MAT_ROW1_Y
         )
-               
         
-        # Toinen rivi
-        col1_y = draw_material_block(
+        # --- RIVI 2 ---
+        draw_material_block(
             "Katon pintamateriaali",
             [data.get("materiaalit_katto_valinta", "–")],
             40,
-            col1_y - 10
+            MAT_ROW2_Y
         )
         
-        col2_y = draw_material_block(
+        draw_material_block(
             "Lämpöputket",
             lampoputket or ["–"],
             40 + COL_W + COL_GAP,
-            col1_y - 10
+            MAT_ROW2_Y
         )
         
         # ==================================================
