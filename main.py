@@ -359,8 +359,7 @@ async def generate_report(kohde_id: str):
          
     IMAGES_TOP_Y = HEADER_BOTTOM_Y - 40
     MATERIALS_TOP_Y = IMAGES_TOP_Y - IMAGES_MAX_HEIGHT - 30
-    TABLE_TOP_Y = h - 18
-
+    
     # ======================================================
     # =============  PAGE 1 — KANSILEHTI  ==================
     # ======================================================
@@ -693,7 +692,7 @@ async def generate_report(kohde_id: str):
             40 + COL_W + COL_GAP,
             MAT_ROW2_Y
         )
-        TABLE_START_Y = MAT_ROW2_Y - 50
+        TABLE_START_Y = MAT_ROW2_Y
         # ==================================================
         #  HUONEISTON TIEDOT (PTS TABLE)
         # ==================================================
