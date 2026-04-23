@@ -767,50 +767,6 @@ async def generate_report(kohde_id: str):
         
         # ✅ PIIRRETÄÄN TAULUKKO VASTA TÄSSÄ
         
-        def draw_pts_table_3col(pdf, x, y, rows, col_widths, w):
-            row_h = 22
-            cur_y = y
-        
-            for idx, row in enumerate(rows):
-                is_header = (idx == 0)
-        
-                # Background
-                if is_header:
-                    pdf.setFillColor(COLOR_TABLE_HEADER)
-                else:
-                    pdf.setFillColor(COLOR_ROW_ALT if idx % 2 == 1 else COLOR_ROW_WHITE)
-        
-                pdf.rect(
-                    x,
-                    cur_y - row_h,
-                    sum(col_widths),
-                    row_h,
-                    fill=1,
-                    stroke=0
-                )
-        
-                # Text
-        from reportlab.pdfbase.pdfmetrics import stringWidth
-        from reportlab.lib.colors import red, green, orange
-        
-        def wrap_text(text, font_name, font_size, max_width):
-            words = text.split(" ")
-            lines = []
-            current = ""
-        
-            for word in words:
-                test = current + (" " if current else "") + word
-                if stringWidth(test, font_name, font_size) <= max_width:
-                    current = test
-                else:
-                    lines.append(current)
-                    current = word
-        
-            if current:
-                lines.append(current)
-        
-            return lines
-                
         from reportlab.lib.colors import red, green, orange
         
         def draw_pts_table_3col(pdf, x, y, rows, col_widths):
@@ -891,8 +847,8 @@ async def generate_report(kohde_id: str):
         
                 # 👇 SIIRRY SEURAAVAAN RIVIIN
                 cur_y -= row_height
-
-        return cur_y
+        
+            return cur_y
           
         draw_pts_table_3col(
             pdf,
