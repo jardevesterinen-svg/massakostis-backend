@@ -828,7 +828,7 @@ async def generate_report(kohde_id: str):
                         lines = wrap_text(
                             str(cell),
                             "Arial",
-                            11,
+                            10,
                             col_widths[i] - 12
                         )
                         text_y = cur_y - 15
