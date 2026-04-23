@@ -357,7 +357,7 @@ async def generate_report(kohde_id: str):
     
     HEADER_BOTTOM_Y = h - HEADER_HEIGHT
          
-    IMAGES_TOP_Y = HEADER_BOTTOM_Y - 30
+    IMAGES_TOP_Y = HEADER_BOTTOM_Y - 10
     MATERIALS_TOP_Y = IMAGES_TOP_Y - IMAGES_MAX_HEIGHT - 30
     
     # ======================================================
