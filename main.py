@@ -89,6 +89,25 @@ def r2_get_json(key: str):
     except:
         return None
 
+from reportlab.pdfbase.pdfmetrics import stringWidth
+
+def wrap_text(text, font_name, font_size, max_width):
+    words = text.split(" ")
+    lines = []
+    current = ""
+
+    for word in words:
+        test = current + (" " if current else "") + word
+        if stringWidth(test, font_name, font_size) <= max_width:
+            current = test
+        else:
+            lines.append(current)
+            current = word
+
+    if current:
+        lines.append(current)
+
+    return lines
 # ==========================================================
 #  1) SAVE METADATA
 # ==========================================================
@@ -791,65 +810,89 @@ async def generate_report(kohde_id: str):
                 lines.append(current)
         
             return lines
+                
+        from reportlab.lib.colors import red, green, orange
         
-        
-        def draw_pts_table_3col(pdf, x, y, rows, col_widths, w):
+        def draw_pts_table_3col(pdf, x, y, rows, col_widths):
             cur_y = y
         
             for idx, row in enumerate(rows):
                 is_header = (idx == 0)
+        
+                # ✅ Minimirivikorkeus
                 row_height = 22
         
-                # Taustaväri
+                # ✅ Taustaväri
                 if is_header:
                     pdf.setFillColor(COLOR_TABLE_HEADER)
                 else:
                     pdf.setFillColor(COLOR_ROW_ALT if idx % 2 == 1 else COLOR_ROW_WHITE)
         
-                pdf.rect(x, cur_y - row_height, sum(col_widths), row_height, fill=1, stroke=0)
-        
+                # ✅ Piirrä taustan suorakulmio vasta lopullisella korkeudella
                 col_x = x
         
+                # --- ENSIN LASKETAAN RIVIN TARVITSEMA KORKEUS ---
+                wrapped_cells = []
+        
                 for i, cell in enumerate(row):
-                    pdf.setFillColor(COLOR_TEXT)
-                    pdf.setFont("Arial-Bold" if is_header else "Arial", 10)
-        
-                    # Kuntoluokan väritys (vain jos numerot)
-                    if i == 1 and not is_header:
-                        if cell == "3":
-                            pdf.setFillColor(green)
-                        elif cell == "2":
-                            pdf.setFillColor(orange)
-                        elif cell == "1":
-                            pdf.setFillColor(red)
-        
-                    # Rivitys oikeassa sarakkeessa
                     if i == 2 and not is_header:
                         lines = wrap_text(
                             str(cell),
                             "Arial",
-                            10,
+                            11,
                             col_widths[i] - 12
                         )
-                        text_y = cur_y - 15
-                        for line in lines:
-                            pdf.drawString(col_x + 6, text_y, line)
-                            text_y -= 13
-        
+                        wrapped_cells.append(lines)
                         row_height = max(row_height, 13 * len(lines))
                     else:
-                        pdf.drawString(col_x + 6, cur_y - 15, str(cell))
+                        wrapped_cells.append([str(cell)])
+        
+                # --- TAUSTA ---
+                pdf.rect(
+                    x,
+                    cur_y - row_height,
+                    sum(col_widths),
+                    row_height,
+                    fill=1,
+                    stroke=0
+                )
+        
+                # --- TEKSTI ---
+                for i, lines in enumerate(wrapped_cells):
+                    pdf.setFillColor(COLOR_TEXT)
+                    pdf.setFont("Arial-Bold" if is_header else "Arial", 11)
+        
+                    # ✅ Kuntoluokan värikoodaus
+                    if i == 1 and not is_header:
+                        value = lines[0]
+                        if value == "3":
+                            pdf.setFillColor(green)
+                        elif value == "2":
+                            pdf.setFillColor(orange)
+                        elif value == "1":
+                            pdf.setFillColor(red)
+        
+                    text_y = cur_y - 15
+                    for line in lines:
+                        pdf.drawString(col_x + 6, text_y, line)
+                        text_y -= 13
         
                     col_x += col_widths[i]
         
-                # Ruudukko
+                # --- ALAVIIVA ---
                 pdf.setStrokeColor(COLOR_GRID)
                 pdf.setLineWidth(0.5)
-                pdf.line(x, cur_y - row_height, x + sum(col_widths), cur_y - row_height)
+                pdf.line(
+                    x,
+                    cur_y - row_height,
+                    x + sum(col_widths),
+                    cur_y - row_height
+                )
         
+                # 👇 SIIRRY SEURAAVAAN RIVIIN
                 cur_y -= row_height
-        
-            return cur_y
+
+    return cur_y
           
         draw_pts_table_3col(
             pdf,
