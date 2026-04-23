@@ -892,7 +892,7 @@ async def generate_report(kohde_id: str):
                 # 👇 SIIRRY SEURAAVAAN RIVIIN
                 cur_y -= row_height
 
-    return cur_y
+        return cur_y
           
         draw_pts_table_3col(
             pdf,
