@@ -1,4 +1,3 @@
-Tuo virhe alkoi kun lisäsin uutta koodia rivikorkeuden säätämisestä. Katsotko jos siinä meni joku vikaan.?
 print("### MAIN.PY V7 ACTIVE ###")
 ###############################################################################
 # MAIN.PY v7 — BRAND-COMPLIANT PDF GENERATOR (STONE HEADER + GLACIER COVER)
