@@ -571,8 +571,6 @@ async def generate_report(kohde_id: str):
                 row_height = max(row_height, 13 * len(lines))
             else:
                 wrapped_cells.append([str(cell)])
-            if not lines:
-                lines = [""]
 
         # --- TAUSTA ---
         pdf.rect(
