@@ -252,7 +252,7 @@ async def save_template(body: dict = Body(...)):
 async def list_templates(kohde_id: str):
     resp = s3.list_objects_v2(
         Bucket=R2_BUCKET,
-        Prefix=f"kohteet/{kohde_id}/pohjat/"
+        Prefix=f"{R2_PREFIX}/kohteet/"
     )
 
     items = []
