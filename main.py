@@ -1,3 +1,4 @@
+Tuo virhe alkoi kun lisäsin uutta koodia rivikorkeuden säätämisestä. Katsotko jos siinä meni joku vikaan.?
 print("### MAIN.PY V7 ACTIVE ###")
 ###############################################################################
 # MAIN.PY v7 — BRAND-COMPLIANT PDF GENERATOR (STONE HEADER + GLACIER COVER)
@@ -27,7 +28,6 @@ R2_BUCKET = os.getenv("R2_BUCKET_NAME")
 R2_ACCESS_KEY_ID = os.getenv("R2_ACCESS_KEY_ID")
 R2_SECRET_ACCESS_KEY = os.getenv("R2_SECRET_ACCESS_KEY")
 R2_ENDPOINT = os.getenv("R2_ENDPOINT")
-R2_PREFIX = "kosteusraportit"
 HEADER_HEIGHT = 48
 IMAGES_MAX_HEIGHT = 220
 MATERIALS_HEIGHT = 120
@@ -120,14 +120,14 @@ async def save_metadata(body: dict = Body(...)):
     if not kohde_id:
         return {"error": "kohde_id missing"}
 
-    key = f"{R2_PREFIX}/kohteet/{kohde_id}/huoneistot/{slug}/data.json"
+    key = f"kohteet/{kohde_id}/metadata.json"
     r2_put_json(key, metadata)
     return {"status": "ok", "saved": key}
 
 
 @app.get("/get-metadata/{kohde_id}")
 async def get_metadata(kohde_id: str):
-    key = f"{R2_PREFIX}/kohteet/{kohde_id}/huoneistot/{slug}/data.json"
+    key = f"kohteet/{kohde_id}/metadata.json"
     return r2_get_json(key) or {"error": "metadata not found"}
 
 
@@ -140,7 +140,7 @@ async def upload_kansikuva(
     kohde_id: str = Form(...),
     file: UploadFile = File(...)
 ):
-    key = f"{R2_PREFIX}/kohteet/{kohde_id}/huoneistot/{slug}/data.json"
+    key = f"kohteet/{kohde_id}/kansikuva.jpg"
     content = await file.read()
 
     s3.put_object(
@@ -165,14 +165,14 @@ async def upload_data(body: dict = Body(...)):
     if not kohde_id or not slug:
         return {"error": "missing fields"}
 
-    key = f"{R2_PREFIX}/kohteet/{kohde_id}/huoneistot/{slug}/data.json"
+    key = f"kohteet/{kohde_id}/huoneistot/{slug}/data.json"
     r2_put_json(key, data)
     return {"status": "ok", "saved": key}
 
 
 @app.get("/get-apartment/{kohde_id}/{huoneisto_slug}")
 async def get_apartment(kohde_id: str, huoneisto_slug: str):
-    key = f"{R2_PREFIX}/kohteet/{kohde_id}/huoneistot/{slug}/data.json"
+    key = f"kohteet/{kohde_id}/huoneistot/{huoneisto_slug}/data.json"
     return r2_get_json(key) or {}
 
 
@@ -187,7 +187,7 @@ async def upload_image(
     index: str = Form(...),
     file: UploadFile = File(...)
 ):
-    key = f"{R2_PREFIX}/kohteet/{kohde_id}/huoneistot/{slug}/data.json"
+    key = f"kohteet/{kohde_id}/huoneistot/{slugify(huoneisto_slug)}/kuva{index}.jpg"
     content = await file.read()
 
     s3.put_object(
@@ -209,7 +209,7 @@ async def list_kohteet():
     while True:
         params = {
             "Bucket": R2_BUCKET,
-            Prefix=f"{R2_PREFIX}/kohteet/"
+            "Prefix": "kohteet/"
         }
         if continuation:
             params["ContinuationToken"] = continuation
@@ -243,7 +243,7 @@ async def save_template(body: dict = Body(...)):
     nimi = body.get("nimi")
     pohja = body.get("pohja")
 
-    key = f"{R2_PREFIX}/kohteet/{kohde_id}/pohjat/{nimi}.json"
+    key = f"kohteet/{kohde_id}/pohjat/{nimi}.json"
     r2_put_json(key, pohja)
     return {"status": "ok", "saved": key}
 
@@ -252,7 +252,7 @@ async def save_template(body: dict = Body(...)):
 async def list_templates(kohde_id: str):
     resp = s3.list_objects_v2(
         Bucket=R2_BUCKET,
-        Prefix=f"{R2_PREFIX}/kohteet/"
+        Prefix=f"kohteet/{kohde_id}/pohjat/"
     )
 
     items = []
@@ -266,7 +266,7 @@ async def list_templates(kohde_id: str):
 
 @app.get("/get-template/{kohde_id}/{nimi}")
 async def get_template(kohde_id: str, nimi: str):
-    key = f"{R2_PREFIX}/kohteet/{kohde_id}/pohjat/{nimi}.json"
+    key = f"kohteet/{kohde_id}/pohjat/{nimi}.json"
     return r2_get_json(key) or {}
 
 
@@ -334,9 +334,6 @@ def draw_stone_header(pdf, w, h):
 #  START PDF GENERATOR
 # ==========================================================
 
-print("DEBUG kohde_id:", kohde_id)
-print("DEBUG metadata key:", f"{R2_PREFIX}/kohteet/{kohde_id}/metadata.json")
-
 @app.post("/generate-report/{kohde_id}")
 async def generate_report(kohde_id: str):
     
@@ -349,7 +346,7 @@ async def generate_report(kohde_id: str):
         return new_h
         
     # ---- LOAD METADATA ----
-    meta_key = f"{R2_PREFIX}/kohteet/{kohde_id}/metadata.json"
+    meta_key = f"kohteet/{kohde_id}/metadata.json"
     metadata = r2_get_json(meta_key)
     if not metadata:
         return {"error": "metadata missing"}
@@ -362,7 +359,7 @@ async def generate_report(kohde_id: str):
     apt_data = {}
     for apt in huoneistot:
         slug = slugify(apt)
-        key = f"{R2_PREFIX}/kohteet/{kohde_id}/huoneistot/{slug}/data.json"
+        key = f"kohteet/{kohde_id}/huoneistot/{slug}/data.json"
         apt_data[apt] = r2_get_json(key) or {}
 
     # ---- FONTS ----
@@ -452,7 +449,7 @@ async def generate_report(kohde_id: str):
     try:
         img_bytes = s3.get_object(
             Bucket=R2_BUCKET,
-            Key=f"{R2_PREFIX}/kohteet/{kohde_id}/kansikuva.jpg"
+            Key=f"kohteet/{kohde_id}/kansikuva.jpg"
         )["Body"].read()
 
         img = ImageReader(io.BytesIO(img_bytes))
@@ -629,8 +626,8 @@ async def generate_report(kohde_id: str):
             except:
                 return None
 
-        img1 = load_img(f"{R2_PREFIX}/kohteet/{kohde_id}/huoneistot/{slug}/kuva1.jpg")
-        img2 = load_img(f"{R2_PREFIX}/kohteet/{kohde_id}/huoneistot/{slug}/kuva2.jpg")
+        img1 = load_img(f"kohteet/{kohde_id}/huoneistot/{slug}/kuva1.jpg")
+        img2 = load_img(f"kohteet/{kohde_id}/huoneistot/{slug}/kuva2.jpg")
 
         # ---- Render images ----
        
@@ -880,7 +877,7 @@ async def generate_report(kohde_id: str):
     pdf.save()
     pdf_bytes = buff.getvalue()
 
-    r2_key = f"{R2_PREFIX}/kohteet/{kohde_id}/raportti.pdf"
+    r2_key = f"kohteet/{kohde_id}/raportti.pdf"
 
     s3.put_object(
         Bucket=R2_BUCKET,
