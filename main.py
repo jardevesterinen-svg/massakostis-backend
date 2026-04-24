@@ -27,6 +27,7 @@ R2_BUCKET = os.getenv("R2_BUCKET_NAME")
 R2_ACCESS_KEY_ID = os.getenv("R2_ACCESS_KEY_ID")
 R2_SECRET_ACCESS_KEY = os.getenv("R2_SECRET_ACCESS_KEY")
 R2_ENDPOINT = os.getenv("R2_ENDPOINT")
+R2_PREFIX = "kosteusraportit"
 HEADER_HEIGHT = 48
 IMAGES_MAX_HEIGHT = 220
 MATERIALS_HEIGHT = 120
@@ -208,7 +209,7 @@ async def list_kohteet():
     while True:
         params = {
             "Bucket": R2_BUCKET,
-            "Prefix": "kohteet/"
+            Prefix=f"{R2_PREFIX}/kohteet/"
         }
         if continuation:
             params["ContinuationToken"] = continuation
@@ -348,7 +349,7 @@ async def generate_report(kohde_id: str):
         return new_h
         
     # ---- LOAD METADATA ----
-    meta_key = f"kohteet/{kohde_id}/metadata.json"
+    meta_key = f"{R2_PREFIX}/kohteet/{kohde_id}/metadata.json"
     metadata = r2_get_json(meta_key)
     if not metadata:
         return {"error": "metadata missing"}
@@ -361,7 +362,7 @@ async def generate_report(kohde_id: str):
     apt_data = {}
     for apt in huoneistot:
         slug = slugify(apt)
-        key = f"kohteet/{kohde_id}/huoneistot/{slug}/data.json"
+        key = f"{R2_PREFIX}/kohteet/{kohde_id}/huoneistot/{slug}/data.json"
         apt_data[apt] = r2_get_json(key) or {}
 
     # ---- FONTS ----
