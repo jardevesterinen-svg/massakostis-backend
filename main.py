@@ -333,6 +333,9 @@ def draw_stone_header(pdf, w, h):
 #  START PDF GENERATOR
 # ==========================================================
 
+print("DEBUG kohde_id:", kohde_id)
+print("DEBUG metadata key:", f"kohteet/{kohde_id}/metadata.json")
+
 @app.post("/generate-report/{kohde_id}")
 async def generate_report(kohde_id: str):
     
