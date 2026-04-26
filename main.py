@@ -856,8 +856,7 @@ async def generate_report(kohde_id: str):
                 40,
                 TABLE_START_Y,
                 rows,
-                col_widths,
-                w
+                col_widths
             )
             # ==================================================
             # FOOTER + PAGE NUMBER
