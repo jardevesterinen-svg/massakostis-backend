@@ -95,8 +95,7 @@ def wrap_text(text, font_name, font_size, max_width):
     words = text.split(" ")
     lines = []
     current = ""
-    pdf.setFont("Arial", 11)
-    
+       
     for word in words:
         test = current + (" " if current else "") + word
         if stringWidth(test, font_name, font_size) <= max_width:
