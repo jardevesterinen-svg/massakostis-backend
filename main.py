@@ -95,7 +95,8 @@ def wrap_text(text, font_name, font_size, max_width):
     words = text.split(" ")
     lines = []
     current = ""
-
+    pdf.setFont("Arial", 11)
+    
     for word in words:
         test = current + (" " if current else "") + word
         if stringWidth(test, font_name, font_size) <= max_width:
@@ -335,560 +336,563 @@ def draw_stone_header(pdf, w, h):
 
 @app.post("/generate-report/{kohde_id}")
 async def generate_report(kohde_id: str):
+    try:    
+        def draw_scaled_image(pdf, img, x, y, max_w):
+            orig_w, orig_h = img.getSize()
+            scale = max_w / orig_w
+            new_w = max_w
+            new_h = orig_h * scale
+            pdf.drawImage(img, x, y - new_h, width=new_w, height=new_h, mask="auto")
+            return new_h
+            
+        # ---- LOAD METADATA ----
+        meta_key = f"kohteet/{kohde_id}/metadata.json"
+        metadata = r2_get_json(meta_key)
+        if not metadata:
+            return {"error": "metadata missing"}
     
-    def draw_scaled_image(pdf, img, x, y, max_w):
-        orig_w, orig_h = img.getSize()
-        scale = max_w / orig_w
-        new_w = max_w
-        new_h = orig_h * scale
-        pdf.drawImage(img, x, y - new_h, width=new_w, height=new_h, mask="auto")
-        return new_h
+        tilaaja = metadata["tilaaja"]
+        kohde = metadata["kohde"]
+        huoneistot = metadata["huoneistot"]
+    
+        # ---- LOAD HUONEISTOT ----
+        apt_data = {}
+        for apt in huoneistot:
+            slug = slugify(apt)
+            key = f"kohteet/{kohde_id}/huoneistot/{slug}/data.json"
+            apt_data[apt] = r2_get_json(key) or {}
+    
+        # ---- FONTS ----
+        pdfmetrics.registerFont(TTFont("Arial", "Arial.ttf"))
+        pdfmetrics.registerFont(TTFont("Arial-Bold", "ArialBold.ttf"))
+    
+        # ---- PDF CANVAS ----
+        buff = io.BytesIO()
+        pdf = canvas.Canvas(buff, pagesize=A4)
+        w, h = A4
         
-    # ---- LOAD METADATA ----
-    meta_key = f"kohteet/{kohde_id}/metadata.json"
-    metadata = r2_get_json(meta_key)
-    if not metadata:
-        return {"error": "metadata missing"}
-
-    tilaaja = metadata["tilaaja"]
-    kohde = metadata["kohde"]
-    huoneistot = metadata["huoneistot"]
-
-    # ---- LOAD HUONEISTOT ----
-    apt_data = {}
-    for apt in huoneistot:
-        slug = slugify(apt)
-        key = f"kohteet/{kohde_id}/huoneistot/{slug}/data.json"
-        apt_data[apt] = r2_get_json(key) or {}
-
-    # ---- FONTS ----
-    pdfmetrics.registerFont(TTFont("Arial", "Arial.ttf"))
-    pdfmetrics.registerFont(TTFont("Arial-Bold", "ArialBold.ttf"))
-
-    # ---- PDF CANVAS ----
-    buff = io.BytesIO()
-    pdf = canvas.Canvas(buff, pagesize=A4)
-    w, h = A4
+        # ==========================
+        # KIINTEÄ HUONEISTOLAYOUT
+        # ==========================
+        
+        HEADER_BOTTOM_Y = h - HEADER_HEIGHT
+             
+        IMAGES_TOP_Y = HEADER_BOTTOM_Y - 15
+        MATERIALS_TOP_Y = IMAGES_TOP_Y - IMAGES_MAX_HEIGHT
+        
+        # ======================================================
+        # =============  PAGE 1 — KANSILEHTI  ==================
+        # ======================================================
     
-    # ==========================
-    # KIINTEÄ HUONEISTOLAYOUT
-    # ==========================
+        # ---- Stone Header (full width, 17 mm ≈ 48 pt) ----
+        
+        pdf.setFillColor(COLOR_HEADER)   # #ECECE7 (Stone Lighter)
+        pdf.rect(0, h - HEADER_HEIGHT, w, HEADER_HEIGHT, fill=1, stroke=0)
     
-    HEADER_BOTTOM_Y = h - HEADER_HEIGHT
-         
-    IMAGES_TOP_Y = HEADER_BOTTOM_Y - 15
-    MATERIALS_TOP_Y = IMAGES_TOP_Y - IMAGES_MAX_HEIGHT
+        # ---- Glacier Corner Shape (ONLY ON COVER) ----
+        try:
+            glacier = ImageReader("corner-small-left-glacier.png")
+            pdf.drawImage(
+                glacier,
+                6,
+                h - HEADER_HEIGHT - 15,     # slightly above stone header overlap
+                width=160,
+                height=59,
+                mask="auto"
+            )
+        except:
+            pass
     
-    # ======================================================
-    # =============  PAGE 1 — KANSILEHTI  ==================
-    # ======================================================
-
-    # ---- Stone Header (full width, 17 mm ≈ 48 pt) ----
-    
-    pdf.setFillColor(COLOR_HEADER)   # #ECECE7 (Stone Lighter)
-    pdf.rect(0, h - HEADER_HEIGHT, w, HEADER_HEIGHT, fill=1, stroke=0)
-
-    # ---- Glacier Corner Shape (ONLY ON COVER) ----
-    try:
-        glacier = ImageReader("corner-small-left-glacier.png")
-        pdf.drawImage(
-            glacier,
-            6,
-            h - HEADER_HEIGHT - 15,     # slightly above stone header overlap
-            width=160,
-            height=59,
+        # ---- Logo on top of Glacier shape (correct aspect ratio) ----
+        try:
+            logo = ImageReader("rakmentor-logo.png")
+            pdf.drawImage(
+            logo,
+            14,
+            h - HEADER_HEIGHT + 12,   # ✅ sisällä, EI yläpuolella
+            width=140,
+            height=HEADER_HEIGHT - 30,  # ✅ pakota korkeus    
+            preserveAspectRatio=True,
             mask="auto"
-        )
-    except:
-        pass
-
-    # ---- Logo on top of Glacier shape (correct aspect ratio) ----
-    try:
-        logo = ImageReader("rakmentor-logo.png")
-        pdf.drawImage(
-        logo,
-        14,
-        h - HEADER_HEIGHT + 12,   # ✅ sisällä, EI yläpuolella
-        width=140,
-        height=HEADER_HEIGHT - 30,  # ✅ pakota korkeus    
-        preserveAspectRatio=True,
-        mask="auto"
-        )
-    except:
-        pass
-    # ---- Blue Border (6 pt) OVER EVERYTHING ----
-    pdf.setLineWidth(6)
-    pdf.setStrokeColor(COLOR_BORDER)   # #C3D9E8
-    pdf.rect(3, 3, w - 6, h - 6, stroke=1, fill=0)
-
-    # ---- Title Block ----
-    pdf.setFillColor(COLOR_TEXT)
-    pdf.setFont("Arial-Bold", 26)
-    pdf.drawString(40, h - 140, "Märkätilojen kosteuskartoitus")
-
-    # ---- Kohde nimi ----
-    pdf.setFont("Arial-Bold", 20)
-    pdf.drawString(40, h - 180, kohde["nimi"])
-
-    # ---- Kohteen osoite ----
-    pdf.setFont("Arial", 14)
-    pdf.drawString(40, h - 205, kohde["osoite"])
-    pdf.drawString(
-        40,
-        h - 225,
-        f"{kohde['postinumero']} {kohde['postitoimipaikka']}"
-    )
-
-    # ---- Tarkastus- ja raportointipäivä ----
-    raportointipaiva = datetime.now().strftime("%d.%m.%Y")
-    pdf.drawString(40, h - 255, f"Tarkastuspäivä: {kohde['paiva']}")
-    pdf.drawString(40, h - 275, f"Raportointipäivä: {raportointipaiva}")
-
-    # ---- Kansikuva ----
-    try:
-        img_bytes = s3.get_object(
-            Bucket=R2_BUCKET,
-            Key=f"kohteet/{kohde_id}/kansikuva.jpg"
-        )["Body"].read()
-
-        img = ImageReader(io.BytesIO(img_bytes))
-        orig_w, orig_h = img.getSize()
-
-        target_w = 500
-        target_h = target_w * orig_h / orig_w
-        
-        pdf.drawImage(
-            img,
+            )
+        except:
+            pass
+        # ---- Blue Border (6 pt) OVER EVERYTHING ----
+        pdf.setLineWidth(6)
+        pdf.setStrokeColor(COLOR_BORDER)   # #C3D9E8
+        pdf.rect(3, 3, w - 6, h - 6, stroke=1, fill=0)
+    
+        # ---- Title Block ----
+        pdf.setFillColor(COLOR_TEXT)
+        pdf.setFont("Arial-Bold", 26)
+        pdf.drawString(40, h - 140, "Märkätilojen kosteuskartoitus")
+    
+        # ---- Kohde nimi ----
+        pdf.setFont("Arial-Bold", 20)
+        pdf.drawString(40, h - 180, kohde["nimi"])
+    
+        # ---- Kohteen osoite ----
+        pdf.setFont("Arial", 14)
+        pdf.drawString(40, h - 205, kohde["osoite"])
+        pdf.drawString(
             40,
-            h - 300 - target_h,  # siisti sijainti
-            width=target_w,
-            height=target_h,
-            mask="auto"
+            h - 225,
+            f"{kohde['postinumero']} {kohde['postitoimipaikka']}"
         )
-    except:
-        pass
-
-    # ---- Footer (ONLY on cover) ----
-    pdf.setFont("Arial", 10)
-    pdf.setFillColor(COLOR_TEXT)
-    pdf.drawString(40, 40, "Rakmentor Oy | 010 739 8770")
-    pdf.drawString(40, 25, "asiakaspalvelu@rakmentor.fi | rakmentor.fi")
-
-    # Cover has NO page number
-    pdf.showPage()
-
-    # ======================================================
-    # ==========  PAGE 2 — PERUSTIEDOT  =====================
-    # ======================================================
-
-    # Draw Stone header + logo + border
-    draw_stone_header(pdf, w, h)
-
-    pdf.setFillColor(COLOR_TEXT)
-    pdf.setFont("Arial-Bold", 22)
-    pdf.drawString(40, h - HEADER_HEIGHT - 40, "Perustiedot")
-
-    current_page = 2
-
     
-    # ======================================================
-    #  TABLE DRAW FUNCTION (PTS STYLE)
-    # ======================================================
-
-    def draw_pts_table(pdf, x, y, rows, col_widths, w):
-        """
-        Draws a PTS‑style table with:
-        - #C3D9E8 header background
-        - alternating rows (#FFFFFF / #F2F7FA)
-        - #D0D0D0 gridlines
-        """
-        row_h = 22
-        cur_y = y
-
-        for idx, (left, right) in enumerate(rows):
-            is_header = (idx == 0)
-
-            # Background
-            if is_header:
-                pdf.setFillColor(COLOR_TABLE_HEADER)
-            else:
-                pdf.setFillColor(COLOR_ROW_ALT if idx % 2 == 1 else COLOR_ROW_WHITE)
-
-            pdf.rect(x, cur_y - row_h, col_widths[0] + col_widths[1],
-                     row_h, fill=1, stroke=0)
-
-            # Text
-            pdf.setFillColor(COLOR_TEXT)
-            if is_header:
-                pdf.setFont("Arial-Bold", 11)
-            else:
-                pdf.setFont("Arial", 11)
-
-            pdf.drawString(x + 6, cur_y - 15, left)
-            pdf.drawString(x + col_widths[0] + 6, cur_y - 15, right)
-
-            # Gridline
-            pdf.setStrokeColor(COLOR_GRID)
-            pdf.setLineWidth(0.5)
-            pdf.line(x, cur_y - row_h,
-                     x + col_widths[0] + col_widths[1],
-                     cur_y - row_h)
-
-            cur_y -= row_h
-
-        return cur_y
-
-
-    # ======================================================
-    #  PERUSTIEDOT — BUILD ROWS (PTS STYLE)
-    # ======================================================
-
-    rows = [
-        ["Tilaajan tiedot", ""],
-        ["Nimi", f"{tilaaja['etunimi']} {tilaaja['sukunimi']}"],
-        ["Yritys", tilaaja["yritys"]],
-        ["Osoite", tilaaja["osoite"]],
-        ["Postitoimipaikka",
-         f"{tilaaja['postinumero']} {tilaaja['postitoimipaikka']}"],
-        ["Sähköposti", tilaaja["sahkoposti"]],
-        ["Puhelin", tilaaja["puhelin"]],
-        ["Kohteen nimi", kohde["nimi"]],
-        ["Kohteen osoite", kohde["osoite"]],
-        ["Tarkastuspäivä", kohde["paiva"]],
-        ["Raportointipäivä", raportointipaiva],
-        ["Tarkastaja", kohde["tarkastaja"]],
-    ]
-
-    # Draw table under the "Perustiedot" heading
-    table_x = 40
-    table_y = h - HEADER_HEIGHT - 90
-    col_widths = [180, 300]
-
-    table_y = draw_pts_table(pdf, table_x, table_y, rows, col_widths, w)
-
-    # Footer + Page Number
-    pdf.setFont("Arial", 10)
-    pdf.setFillColor(COLOR_TEXT)
-
-    pdf.drawString(40, 30, "Rakmentor Oy")
-    pdf.drawRightString(555, 30, str(current_page))
-
-    pdf.showPage()
-    current_page += 1
-    # ======================================================
-    # ===============  HUONEISTO-SIVUT  ====================
-    # ======================================================
-
-
-    for apt in huoneistot:
-        slug = slugify(apt)
-        data = apt_data.get(apt, {})
+        # ---- Tarkastus- ja raportointipäivä ----
+        raportointipaiva = datetime.now().strftime("%d.%m.%Y")
+        pdf.drawString(40, h - 255, f"Tarkastuspäivä: {kohde['paiva']}")
+        pdf.drawString(40, h - 275, f"Raportointipäivä: {raportointipaiva}")
     
-        # ---- Stone header + logo + border ----
+        # ---- Kansikuva ----
+        try:
+            img_bytes = s3.get_object(
+                Bucket=R2_BUCKET,
+                Key=f"kohteet/{kohde_id}/kansikuva.jpg"
+            )["Body"].read()
+    
+            img = ImageReader(io.BytesIO(img_bytes))
+            orig_w, orig_h = img.getSize()
+    
+            target_w = 500
+            target_h = target_w * orig_h / orig_w
+            
+            pdf.drawImage(
+                img,
+                40,
+                h - 300 - target_h,  # siisti sijainti
+                width=target_w,
+                height=target_h,
+                mask="auto"
+            )
+        except:
+            pass
+    
+        # ---- Footer (ONLY on cover) ----
+        pdf.setFont("Arial", 10)
+        pdf.setFillColor(COLOR_TEXT)
+        pdf.drawString(40, 40, "Rakmentor Oy | 010 739 8770")
+        pdf.drawString(40, 25, "asiakaspalvelu@rakmentor.fi | rakmentor.fi")
+    
+        # Cover has NO page number
+        pdf.showPage()
+    
+        # ======================================================
+        # ==========  PAGE 2 — PERUSTIEDOT  =====================
+        # ======================================================
+    
+        # Draw Stone header + logo + border
         draw_stone_header(pdf, w, h)
     
-        # ---- Headerin oikean reunan lisätiedot ----
-        pdf.setFont("Arial", 9)
         pdf.setFillColor(COLOR_TEXT)
-        
-        info_x = w - 80   # infosarakkeen oikea reuna
-        page_x = w - 40    # sivunumeron äärioikea
-        
-        y = h - 18
-        
-        pdf.drawRightString(info_x, y, f"Huoneisto {apt}")
-        y -= 11
-        pdf.drawRightString(info_x, y, f"Tarkastuspäivä: {kohde['paiva']}")
-        y -= 11
-        pdf.drawRightString(
-            info_x,
-            y,
-            f"{kohde['osoite']}, {kohde['postitoimipaikka']}"
-        )
-        
-        # Sivunumero ERIKSEEN aivan oikealle
-        pdf.drawRightString(page_x, h + 10 , f"Sivu {current_page}")
-       
-        # (tähän kuvat, materiaalit, taulukko...)
+        pdf.setFont("Arial-Bold", 22)
+        pdf.drawString(40, h - HEADER_HEIGHT - 40, "Perustiedot")
     
-        # ==================================================
-        #  LOAD IMAGES (two side-by-side)
-        # ==================================================
-        img_w = 240
-        img_h = 240
-        gap = 40
-
-        def load_img(path):
-            try:
-                b = s3.get_object(Bucket=R2_BUCKET, Key=path)["Body"].read()
-                return ImageReader(io.BytesIO(b))
-            except:
-                return None
-
-        img1 = load_img(f"kohteet/{kohde_id}/huoneistot/{slug}/kuva1.jpg")
-        img2 = load_img(f"kohteet/{kohde_id}/huoneistot/{slug}/kuva2.jpg")
-
-        # ---- Render images ----
-       
-        MAX_IMG_W = (w - 40*2 - 20) / 2
-        y_img = IMAGES_TOP_Y
+        current_page = 2
+    
         
-        if img1 and img2:
-            draw_scaled_image(pdf, img1, 40, y_img, MAX_IMG_W)
-            draw_scaled_image(pdf, img2, 40 + MAX_IMG_W + 20, y_img, MAX_IMG_W)
-                    
-        elif img1:
-            draw_scaled_image(pdf, img1, 40, y_img, MAX_IMG_W*2 + 20)
-                    
-        elif img2:
-            draw_scaled_image(pdf, img2, 40, y_img, MAX_IMG_W*2 + 20)
-      
-        
-        # ======================
-        # PINTARAKENTEIDEN MATERIAALIT
-        # ======================
-        
-        MAT_TITLE_Y = MATERIALS_TOP_Y
-        MAT_ROW1_Y  = MAT_TITLE_Y - 24
-        MAT_ROW2_Y  = MAT_ROW1_Y - 44
-
-        pdf.setFont("Arial-Bold", 14)
-        pdf.setFillColor(COLOR_TEXT)
-        pdf.drawString(40, MAT_TITLE_Y, "Pintarakenteiden materiaalit")
-                    
-        COL_GAP = 20
-        COL_W = (w - 40*2 - COL_GAP*2) / 3
-        
-        def draw_material_block(title, items, x, y):
-            pdf.setFont("Arial-Bold", 11)
-            pdf.drawString(x, y, title)
-            y -= 14
-        
-            pdf.setFont("Arial", 11)
-            for item in items:
-                pdf.drawString(x + 10, y, f"• {item}")
-                y -= 13
-        
-            return y
-        
-        # Pilko putket listaksi
-        vesiputket = [s.strip() for s in data.get("materiaalit_vesiputket", "").split(",") if s.strip()]
-        lampoputket = [s.strip() for s in data.get("materiaalit_lampoputket", "").split(",") if s.strip()]
-        
-        # --- RIVI 1 ---
-        draw_material_block(
-            "Seinien pintamateriaali",
-            [data.get("materiaalit_seinat_valinta", "–")],
-            40,
-            MAT_ROW1_Y
-        )
-        
-        draw_material_block(
-            "Lattian pintamateriaali",
-            [data.get("materiaalit_lattia_valinta", "–")],
-            40 + COL_W + COL_GAP,
-            MAT_ROW1_Y
-        )
-        
-        draw_material_block(
-            "Vesiputket",
-            vesiputket or ["–"],
-            40 + (COL_W + COL_GAP) * 2,
-            MAT_ROW1_Y
-        )
-        
-        # --- RIVI 2 ---
-        draw_material_block(
-            "Katon pintamateriaali",
-            [data.get("materiaalit_katto_valinta", "–")],
-            40,
-            MAT_ROW2_Y
-        )
-        
-        draw_material_block(
-            "Lämpöputket",
-            lampoputket or ["–"],
-            40 + COL_W + COL_GAP,
-            MAT_ROW2_Y
-        )
-        TABLE_START_Y = MAT_ROW2_Y - 50
-        # ==================================================
-        #  HUONEISTON TIEDOT (PTS TABLE)
-        # ==================================================
-        
-        col_widths = [160, 80, 240]
-       
-        TARKASTUSKOHTEET = [
-            ("seinien_kosteus", "Seinien kosteus"),
-            ("läpiviennit", "Läpiviennit"),
-            ("pinnat", "Pinnat, saumat, silikoni"),
-            ("vesikalusteet", "Vesikalusteet"),
-            ("ilmanvaihto", "Ilmanvaihto"),
-            ("ovikynnys", "Ovikynnys"),
-            ("lattiakaivo", "Lattiakaivo"),
-            ("lattiakallistukset", "Lattiakallistukset"),
-        ]
-      
-        rows = [
-            ["Tarkastuskohde", "Kuntoluokka", "Havainnot ja toimenpiteet"]
-        ]
-
-        for key, label in TARKASTUSKOHTEET:
-            # Kuntoluokka (★★, ★ jne.)
-            kuntoluokka = data.get(f"{key}_kuntoluokka", "–")
-        
-            # Havainnot
-            havainnot = (
-                data.get(f"{key}_havainnot_textarea", "") or
-                data.get(f"{key}_havainnot_select", "")
-            ).strip()
-        
-            # Toimenpiteet
-            toimenpiteet = (
-                data.get(f"{key}_toimenpiteet_textarea", "") or
-                data.get(f"{key}_toimenpiteet_select", "")
-            ).strip()
-        
-            if not havainnot and not toimenpiteet:
-                teksti = "Havainnot: Ei havaittu puutteita"
-            else:
-                osat = []
-                if havainnot:
-                    osat.append(f"Havainnot: {havainnot}")
-                if toimenpiteet:
-                    osat.append(f"Toimenpiteet: {toimenpiteet}")
-                teksti = " ".join(osat)
-        
-            rows.append([
-                label,
-                kuntoluokka,
-                teksti
-            ])
-        
-        # ✅ PIIRRETÄÄN TAULUKKO VASTA TÄSSÄ
-        
-        from reportlab.lib.colors import red, green, orange
-        
-        def draw_pts_table_3col(pdf, x, y, rows, col_widths):
+        # ======================================================
+        #  TABLE DRAW FUNCTION (PTS STYLE)
+        # ======================================================
+    
+        def draw_pts_table(pdf, x, y, rows, col_widths, w):
+            """
+            Draws a PTS‑style table with:
+            - #C3D9E8 header background
+            - alternating rows (#FFFFFF / #F2F7FA)
+            - #D0D0D0 gridlines
+            """
+            row_h = 22
             cur_y = y
-        
-            for idx, row in enumerate(rows):
+    
+            for idx, (left, right) in enumerate(rows):
                 is_header = (idx == 0)
-        
-                # ✅ Minimirivikorkeus
-                row_height = 22
-        
-                # ✅ Taustaväri
+    
+                # Background
                 if is_header:
                     pdf.setFillColor(COLOR_TABLE_HEADER)
                 else:
                     pdf.setFillColor(COLOR_ROW_ALT if idx % 2 == 1 else COLOR_ROW_WHITE)
-        
-                # ✅ Piirrä taustan suorakulmio vasta lopullisella korkeudella
-                col_x = x
-        
-                # --- ENSIN LASKETAAN RIVIN TARVITSEMA KORKEUS ---
-                wrapped_cells = []
-        
-                for i, cell in enumerate(row):
-                    if i == 2 and not is_header:
-                        lines = wrap_text(
-                            str(cell),
-                            "Arial",
-                            11,
-                            col_widths[i] - 12
-                        )
-                        wrapped_cells.append(lines)
-                        row_height = max(row_height, 13 * len(lines))
-                    else:
-                        wrapped_cells.append([str(cell)])
-        
-                # --- TAUSTA ---
-                pdf.rect(
-                    x,
-                    cur_y - row_height,
-                    sum(col_widths),
-                    row_height,
-                    fill=1,
-                    stroke=0
-                )
-        
-                # --- TEKSTI ---
-                for i, lines in enumerate(wrapped_cells):
-                    pdf.setFillColor(COLOR_TEXT)
-                    pdf.setFont("Arial-Bold" if is_header else "Arial", 11)
-        
-                    # ✅ Kuntoluokan värikoodaus
-                    if i == 1 and not is_header:
-                        value = lines[0]
-                        if value == "3":
-                            pdf.setFillColor(green)
-                        elif value == "2":
-                            pdf.setFillColor(orange)
-                        elif value == "1":
-                            pdf.setFillColor(red)
-        
-                    text_y = cur_y - 15
-                    for line in lines:
-                        pdf.drawString(col_x + 6, text_y, line)
-                        text_y -= 13
-        
-                    col_x += col_widths[i]
-        
-                # --- ALAVIIVA ---
+    
+                pdf.rect(x, cur_y - row_h, col_widths[0] + col_widths[1],
+                         row_h, fill=1, stroke=0)
+    
+                # Text
+                pdf.setFillColor(COLOR_TEXT)
+                if is_header:
+                    pdf.setFont("Arial-Bold", 11)
+                else:
+                    pdf.setFont("Arial", 11)
+    
+                pdf.drawString(x + 6, cur_y - 15, left)
+                pdf.drawString(x + col_widths[0] + 6, cur_y - 15, right)
+    
+                # Gridline
                 pdf.setStrokeColor(COLOR_GRID)
                 pdf.setLineWidth(0.5)
-                pdf.line(
-                    x,
-                    cur_y - row_height,
-                    x + sum(col_widths),
-                    cur_y - row_height
-                )
-        
-                # 👇 SIIRRY SEURAAVAAN RIVIIN
-                cur_y -= row_height
-        
+                pdf.line(x, cur_y - row_h,
+                         x + col_widths[0] + col_widths[1],
+                         cur_y - row_h)
+    
+                cur_y -= row_h
+    
             return cur_y
-          
-        draw_pts_table_3col(
-            pdf,
-            40,
-            TABLE_START_Y,
-            rows,
-            col_widths,
-            w
-        )
-        # ==================================================
-        # FOOTER + PAGE NUMBER
-        # ==================================================
+    
+    
+        # ======================================================
+        #  PERUSTIEDOT — BUILD ROWS (PTS STYLE)
+        # ======================================================
+    
+        rows = [
+            ["Tilaajan tiedot", ""],
+            ["Nimi", f"{tilaaja['etunimi']} {tilaaja['sukunimi']}"],
+            ["Yritys", tilaaja["yritys"]],
+            ["Osoite", tilaaja["osoite"]],
+            ["Postitoimipaikka",
+             f"{tilaaja['postinumero']} {tilaaja['postitoimipaikka']}"],
+            ["Sähköposti", tilaaja["sahkoposti"]],
+            ["Puhelin", tilaaja["puhelin"]],
+            ["Kohteen nimi", kohde["nimi"]],
+            ["Kohteen osoite", kohde["osoite"]],
+            ["Tarkastuspäivä", kohde["paiva"]],
+            ["Raportointipäivä", raportointipaiva],
+            ["Tarkastaja", kohde["tarkastaja"]],
+        ]
+    
+        # Draw table under the "Perustiedot" heading
+        table_x = 40
+        table_y = h - HEADER_HEIGHT - 90
+        col_widths = [180, 300]
+    
+        table_y = draw_pts_table(pdf, table_x, table_y, rows, col_widths, w)
+    
+        # Footer + Page Number
         pdf.setFont("Arial", 10)
         pdf.setFillColor(COLOR_TEXT)
-
+    
         pdf.drawString(40, 30, "Rakmentor Oy")
         pdf.drawRightString(555, 30, str(current_page))
-
+    
         pdf.showPage()
         current_page += 1
         # ======================================================
-    #  SAVE PDF → R2 AND RETURN URL
-    # ======================================================
+        # ===============  HUONEISTO-SIVUT  ====================
+        # ======================================================
+    
+    
+        for apt in huoneistot:
+            slug = slugify(apt)
+            data = apt_data.get(apt, {})
+        
+            # ---- Stone header + logo + border ----
+            draw_stone_header(pdf, w, h)
+        
+            # ---- Headerin oikean reunan lisätiedot ----
+            pdf.setFont("Arial", 9)
+            pdf.setFillColor(COLOR_TEXT)
+            
+            info_x = w - 80   # infosarakkeen oikea reuna
+            page_x = w - 40    # sivunumeron äärioikea
+            
+            y = h - 18
+            
+            pdf.drawRightString(info_x, y, f"Huoneisto {apt}")
+            y -= 11
+            pdf.drawRightString(info_x, y, f"Tarkastuspäivä: {kohde['paiva']}")
+            y -= 11
+            pdf.drawRightString(
+                info_x,
+                y,
+                f"{kohde['osoite']}, {kohde['postitoimipaikka']}"
+            )
+            
+            # Sivunumero ERIKSEEN aivan oikealle
+            pdf.drawRightString(page_x, h + 10 , f"Sivu {current_page}")
+           
+            # (tähän kuvat, materiaalit, taulukko...)
+        
+            # ==================================================
+            #  LOAD IMAGES (two side-by-side)
+            # ==================================================
+            img_w = 240
+            img_h = 240
+            gap = 40
+    
+            def load_img(path):
+                try:
+                    b = s3.get_object(Bucket=R2_BUCKET, Key=path)["Body"].read()
+                    return ImageReader(io.BytesIO(b))
+                except:
+                    return None
+    
+            img1 = load_img(f"kohteet/{kohde_id}/huoneistot/{slug}/kuva1.jpg")
+            img2 = load_img(f"kohteet/{kohde_id}/huoneistot/{slug}/kuva2.jpg")
+    
+            # ---- Render images ----
+           
+            MAX_IMG_W = (w - 40*2 - 20) / 2
+            y_img = IMAGES_TOP_Y
+            
+            if img1 and img2:
+                draw_scaled_image(pdf, img1, 40, y_img, MAX_IMG_W)
+                draw_scaled_image(pdf, img2, 40 + MAX_IMG_W + 20, y_img, MAX_IMG_W)
+                        
+            elif img1:
+                draw_scaled_image(pdf, img1, 40, y_img, MAX_IMG_W*2 + 20)
+                        
+            elif img2:
+                draw_scaled_image(pdf, img2, 40, y_img, MAX_IMG_W*2 + 20)
+          
+            
+            # ======================
+            # PINTARAKENTEIDEN MATERIAALIT
+            # ======================
+            
+            MAT_TITLE_Y = MATERIALS_TOP_Y
+            MAT_ROW1_Y  = MAT_TITLE_Y - 24
+            MAT_ROW2_Y  = MAT_ROW1_Y - 44
+    
+            pdf.setFont("Arial-Bold", 14)
+            pdf.setFillColor(COLOR_TEXT)
+            pdf.drawString(40, MAT_TITLE_Y, "Pintarakenteiden materiaalit")
+                        
+            COL_GAP = 20
+            COL_W = (w - 40*2 - COL_GAP*2) / 3
+            
+            def draw_material_block(title, items, x, y):
+                pdf.setFont("Arial-Bold", 11)
+                pdf.drawString(x, y, title)
+                y -= 14
+            
+                pdf.setFont("Arial", 11)
+                for item in items:
+                    pdf.drawString(x + 10, y, f"• {item}")
+                    y -= 13
+            
+                return y
+            
+            # Pilko putket listaksi
+            vesiputket = [s.strip() for s in data.get("materiaalit_vesiputket", "").split(",") if s.strip()]
+            lampoputket = [s.strip() for s in data.get("materiaalit_lampoputket", "").split(",") if s.strip()]
+            
+            # --- RIVI 1 ---
+            draw_material_block(
+                "Seinien pintamateriaali",
+                [data.get("materiaalit_seinat_valinta", "–")],
+                40,
+                MAT_ROW1_Y
+            )
+            
+            draw_material_block(
+                "Lattian pintamateriaali",
+                [data.get("materiaalit_lattia_valinta", "–")],
+                40 + COL_W + COL_GAP,
+                MAT_ROW1_Y
+            )
+            
+            draw_material_block(
+                "Vesiputket",
+                vesiputket or ["–"],
+                40 + (COL_W + COL_GAP) * 2,
+                MAT_ROW1_Y
+            )
+            
+            # --- RIVI 2 ---
+            draw_material_block(
+                "Katon pintamateriaali",
+                [data.get("materiaalit_katto_valinta", "–")],
+                40,
+                MAT_ROW2_Y
+            )
+            
+            draw_material_block(
+                "Lämpöputket",
+                lampoputket or ["–"],
+                40 + COL_W + COL_GAP,
+                MAT_ROW2_Y
+            )
+            TABLE_START_Y = MAT_ROW2_Y - 50
+            # ==================================================
+            #  HUONEISTON TIEDOT (PTS TABLE)
+            # ==================================================
+            
+            col_widths = [160, 80, 240]
+           
+            TARKASTUSKOHTEET = [
+                ("seinien_kosteus", "Seinien kosteus"),
+                ("läpiviennit", "Läpiviennit"),
+                ("pinnat", "Pinnat, saumat, silikoni"),
+                ("vesikalusteet", "Vesikalusteet"),
+                ("ilmanvaihto", "Ilmanvaihto"),
+                ("ovikynnys", "Ovikynnys"),
+                ("lattiakaivo", "Lattiakaivo"),
+                ("lattiakallistukset", "Lattiakallistukset"),
+            ]
+          
+            rows = [
+                ["Tarkastuskohde", "Kuntoluokka", "Havainnot ja toimenpiteet"]
+            ]
+    
+            for key, label in TARKASTUSKOHTEET:
+                # Kuntoluokka (★★, ★ jne.)
+                kuntoluokka = data.get(f"{key}_kuntoluokka", "–")
+            
+                # Havainnot
+                havainnot = (
+                    data.get(f"{key}_havainnot_textarea", "") or
+                    data.get(f"{key}_havainnot_select", "")
+                ).strip()
+            
+                # Toimenpiteet
+                toimenpiteet = (
+                    data.get(f"{key}_toimenpiteet_textarea", "") or
+                    data.get(f"{key}_toimenpiteet_select", "")
+                ).strip()
+            
+                if not havainnot and not toimenpiteet:
+                    teksti = "Havainnot: Ei havaittu puutteita"
+                else:
+                    osat = []
+                    if havainnot:
+                        osat.append(f"Havainnot: {havainnot}")
+                    if toimenpiteet:
+                        osat.append(f"Toimenpiteet: {toimenpiteet}")
+                    teksti = " ".join(osat)
+            
+                rows.append([
+                    label,
+                    kuntoluokka,
+                    teksti
+                ])
+            
+            # ✅ PIIRRETÄÄN TAULUKKO VASTA TÄSSÄ
+            
+            from reportlab.lib.colors import red, green, orange
+            
+            def draw_pts_table_3col(pdf, x, y, rows, col_widths):
+                cur_y = y
+            
+                for idx, row in enumerate(rows):
+                    is_header = (idx == 0)
+            
+                    # ✅ Minimirivikorkeus
+                    row_height = 22
+            
+                    # ✅ Taustaväri
+                    if is_header:
+                        pdf.setFillColor(COLOR_TABLE_HEADER)
+                    else:
+                        pdf.setFillColor(COLOR_ROW_ALT if idx % 2 == 1 else COLOR_ROW_WHITE)
+            
+                    # ✅ Piirrä taustan suorakulmio vasta lopullisella korkeudella
+                    col_x = x
+            
+                    # --- ENSIN LASKETAAN RIVIN TARVITSEMA KORKEUS ---
+                    wrapped_cells = []
+            
+                    for i, cell in enumerate(row):
+                        if i == 2 and not is_header:
+                            lines = wrap_text(
+                                str(cell),
+                                "Arial",
+                                11,
+                                col_widths[i] - 12
+                            )
+                            wrapped_cells.append(lines)
+                            row_height = max(row_height, 13 * len(lines))
+                        else:
+                            wrapped_cells.append([str(cell)])
+            
+                    # --- TAUSTA ---
+                    pdf.rect(
+                        x,
+                        cur_y - row_height,
+                        sum(col_widths),
+                        row_height,
+                        fill=1,
+                        stroke=0
+                    )
+            
+                    # --- TEKSTI ---
+                    for i, lines in enumerate(wrapped_cells):
+                        pdf.setFillColor(COLOR_TEXT)
+                        pdf.setFont("Arial-Bold" if is_header else "Arial", 11)
+            
+                        # ✅ Kuntoluokan värikoodaus
+                        if i == 1 and not is_header:
+                            value = lines[0]
+                            if value == "3":
+                                pdf.setFillColor(green)
+                            elif value == "2":
+                                pdf.setFillColor(orange)
+                            elif value == "1":
+                                pdf.setFillColor(red)
+            
+                        text_y = cur_y - 15
+                        for line in lines:
+                            pdf.drawString(col_x + 6, text_y, line)
+                            text_y -= 13
+            
+                        col_x += col_widths[i]
+            
+                    # --- ALAVIIVA ---
+                    pdf.setStrokeColor(COLOR_GRID)
+                    pdf.setLineWidth(0.5)
+                    pdf.line(
+                        x,
+                        cur_y - row_height,
+                        x + sum(col_widths),
+                        cur_y - row_height
+                    )
+            
+                    # 👇 SIIRRY SEURAAVAAN RIVIIN
+                    cur_y -= row_height
+            
+                return cur_y
+              
+            draw_pts_table_3col(
+                pdf,
+                40,
+                TABLE_START_Y,
+                rows,
+                col_widths,
+                w
+            )
+            # ==================================================
+            # FOOTER + PAGE NUMBER
+            # ==================================================
+            pdf.setFont("Arial", 10)
+            pdf.setFillColor(COLOR_TEXT)
+    
+            pdf.drawString(40, 30, "Rakmentor Oy")
+            pdf.drawRightString(555, 30, str(current_page))
+    
+            pdf.showPage()
+            current_page += 1
+            # ======================================================
+        #  SAVE PDF → R2 AND RETURN URL
+        # ======================================================
+    
+        pdf.save()
+        pdf_bytes = buff.getvalue()
+    
+        r2_key = f"kohteet/{kohde_id}/raportti.pdf"
+    
+        s3.put_object(
+            Bucket=R2_BUCKET,
+            Key=r2_key,
+            Body=pdf_bytes,
+            ContentType="application/pdf"
+        )
+    
+        pdf_url = f"{PUBLIC_URL}/{r2_key}"
+    
+        return {"status": "ok", "url": pdf_url}
 
-    pdf.save()
-    pdf_bytes = buff.getvalue()
-
-    r2_key = f"kohteet/{kohde_id}/raportti.pdf"
-
-    s3.put_object(
-        Bucket=R2_BUCKET,
-        Key=r2_key,
-        Body=pdf_bytes,
-        ContentType="application/pdf"
-    )
-
-    pdf_url = f"{PUBLIC_URL}/{r2_key}"
-
-    return {"status": "ok", "url": pdf_url}
-
+    except Exception as e:
+        print("PDF GENERATION ERROR:", type(e).__name__, str(e))
+        raise
 
 ###############################################################################
 # END OF FILE — main.py v7
