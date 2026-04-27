@@ -531,7 +531,8 @@ async def generate_report(kohde_id: str):
                     row_h,
                     fill=1,
                     stroke=0
-    
+                )
+                
                 # Text
                 pdf.setFillColor(COLOR_TEXT)
                 if is_header:
