@@ -22,14 +22,14 @@ from reportlab.lib.colors import HexColor
 #  ENVIRONMENT VARIABLES (Railway)
 # ==========================================================
 
-CLOUDFLARE_ACCOUNT_ID = os.getenv("CLOUDFLARE_ACCOUNT_ID")
+# CLOUDFLARE_ACCOUNT_ID = os.getenv("CLOUDFLARE_ACCOUNT_ID")
 R2_BUCKET = os.getenv("R2_BUCKET_NAME")
 R2_ACCESS_KEY_ID = os.getenv("R2_ACCESS_KEY_ID")
 R2_SECRET_ACCESS_KEY = os.getenv("R2_SECRET_ACCESS_KEY")
 R2_ENDPOINT = os.getenv("R2_ENDPOINT")
 HEADER_HEIGHT = 48
 IMAGES_MAX_HEIGHT = 220
-MATERIALS_HEIGHT = 120
+# MATERIALS_HEIGHT = 120
 PUBLIC_URL = "https://pub-9f421e06dc9f4bd49ae0adcf5690c438.r2.dev"
 
 # ==========================================================
@@ -505,7 +505,7 @@ async def generate_report(kohde_id: str):
         #  TABLE DRAW FUNCTION (PTS STYLE)
         # ======================================================
     
-        def draw_pts_table(pdf, x, y, rows, col_widths, w):
+        def draw_pts_table(pdf, x, y, rows, col_widths):
             """
             Draws a PTS‑style table with:
             - #C3D9E8 header background
@@ -588,7 +588,7 @@ async def generate_report(kohde_id: str):
             TABLE_WIDTH * 0.60
         ]
 
-        table_y = draw_pts_table(pdf, TABLE_X, table_y, rows, col_widths_2col, w)
+        table_y = draw_pts_table(pdf, TABLE_X, table_y, rows, col_widths_2col)
     
         # Footer + Page Number
         pdf.setFont("Arial", 10)
@@ -638,9 +638,9 @@ async def generate_report(kohde_id: str):
             # ==================================================
             #  LOAD IMAGES (two side-by-side)
             # ==================================================
-            img_w = 240
-            img_h = 240
-            gap = 40
+            # img_w = 240
+            # img_h = 240
+            # gap = 40
             
             def load_img(path):
                 try:
