@@ -569,7 +569,13 @@ async def generate_report(kohde_id: str):
             ["Tarkastaja", kohde["tarkastaja"]],
         ]
         table_y = h - HEADER_HEIGHT - 90
-        table_y = draw_pts_table(pdf, TABLE_X, table_y, rows, col_widths, w)
+        
+        col_widths_2col = [
+            TABLE_WIDTH * 0.40,
+            TABLE_WIDTH * 0.60
+        ]
+
+        table_y = draw_pts_table(pdf, TABLE_X, table_y, rows, col_widths_2col, w)
     
         # Footer + Page Number
         pdf.setFont("Arial", 10)
