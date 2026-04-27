@@ -735,7 +735,7 @@ async def generate_report(kohde_id: str):
                 40 + COL_W + COL_GAP,
                 MAT_ROW2_Y
             )
-            TABLE_START_Y = MAT_ROW2_Y - 50
+            TABLE_START_Y = MAT_ROW2_Y - 40
             # ==================================================
             #  HUONEISTON TIEDOT (PTS TABLE)
             # ==================================================
