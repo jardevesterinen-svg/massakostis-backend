@@ -562,7 +562,12 @@ async def generate_report(kohde_id: str):
         # Draw table under the "Perustiedot" heading
         table_x = 40
         table_y = h - HEADER_HEIGHT - 90
-        col_widths = [180, 300]
+        TABLE_WIDTH = MAX_IMG_W * 2 + 20        
+        col_widths = [
+            TABLE_WIDTH * 0.30,
+            TABLE_WIDTH * 0.10,
+            TABLE_WIDTH * 0.60
+        ]
     
         table_y = draw_pts_table(pdf, table_x, table_y, rows, col_widths, w)
     
@@ -859,7 +864,7 @@ async def generate_report(kohde_id: str):
               
             draw_pts_table_3col(
                 pdf,
-                40,
+                TABLE_X,
                 TABLE_START_Y,
                 rows,
                 col_widths
