@@ -300,6 +300,7 @@ async def pdf_options(kohde_id: str):
 # ==========================
 # LAYOUT CONSTANTS
 # ==========================
+w, h = A4
 CONTENT_X = 40
 CONTENT_GAP = 20
 CONTENT_WIDTH = w - CONTENT_X * 2
