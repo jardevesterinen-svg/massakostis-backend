@@ -789,7 +789,10 @@ async def generate_report(kohde_id: str):
             
                     # --- ENSIN LASKETAAN RIVIN TARVITSEMA KORKEUS ---
                     wrapped_cells = []
-            
+                    
+                    LEADING = 14          # riviväli
+                    CELL_PADDING = 6      # ylä- ja alamarginaali
+
                     for i, cell in enumerate(row):
                         if i == 2 and not is_header:
                             lines = wrap_text(
@@ -798,8 +801,9 @@ async def generate_report(kohde_id: str):
                                 10,
                                 col_widths[i] - 12
                             )
-                            wrapped_cells.append(lines)
-                            row_height = max(row_height, 13 * len(lines))
+                            wrapped_cells.append(lines)                            
+                            text_height = LEADING * len(lines)
+                            row_height = max(row_height, text_height + CELL_PADDING * 2)
                         else:
                             wrapped_cells.append([str(cell)])
             
@@ -828,10 +832,10 @@ async def generate_report(kohde_id: str):
                             elif value == "1":
                                 pdf.setFillColor(red)
             
-                        text_y = cur_y - 15
+                        text_y = cur_y - CELL_PADDING - FONT_SIZE
                         for line in lines:
                             pdf.drawString(col_x + 6, text_y, line)
-                            text_y -= 13
+                            text_y -= LEADING
             
                         col_x += col_widths[i]
             
