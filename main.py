@@ -788,7 +788,7 @@ async def generate_report(kohde_id: str):
                     col_x = x
             
                     # --- ENSIN LASKETAAN RIVIN TARVITSEMA KORKEUS ---
-                    wrapped_cells = []
+                    _cells = []
                     FONT_SIZE = 10
                     LEADING = 14          # riviväli
                     CELL_PADDING = 6      # ylä- ja alamarginaali
@@ -801,12 +801,15 @@ async def generate_report(kohde_id: str):
                                 10,
                                 col_widths[i] - 12
                             )
-                            wrapped_cells.append(lines)                            
+                            _cells.append(lines)                            
                             text_height = LEADING * len(lines)
                             row_height = max(row_height, text_height + CELL_PADDING * 2)
                         else:
-                            wrapped_cells.append([str(cell)])
-            
+                            _cells.append([str(cell)])
+                    
+                    if is_header:
+                       row_height = max(row_height, 28)
+
                     # --- TAUSTA ---
                     pdf.rect(
                         x,
@@ -818,7 +821,7 @@ async def generate_report(kohde_id: str):
                     )
             
                     # --- TEKSTI ---
-                    for i, lines in enumerate(wrapped_cells):
+                    for i, lines in enumerate(_cells):
                         pdf.setFillColor(COLOR_TEXT)
                         pdf.setFont("Arial-Bold" if is_header else "Arial", FONT_SIZE)
             
