@@ -522,7 +522,7 @@ async def generate_report(kohde_id: str):
                 if is_header:
                     pdf.setFont("Arial-Bold", 11)
                 else:
-                    pdf.setFont("Arial", 11)
+                    pdf.setFont("Arial", 10)
     
                 pdf.drawString(x + 6, cur_y - 15, left)
                 pdf.drawString(x + col_widths[0] + 6, cur_y - 15, right)
@@ -795,7 +795,7 @@ async def generate_report(kohde_id: str):
                             lines = wrap_text(
                                 str(cell),
                                 "Arial",
-                                11,
+                                10,
                                 col_widths[i] - 12
                             )
                             wrapped_cells.append(lines)
@@ -816,7 +816,7 @@ async def generate_report(kohde_id: str):
                     # --- TEKSTI ---
                     for i, lines in enumerate(wrapped_cells):
                         pdf.setFillColor(COLOR_TEXT)
-                        pdf.setFont("Arial-Bold" if is_header else "Arial", 11)
+                        pdf.setFont("Arial-Bold" if is_header else "Arial", 10)
             
                         # ✅ Kuntoluokan värikoodaus
                         if i == 1 and not is_header:
