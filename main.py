@@ -552,7 +552,7 @@ async def generate_report(kohde_id: str):
         # ======================================================
         #  PERUSTIEDOT — BUILD ROWS (PTS STYLE)
         # ======================================================
-    
+        
         rows = [
             ["Tilaajan tiedot", ""],
             ["Nimi", f"{tilaaja['etunimi']} {tilaaja['sukunimi']}"],
@@ -568,7 +568,7 @@ async def generate_report(kohde_id: str):
             ["Raportointipäivä", raportointipaiva],
             ["Tarkastaja", kohde["tarkastaja"]],
         ]
-    
+        table_y = h - HEADER_HEIGHT - 90
         table_y = draw_pts_table(pdf, TABLE_X, table_y, rows, col_widths, w)
     
         # Footer + Page Number
