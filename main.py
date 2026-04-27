@@ -505,7 +505,7 @@ async def generate_report(kohde_id: str):
         #  TABLE DRAW FUNCTION (PTS STYLE)
         # ======================================================
     
-        def draw_pts_table(pdf, x, y, rows, col_widths, w):
+        def draw_pts_table(pdf, x, y, rows, , w):
             """
             Draws a PTS‑style table with:
             - #C3D9E8 header background
@@ -524,7 +524,7 @@ async def generate_report(kohde_id: str):
                 else:
                     pdf.setFillColor(COLOR_ROW_ALT if idx % 2 == 1 else COLOR_ROW_WHITE)
     
-                pdf.rect(x, cur_y - row_h, col_widths[0] + col_widths[1],
+                pdf.rect(x, cur_y - row_h, [0] + [1],
                          row_h, fill=1, stroke=0)
     
                 # Text
@@ -535,13 +535,13 @@ async def generate_report(kohde_id: str):
                     pdf.setFont("Arial", 10)
     
                 pdf.drawString(x + 6, cur_y - 15, left)
-                pdf.drawString(x + col_widths[0] + 6, cur_y - 15, right)
+                pdf.drawString(x + [0] + 6, cur_y - 15, right)
     
                 # Gridline
                 pdf.setStrokeColor(COLOR_GRID)
                 pdf.setLineWidth(0.5)
                 pdf.line(x, cur_y - row_h,
-                         x + col_widths[0] + col_widths[1],
+                         x + [0] + [1],
                          cur_y - row_h)
     
                 cur_y -= row_h
@@ -571,13 +571,13 @@ async def generate_report(kohde_id: str):
     
         # Draw table under the "Perustiedot" heading
         table_y = h - HEADER_HEIGHT - 90
-        col_widths = [
+         = [
             TABLE_WIDTH * 0.30,
             TABLE_WIDTH * 0.10,
             TABLE_WIDTH * 0.60
         ]
     
-        table_y = draw_pts_table(pdf, TABLE_X, table_y, rows, col_widths, w)
+        table_y = draw_pts_table(pdf, TABLE_X, table_y, rows, , w)
     
         # Footer + Page Number
         pdf.setFont("Arial", 10)
@@ -728,9 +728,7 @@ async def generate_report(kohde_id: str):
             # ==================================================
             #  HUONEISTON TIEDOT (PTS TABLE)
             # ==================================================
-            
-            col_widths = [160, 80, 240]
-           
+                      
             TARKASTUSKOHTEET = [
                 ("seinien_kosteus", "Seinien kosteus"),
                 ("läpiviennit", "Läpiviennit"),
