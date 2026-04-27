@@ -789,7 +789,7 @@ async def generate_report(kohde_id: str):
             
                     # --- ENSIN LASKETAAN RIVIN TARVITSEMA KORKEUS ---
                     wrapped_cells = []
-                    
+                    FONT_SIZE = 10
                     LEADING = 14          # riviväli
                     CELL_PADDING = 6      # ylä- ja alamarginaali
 
@@ -820,7 +820,7 @@ async def generate_report(kohde_id: str):
                     # --- TEKSTI ---
                     for i, lines in enumerate(wrapped_cells):
                         pdf.setFillColor(COLOR_TEXT)
-                        pdf.setFont("Arial-Bold" if is_header else "Arial", 10)
+                        pdf.setFont("Arial-Bold" if is_header else "Arial", FONT_SIZE)
             
                         # ✅ Kuntoluokan värikoodaus
                         if i == 1 and not is_header:
