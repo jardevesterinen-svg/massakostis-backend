@@ -743,7 +743,7 @@ async def generate_report(kohde_id: str):
             TARKASTUSKOHTEET = [
                 ("seinien_kosteus", "Seinien kosteus"),
                 ("läpiviennit", "Läpiviennit"),
-                ("pinnat", "Pinnat, saumat, silikoni"),
+                ("pinnat", "Pinnat ja saumat"),
                 ("vesikalusteet", "Vesikalusteet"),
                 ("ilmanvaihto", "Ilmanvaihto"),
                 ("ovikynnys", "Ovikynnys"),
