@@ -560,9 +560,9 @@ async def generate_report(kohde_id: str):
         ]
     
         # Draw table under the "Perustiedot" heading
-        table_x = 40
+        table_x = CONTENT_X
         table_y = h - HEADER_HEIGHT - 90
-        TABLE_WIDTH = MAX_IMG_W * 2 + 20        
+        TABLE_WIDTH = CONTENT_WIDTH        
         col_widths = [
             TABLE_WIDTH * 0.30,
             TABLE_WIDTH * 0.10,
@@ -622,7 +622,11 @@ async def generate_report(kohde_id: str):
             img_w = 240
             img_h = 240
             gap = 40
-    
+            
+            CONTENT_X = 40
+            CONTENT_GAP = 20
+            CONTENT_WIDTH = w - CONTENT_X * 2
+
             def load_img(path):
                 try:
                     b = s3.get_object(Bucket=R2_BUCKET, Key=path)["Body"].read()
@@ -635,18 +639,18 @@ async def generate_report(kohde_id: str):
     
             # ---- Render images ----
            
-            MAX_IMG_W = (w - 40*2 - 20) / 2
+            MAX_IMG_W = (CONTENT_WIDTH - CONTENT_GAP) / 2
             y_img = IMAGES_TOP_Y
             
             if img1 and img2:
-                draw_scaled_image(pdf, img1, 40, y_img, MAX_IMG_W)
-                draw_scaled_image(pdf, img2, 40 + MAX_IMG_W + 20, y_img, MAX_IMG_W)
+                draw_scaled_image(pdf, img1, CONTENT_X, y_img, MAX_IMG_W)
+                draw_scaled_image(pdf, img2, CONTENT_X + MAX_IMG_W + 20, y_img, MAX_IMG_W)
                         
             elif img1:
-                draw_scaled_image(pdf, img1, 40, y_img, MAX_IMG_W*2 + 20)
+                draw_scaled_image(pdf, img1, CONTENT_X, y_img, MAX_IMG_W*2 + 20)
                         
             elif img2:
-                draw_scaled_image(pdf, img2, 40, y_img, MAX_IMG_W*2 + 20)
+                draw_scaled_image(pdf, img2, CONTENT_X, y_img, MAX_IMG_W*2 + 20)
           
             
             # ======================
