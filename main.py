@@ -761,7 +761,7 @@ async def generate_report(kohde_id: str):
             ]            
             
             for key, label in TARKASTUSKOHTEET:
-                # Kuntoluokka (★★, ★ jne.)
+                # Kuntoluokka (1, 2 jne.)
                 kuntoluokka = data.get(f"{key}_kuntoluokka", "–")
             
                 # Havainnot
@@ -851,17 +851,7 @@ async def generate_report(kohde_id: str):
                     for i, lines in enumerate(_cells):
                         pdf.setFillColor(COLOR_TEXT)
                         pdf.setFont("Arial-Bold" if is_header else "Arial", FONT_SIZE)
-            
-                        # ✅ Kuntoluokan värikoodaus
-                        if i == 1 and not is_header:
-                            value = lines[0]
-                            if value == "3":
-                                pdf.setFillColor(green)
-                            elif value == "2":
-                                pdf.setFillColor(orange)
-                            elif value == "1":
-                                pdf.setFillColor(red)
-            
+               
                         text_y = cur_y - CELL_PADDING - FONT_SIZE
                         for line in lines:
                             pdf.drawString(col_x + 6, text_y, line)
