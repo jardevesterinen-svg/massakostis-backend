@@ -577,7 +577,7 @@ async def generate_report(kohde_id: str):
             TABLE_WIDTH * 0.60
         ]
     
-        table_y = draw_pts_table(pdf, table_x, table_y, rows, col_widths, w)
+        table_y = draw_pts_table(pdf, TABLE_X, table_y, rows, col_widths, w)
     
         # Footer + Page Number
         pdf.setFont("Arial", 10)
