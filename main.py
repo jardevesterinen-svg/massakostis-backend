@@ -297,6 +297,12 @@ async def pdf_options(kohde_id: str):
         }
     )
 
+# ==========================
+# LAYOUT CONSTANTS
+# ==========================
+CONTENT_X = 40
+CONTENT_GAP = 20
+CONTENT_WIDTH = w - CONTENT_X * 2
 
 # ==========================================================
 #  PDF HEADER FUNCTION (used on ALL pages except cover)
@@ -623,10 +629,6 @@ async def generate_report(kohde_id: str):
             img_h = 240
             gap = 40
             
-            CONTENT_X = 40
-            CONTENT_GAP = 20
-            CONTENT_WIDTH = w - CONTENT_X * 2
-
             def load_img(path):
                 try:
                     b = s3.get_object(Bucket=R2_BUCKET, Key=path)["Body"].read()
