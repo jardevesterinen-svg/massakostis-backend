@@ -305,6 +305,9 @@ CONTENT_X = 40
 CONTENT_GAP = 20
 CONTENT_WIDTH = w - CONTENT_X * 2
 
+TABLE_X = CONTENT_X
+TABLE_WIDTH = CONTENT_WIDTH
+
 # ==========================================================
 #  PDF HEADER FUNCTION (used on ALL pages except cover)
 # ==========================================================
@@ -567,9 +570,7 @@ async def generate_report(kohde_id: str):
         ]
     
         # Draw table under the "Perustiedot" heading
-        table_x = CONTENT_X
         table_y = h - HEADER_HEIGHT - 90
-        TABLE_WIDTH = CONTENT_WIDTH        
         col_widths = [
             TABLE_WIDTH * 0.30,
             TABLE_WIDTH * 0.10,
