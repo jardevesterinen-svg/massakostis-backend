@@ -742,9 +742,9 @@ async def generate_report(kohde_id: str):
                 ["Tarkastuskohde", "Kuntoluokka", "Havainnot ja toimenpiteet"]
             ]
             col_widths = [
-                TABLE_WIDTH * 0.30,   # Tarkastuskohde
-                TABLE_WIDTH * 0.10,   # Kuntoluokka
-                TABLE_WIDTH * 0.60    # Havainnot ja toimenpiteet
+                float(TABLE_WIDTH) * 0.30,   # Tarkastuskohde
+                float(TABLE_WIDTH) * 0.10,   # Kuntoluokka
+                float(TABLE_WIDTH) * 0.60    # Havainnot ja toimenpiteet
             ]            
             
             for key, label in TARKASTUSKOHTEET:
