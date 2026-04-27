@@ -569,14 +569,6 @@ async def generate_report(kohde_id: str):
             ["Tarkastaja", kohde["tarkastaja"]],
         ]
     
-        # Draw table under the "Perustiedot" heading
-        table_y = h - HEADER_HEIGHT - 90
-         = [
-            TABLE_WIDTH * 0.30,
-            TABLE_WIDTH * 0.10,
-            TABLE_WIDTH * 0.60
-        ]
-    
         table_y = draw_pts_table(pdf, TABLE_X, table_y, rows, , w)
     
         # Footer + Page Number
@@ -743,8 +735,11 @@ async def generate_report(kohde_id: str):
             rows = [
                 ["Tarkastuskohde", "Kuntoluokka", "Havainnot ja toimenpiteet"]
             ]
-    
-            for key, label in TARKASTUSKOHTEET:
+            col_widths = [
+                TABLE_WIDTH * 0.30,   # Tarkastuskohde
+                TABLE_WIDTH * 0.10,   # Kuntoluokka
+                TABLE_WIDTH * 0.60    # Havainnot ja toimenpiteet
+            ]            for key, label in TARKASTUSKOHTEET:
                 # Kuntoluokka (★★, ★ jne.)
                 kuntoluokka = data.get(f"{key}_kuntoluokka", "–")
             
