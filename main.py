@@ -523,9 +523,14 @@ async def generate_report(kohde_id: str):
                     pdf.setFillColor(COLOR_TABLE_HEADER)
                 else:
                     pdf.setFillColor(COLOR_ROW_ALT if idx % 2 == 1 else COLOR_ROW_WHITE)
-    
-                pdf.rect(x, cur_y - row_h, [0] + [1],
-                         row_h, fill=1, stroke=0)
+                    
+                pdf.rect(
+                    x,
+                    cur_y - row_h,
+                    col_widths[0] + col_widths[1],
+                    row_h,
+                    fill=1,
+                    stroke=0
     
                 # Text
                 pdf.setFillColor(COLOR_TEXT)
@@ -533,16 +538,23 @@ async def generate_report(kohde_id: str):
                     pdf.setFont("Arial-Bold", 11)
                 else:
                     pdf.setFont("Arial", 10)
-    
-                pdf.drawString(x + 6, cur_y - 15, left)
-                pdf.drawString(x + [0] + 6, cur_y - 15, right)
+                    
+                pdf.drawString(
+                    x + col_widths[0] + 6,
+                    cur_y - 15,
+                    right
+                )
     
                 # Gridline
                 pdf.setStrokeColor(COLOR_GRID)
                 pdf.setLineWidth(0.5)
-                pdf.line(x, cur_y - row_h,
-                         x + [0] + [1],
-                         cur_y - row_h)
+
+                pdf.line(
+                    x,
+                    cur_y - row_h,
+                    x + col_widths[0] + col_widths[1],
+                    cur_y - row_h
+                )
     
                 cur_y -= row_h
     
