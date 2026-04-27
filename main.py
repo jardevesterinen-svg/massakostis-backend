@@ -505,7 +505,7 @@ async def generate_report(kohde_id: str):
         #  TABLE DRAW FUNCTION (PTS STYLE)
         # ======================================================
     
-        def draw_pts_table(pdf, x, y, rows, , w):
+        def draw_pts_table(pdf, x, y, rows, col_widths, w):
             """
             Draws a PTS‑style table with:
             - #C3D9E8 header background
@@ -569,7 +569,7 @@ async def generate_report(kohde_id: str):
             ["Tarkastaja", kohde["tarkastaja"]],
         ]
     
-        table_y = draw_pts_table(pdf, TABLE_X, table_y, rows, , w)
+        table_y = draw_pts_table(pdf, TABLE_X, table_y, rows, col_widths, w)
     
         # Footer + Page Number
         pdf.setFont("Arial", 10)
@@ -739,7 +739,9 @@ async def generate_report(kohde_id: str):
                 TABLE_WIDTH * 0.30,   # Tarkastuskohde
                 TABLE_WIDTH * 0.10,   # Kuntoluokka
                 TABLE_WIDTH * 0.60    # Havainnot ja toimenpiteet
-            ]            for key, label in TARKASTUSKOHTEET:
+            ]            
+            
+            for key, label in TARKASTUSKOHTEET:
                 # Kuntoluokka (★★, ★ jne.)
                 kuntoluokka = data.get(f"{key}_kuntoluokka", "–")
             
