@@ -620,8 +620,8 @@ async def generate_report(kohde_id: str):
             
             y = h - 18
             pdf.setFont("Arial", 11)
-            pdf.drawRightString(info_x - 200, y, f"Huoneisto {apt}")
-            y -= 11
+            pdf.drawRightString(info_x - 200, y - 11 , f"Huoneisto {apt}")
+            y += 5
             pdf.setFont("Arial", 9)
             pdf.drawRightString(info_x, y, f"Tarkastuspäivä: {kohde['paiva']}")
             y -= 11
