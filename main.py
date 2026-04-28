@@ -612,16 +612,17 @@ async def generate_report(kohde_id: str):
             draw_stone_header(pdf, w, h)
         
             # ---- Headerin oikean reunan lisätiedot ----
-            pdf.setFont("Arial", 9)
+            
             pdf.setFillColor(COLOR_TEXT)
             
             info_x = w - 80   # infosarakkeen oikea reuna
             page_x = w - 40    # sivunumeron äärioikea
             
             y = h - 18
-            
-            pdf.drawRightString(info_x - 100, y, f"Huoneisto {apt}")
+            pdf.setFont("Arial", 11)
+            pdf.drawRightString(info_x - 200, y, f"Huoneisto {apt}")
             y -= 11
+            pdf.setFont("Arial", 9)
             pdf.drawRightString(info_x, y, f"Tarkastuspäivä: {kohde['paiva']}")
             y -= 11
             pdf.drawRightString(
