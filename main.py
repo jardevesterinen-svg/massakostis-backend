@@ -762,7 +762,7 @@ async def generate_report(kohde_id: str):
             
             for key, label in TARKASTUSKOHTEET:
                 # Kuntoluokka (1, 2 jne.)
-                kuntoluokka = data.get(f"{key}_kuntoluokka", "–")
+                kuntoluokka = data.get(f"kuntoluokka__{key}", "–")
             
                 # Havainnot
                 havainnot = (
