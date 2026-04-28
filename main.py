@@ -696,8 +696,17 @@ async def generate_report(kohde_id: str):
                 return y
             
             # Pilko putket listaksi
-            vesiputket = [s.strip() for s in data.get("materiaalit_vesiputket", "").split(",") if s.strip()]
-            lampoputket = [s.strip() for s in data.get("materiaalit_lampoputket", "").split(",") if s.strip()]
+            def safe_split(value):
+                if not value:
+                    return []
+                if isinstance(value, list):
+                    return value
+                if isinstance(value, str):
+                    return [s.strip() for s in value.split(",") if s.strip()]
+                return []
+            
+            vesiputket = safe_split(data.get("materiaalit_vesiputket"))
+            lampoputket = safe_split(data.get("materiaalit_lampoputket"))
             
             # --- RIVI 1 ---
             draw_material_block(
