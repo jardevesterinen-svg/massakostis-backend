@@ -32,6 +32,17 @@ IMAGES_MAX_HEIGHT = 220
 # MATERIALS_HEIGHT = 120
 PUBLIC_URL = "https://pub-9f421e06dc9f4bd49ae0adcf5690c438.r2.dev"
 
+KOSTEUSKARTOITUS_TEKSTI = """
+Märkätilojen kosteuskartoituksessa tarkastellaan tilojen pintarakenteita, liitoksia ja läpivientejä aistinvaraisesti sekä tarvittaessa pintakosteusmittauksin.
+Kartoitus ei sisällä rakenteiden avaamista eikä rakenteiden sisäisiä mittauksia.
+Mahdolliset mittaustulokset ovat suuntaa-antavia.
+Kartoituksessa ei arvioida rakenteiden teknistä käyttöikää eikä energiatehokkuutta.
+Havaitut puutteet ja riskit kirjataan raporttiin.
+Raportti ei ole rakenteellinen kuntotutkimus.
+Tarvittaessa suositellaan tarkempia tutkimuksia.
+Kartoitus perustuu tarkastushetken havaintoihin.
+"""
+
 # ==========================================================
 #  S3 CLIENT (Cloudflare R2)
 # ==========================================================
@@ -603,6 +614,37 @@ async def generate_report(kohde_id: str):
         ]
 
         table_y = draw_pts_table(pdf, TABLE_X, table_y, rows, col_widths_2col)
+        
+        TEXT_START_Y = table_y - 30
+        TEXT_WIDTH = TABLE_WIDTH
+        
+        pdf.setFont("Arial-Bold", 12)
+        pdf.drawString(TABLE_X, TEXT_START_Y, "Märkätilojen kosteuskartoituksen sisältö ja rajaukset")
+        
+        pdf.setFont("Arial", 10)
+        
+        lines = wrap_text(
+            KOSTEUSKARTOITUS_TEKSTI.strip(),
+            "Arial",
+            10,
+            TEXT_WIDTH
+        )
+        
+        y_text = TEXT_START_Y - 18
+        
+        for line in lines:
+            pdf.drawString(TABLE_X, y_text, line)
+            y_text -= 14
+        
+        kunto_y = y_text - 30
+        col_widths_kunto = [
+            TABLE_WIDTH * 0.15,
+            TABLE_WIDTH * 0.85
+        ]
+
+        rows = [["Kuntoluokka", "Selitys"]] + KUNTOLUOKAT
+        
+        draw_pts_table(pdf, TABLE_X, kunto_y, rows, col_widths_kunto)
     
         # Footer + Page Number
         pdf.setFont("Arial", 10)
