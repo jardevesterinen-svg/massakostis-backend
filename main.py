@@ -644,10 +644,14 @@ async def generate_report(kohde_id: str):
 
         rows = [
             ["Kuntoluokka", "Kuntoluokan selitys"],
-            ["1", "selitys"],
-            ["2", "selitys"],
-            ["3", "selitys"],
-            ["4", "selitys"],
+            ["1", """Rakenteet ovat hyvässä kunnossa eikä merkittäviä puutteita havaittu.
+        Vain normaalia kulumista voi esiintyä."""] ,
+            ["2", """Rakenteissa on havaittavissa vähäisiä puutteita tai kulumaa.
+        Korjaustarpeet eivät ole välittömiä."""] ,
+            ["3", """Rakenteissa on selkeitä puutteita tai vaurioita.
+        Korjaustoimenpiteet suositellaan tehtäväksi lähivuosina."""] ,
+            ["4", """Rakenteissa on merkittäviä vaurioita tai kosteusriski.
+        Korjaustoimenpiteet ovat kiireellisiä."""] ,
         ]
         
         kunto_y = draw_pts_table(pdf, TABLE_X, kunto_y, rows, col_widths_kunto)
