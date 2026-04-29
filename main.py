@@ -642,9 +642,9 @@ async def generate_report(kohde_id: str):
             TABLE_WIDTH * 0.85
         ]
 
-        rows = [["Kuntoluokka", "Selitys"]] + KUNTOLUOKAT
+        # rows = [["Kuntoluokka", "Selitys"]] + KUNTOLUOKAT
         
-        draw_pts_table(pdf, TABLE_X, kunto_y, rows, col_widths_kunto)
+        # draw_pts_table(pdf, TABLE_X, kunto_y, rows, col_widths_kunto)
     
         # Footer + Page Number
         pdf.setFont("Arial", 10)
