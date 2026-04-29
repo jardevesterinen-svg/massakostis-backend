@@ -642,7 +642,15 @@ async def generate_report(kohde_id: str):
             TABLE_WIDTH * 0.85
         ]
 
-        # rows = [["Kuntoluokka", "Selitys"]] + KUNTOLUOKAT
+        rows = [
+            ["Kuntoluokka", "Kuntoluokan selitys"],
+            ["1", "Pinnoite ja vedeneriste / kaluste / rakenne suositeltavaa uusia pääosin tai
+            kokonaan. Alusrakenteiden kunto tulee tarkastaa ja kastuneet rakenteet
+            tulee koneellisesti kuivata"],
+            ["2", "selitys"],
+            ["3", "selitys"],
+            ["4", "selitys"],
+        ]
         
         # draw_pts_table(pdf, TABLE_X, kunto_y, rows, col_widths_kunto)
     
