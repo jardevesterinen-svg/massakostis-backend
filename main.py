@@ -824,8 +824,15 @@ async def generate_report(kohde_id: str):
             
             draw_material_block(
                 "Lämpöputket",
-                lampoputket or ["–"],
+                [data.get("pintarakenteiden_ika", "–")],
                 40 + COL_W + COL_GAP,
+                MAT_ROW2_Y
+            )
+
+            draw_material_block(
+                "Arvioitu pintarakenteiden ikä",
+                lampoputket or ["–"],
+                40 + (COL_W + COL_GAP) * 2,
                 MAT_ROW2_Y
             )
             TABLE_START_Y = MAT_ROW2_Y - 40
