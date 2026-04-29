@@ -661,7 +661,7 @@ async def generate_report(kohde_id: str):
             TABLE_WIDTH * 0.15,
             TABLE_WIDTH * 0.85
         ]
-        
+        pdf.setFont("Arial", 9)
         rows = [
             ["Kuntoluokka", "Kuntoluokan selitys"],
             ["1", """Rakenteet ovat hyvässä kunnossa eikä merkittäviä puutteita havaittu. Vain normaalia kulumista voi esiintyä."""] ,
