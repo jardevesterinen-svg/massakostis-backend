@@ -644,15 +644,13 @@ async def generate_report(kohde_id: str):
 
         rows = [
             ["Kuntoluokka", "Kuntoluokan selitys"],
-            ["1", "Pinnoite ja vedeneriste / kaluste / rakenne suositeltavaa uusia pääosin tai
-            kokonaan. Alusrakenteiden kunto tulee tarkastaa ja kastuneet rakenteet
-            tulee koneellisesti kuivata"],
+            ["1", "selitys"],
             ["2", "selitys"],
             ["3", "selitys"],
             ["4", "selitys"],
         ]
         
-        draw_pts_table(pdf, TABLE_X, kunto_y, rows, col_widths_kunto)
+        kunto_y = draw_pts_table(pdf, TABLE_X, kunto_y, rows, col_widths_kunto)
     
         # Footer + Page Number
         pdf.setFont("Arial", 10)
