@@ -556,6 +556,22 @@ async def generate_report(kohde_id: str):
                 else:
                     pdf.setFont("Arial", 10)
                
+                # ✅ VASEN SARKE
+                if left:
+                    pdf.drawString(
+                        x + 6,
+                        cur_y - 15,
+                        str(left)
+                    )
+        
+                # ✅ OIKEA SARKE
+                if right:
+                    pdf.drawString(
+                        x + col_widths[0] + 6,
+                        cur_y - 15,
+                        str(right)
+                    )
+
                 lines = wrap_text(
                     str(right),
                     "Arial-Bold" if is_header else "Arial",
