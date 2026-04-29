@@ -589,7 +589,7 @@ async def generate_report(kohde_id: str):
             ["Raportointipäivä", raportointipaiva],
             ["Tarkastaja", kohde["tarkastaja"]],
         ]
-        table_y = h - HEADER_HEIGHT - 90
+        table_y = h - HEADER_HEIGHT - 60
         
         col_widths_2col = [
             TABLE_WIDTH * 0.40,
