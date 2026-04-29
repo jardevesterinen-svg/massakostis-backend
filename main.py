@@ -652,7 +652,7 @@ async def generate_report(kohde_id: str):
             ["4", "selitys"],
         ]
         
-        # draw_pts_table(pdf, TABLE_X, kunto_y, rows, col_widths_kunto)
+        draw_pts_table(pdf, TABLE_X, kunto_y, rows, col_widths_kunto)
     
         # Footer + Page Number
         pdf.setFont("Arial", 10)
