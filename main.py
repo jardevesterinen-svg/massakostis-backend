@@ -593,8 +593,6 @@ async def generate_report(kohde_id: str):
             ["Puhelin", tilaaja["puhelin"]],
             ["Kohteen nimi", kohde["nimi"]],
             ["Kohteen osoite", kohde["osoite"]],
-            ["Tarkastuspäivä", format_date(kohde["paiva"])],
-            ["Raportointipäivä", raportointipaiva],
             ["Tarkastaja", kohde["tarkastaja"]],
         ]
         table_y = h - HEADER_HEIGHT - 60
