@@ -555,13 +555,7 @@ async def generate_report(kohde_id: str):
                     pdf.setFont("Arial-Bold", 11)
                 else:
                     pdf.setFont("Arial", 10)
-                
-               pdf.drawString(
-                    x + 6,
-                    cur_y - 15,
-                    left
-                )
-                
+               
                 lines = wrap_text(
                     str(right),
                     "Arial-Bold" if is_header else "Arial",
