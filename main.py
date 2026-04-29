@@ -627,26 +627,7 @@ async def generate_report(kohde_id: str):
         ]
 
         table_y = draw_pts_table(pdf, TABLE_X, table_y, rows, col_widths_2col)
-        
-        # Text
-        pdf.setFillColor(COLOR_TEXT)
-        if is_header:
-            pdf.setFont("Arial-Bold", 11)
-        else:
-            pdf.setFont("Arial", 10)
-
-        pdf.drawString(
-            x + 6,
-            cur_y - 15,
-            left
-        )
-        
-        pdf.drawString(
-            x + col_widths[0] + 6,
-            cur_y - 15,
-            right
-        )
-        
+               
         TEXT_START_Y = table_y - 30
         TEXT_WIDTH = TABLE_WIDTH
         
@@ -668,20 +649,9 @@ async def generate_report(kohde_id: str):
         for line in lines:
             pdf.drawString(TABLE_X, y_text, line)
             y_text -= 14
-
-        pdf.drawString(
-            x + 6,
-            cur_y - 15,
-            left
-        )
-        
-        pdf.drawString(
-            x + col_widths[0] + 6,
-            cur_y - 15,
-            right
-        )
-        
+       
         kunto_y = y_text - 30
+        
         col_widths_kunto = [
             TABLE_WIDTH * 0.15,
             TABLE_WIDTH * 0.85
