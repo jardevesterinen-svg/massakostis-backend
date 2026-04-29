@@ -450,8 +450,16 @@ async def generate_report(kohde_id: str):
         )
     
         # ---- Tarkastus- ja raportointipäivä ----
+        
+        def format_date(date_str):
+            if not date_str:
+                return ""
+            try:
+                return datetime.strptime(date_str, "%Y-%m-%d").strftime("%d.%m.%Y")
+            except:
+                return date_str
         raportointipaiva = datetime.now().strftime("%d.%m.%Y")
-        pdf.drawString(40, h - 255, f"Tarkastuspäivä: {kohde['paiva']}")
+        pdf.drawString(40, h - 255, f"Tarkastuspäivä: {format_date(kohde['paiva'])}")
         pdf.drawString(40, h - 275, f"Raportointipäivä: {raportointipaiva}")
     
         # ---- Kansikuva ----
@@ -585,7 +593,7 @@ async def generate_report(kohde_id: str):
             ["Puhelin", tilaaja["puhelin"]],
             ["Kohteen nimi", kohde["nimi"]],
             ["Kohteen osoite", kohde["osoite"]],
-            ["Tarkastuspäivä", kohde["paiva"]],
+            ["Tarkastuspäivä", format_date(kohde["paiva"])],
             ["Raportointipäivä", raportointipaiva],
             ["Tarkastaja", kohde["tarkastaja"]],
         ]
