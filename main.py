@@ -539,7 +539,15 @@ async def generate_report(kohde_id: str):
                     pdf.setFont("Arial-Bold", 11)
                 else:
                     pdf.setFont("Arial", 10)
-                    
+                
+                # ✅ vasen sarake
+                pdf.drawString(
+                    x + 6,
+                    cur_y - 15,
+                    left
+                )
+                
+                # ✅ oikea sarake
                 pdf.drawString(
                     x + col_widths[0] + 6,
                     cur_y - 15,
