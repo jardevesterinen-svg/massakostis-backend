@@ -644,25 +644,24 @@ async def generate_report(kohde_id: str):
         )
         
         y_text = TEXT_START_Y - 18
-
         
         for line in lines:
             pdf.drawString(TABLE_X, y_text, line)
             y_text -= 14
        
         kunto_y = y_text - 30
-        
+                       
         col_widths_kunto = [
             TABLE_WIDTH * 0.15,
             TABLE_WIDTH * 0.85
         ]
-
+        
         rows = [
-            ["Kuntoluokka", "Kuntoluokan selitys"],
-            ["1", """Rakenteet ovat hyvässä kunnossa eikä merkittäviä puutteita havaittu. Vain normaalia kulumista voi esiintyä."""] ,
-            ["2", """Rakenteissa on havaittavissa vähäisiä puutteita tai kulumaa. Korjaustarpeet eivät ole välittömiä."""] ,
-            ["3", """Rakenteissa on selkeitä puutteita tai vaurioita. Korjaustoimenpiteet suositellaan tehtäväksi lähivuosina."""] ,
-            ["4", """Rakenteissa on merkittäviä vaurioita tai kosteusriski. Korjaustoimenpiteet ovat kiireellisiä."""] ,
+            ["Kuntoluokka", "Selitys"],
+            ["1", "Ei merkittäviä puutteita"],
+            ["2", "Vähäisiä puutteita"],
+            ["3", "Selkeitä puutteita"],
+            ["4", "Kiireellinen korjaustarve"],
         ]
         
         kunto_y = draw_pts_table(pdf, TABLE_X, kunto_y, rows, col_widths_kunto)
