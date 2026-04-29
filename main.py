@@ -34,12 +34,9 @@ PUBLIC_URL = "https://pub-9f421e06dc9f4bd49ae0adcf5690c438.r2.dev"
 
 KOSTEUSKARTOITUS_TEKSTI = """
 Märkätilojen kosteuskartoituksessa tarkastellaan tilojen pintarakenteita, liitoksia ja läpivientejä aistinvaraisesti sekä tarvittaessa pintakosteusmittauksin.
-Kartoitus ei sisällä rakenteiden avaamista eikä rakenteiden sisäisiä mittauksia.
-Mahdolliset mittaustulokset ovat suuntaa-antavia.
-Kartoituksessa ei arvioida rakenteiden teknistä käyttöikää eikä energiatehokkuutta.
-Havaitut puutteet ja riskit kirjataan raporttiin.
-Raportti ei ole rakenteellinen kuntotutkimus.
-Tarvittaessa suositellaan tarkempia tutkimuksia.
+Kartoitus ei sisällä rakenteiden avaamista eikä rakenteiden sisäisiä mittauksia. Mahdolliset mittaustulokset ovat suuntaa-antavia.
+Kartoituksessa ei arvioida rakenteiden teknistä käyttöikää eikä energiatehokkuutta. Havaitut puutteet ja riskit kirjataan raporttiin.
+Raportti ei ole rakenteellinen kuntotutkimus. Tarvittaessa suositellaan tarkempia tutkimuksia.
 Kartoitus perustuu tarkastushetken havaintoihin.
 """
 
@@ -644,14 +641,10 @@ async def generate_report(kohde_id: str):
 
         rows = [
             ["Kuntoluokka", "Kuntoluokan selitys"],
-            ["1", """Rakenteet ovat hyvässä kunnossa eikä merkittäviä puutteita havaittu.
-        Vain normaalia kulumista voi esiintyä."""] ,
-            ["2", """Rakenteissa on havaittavissa vähäisiä puutteita tai kulumaa.
-        Korjaustarpeet eivät ole välittömiä."""] ,
-            ["3", """Rakenteissa on selkeitä puutteita tai vaurioita.
-        Korjaustoimenpiteet suositellaan tehtäväksi lähivuosina."""] ,
-            ["4", """Rakenteissa on merkittäviä vaurioita tai kosteusriski.
-        Korjaustoimenpiteet ovat kiireellisiä."""] ,
+            ["1", """Rakenteet ovat hyvässä kunnossa eikä merkittäviä puutteita havaittu. Vain normaalia kulumista voi esiintyä."""] ,
+            ["2", """Rakenteissa on havaittavissa vähäisiä puutteita tai kulumaa. Korjaustarpeet eivät ole välittömiä."""] ,
+            ["3", """Rakenteissa on selkeitä puutteita tai vaurioita. Korjaustoimenpiteet suositellaan tehtäväksi lähivuosina."""] ,
+            ["4", """Rakenteissa on merkittäviä vaurioita tai kosteusriski. Korjaustoimenpiteet ovat kiireellisiä."""] ,
         ]
         
         kunto_y = draw_pts_table(pdf, TABLE_X, kunto_y, rows, col_widths_kunto)
