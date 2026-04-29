@@ -556,19 +556,58 @@ async def generate_report(kohde_id: str):
                 else:
                     pdf.setFont("Arial", 10)
                 
-                # ✅ vasen sarake
-                pdf.drawString(
-                    x + 6,
-                    cur_y - 15,
-                    left
+                # --- WRAP vasen ---
+                left_lines = wrap_text(
+                    str(left),
+                    "Arial-Bold" if is_header else "Arial",
+                    10,
+                    col_widths[0] - 12
                 )
                 
-                # ✅ oikea sarake
-                pdf.drawString(
-                    x + col_widths[0] + 6,
-                    cur_y - 15,
-                    right
+                # --- WRAP oikea ---
+                right_lines = wrap_text(
+                    str(right),
+                    "Arial-Bold" if is_header else "Arial",
+                    10,
+                    col_widths[1] - 12
                 )
+                
+                # --- rivikorkeus dynaamiseksi ---
+                LINE_HEIGHT = 14
+                CELL_PADDING = 6
+                
+                row_height = max(
+                    22,
+                    LINE_HEIGHT * max(len(left_lines), len(right_lines)) + CELL_PADDING * 2
+                )
+                
+                # --- TAUSTA ---
+                pdf.rect(
+                    x,
+                    cur_y - row_height,
+                    col_widths[0] + col_widths[1],
+                    row_height,
+                    fill=1,
+                    stroke=0
+                )
+                
+                # --- TEKSTI ---
+                pdf.setFillColor(COLOR_TEXT)
+                pdf.setFont("Arial-Bold" if is_header else "Arial", 10)
+                
+                # vasen sarake
+                text_y_left = cur_y - CELL_PADDING - 10
+                for line in left_lines:
+                    pdf.drawString(x + 6, text_y_left, line)
+                    text_y_left -= LINE_HEIGHT
+                
+                # oikea sarake
+                text_y_right = cur_y - CELL_PADDING - 10
+                for line in right_lines:
+                    pdf.drawString(x + col_widths[0] + 6, text_y_right, line)
+                    text_y_right -= LINE_HEIGHT
+                
+                cur_y -= row_height
     
                 # Gridline
                 pdf.setStrokeColor(COLOR_GRID)
