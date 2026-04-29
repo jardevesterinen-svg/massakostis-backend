@@ -628,6 +628,25 @@ async def generate_report(kohde_id: str):
 
         table_y = draw_pts_table(pdf, TABLE_X, table_y, rows, col_widths_2col)
         
+        # Text
+        pdf.setFillColor(COLOR_TEXT)
+        if is_header:
+            pdf.setFont("Arial-Bold", 11)
+        else:
+            pdf.setFont("Arial", 10)
+
+        pdf.drawString(
+            x + 6,
+            cur_y - 15,
+            left
+        )
+        
+        pdf.drawString(
+            x + col_widths[0] + 6,
+            cur_y - 15,
+            right
+        )
+        
         TEXT_START_Y = table_y - 30
         TEXT_WIDTH = TABLE_WIDTH
         
