@@ -438,16 +438,16 @@ async def generate_report(kohde_id: str):
         # ---- Title Block ----
         pdf.setFillColor(COLOR_TEXT)
         pdf.setFont("Arial-Bold", 26)
-        pdf.drawString(40, h - 140, "Märkätilojen kosteuskartoitus")
+        (40, h - 140, "Märkätilojen kosteuskartoitus")
     
         # ---- Kohde nimi ----
         pdf.setFont("Arial-Bold", 20)
-        pdf.drawString(40, h - 180, kohde["nimi"])
+        (40, h - 180, kohde["nimi"])
     
         # ---- Kohteen osoite ----
         pdf.setFont("Arial", 14)
-        pdf.drawString(40, h - 205, kohde["osoite"])
-        pdf.drawString(
+        (40, h - 205, kohde["osoite"])
+        (
             40,
             h - 225,
             f"{kohde['postinumero']} {kohde['postitoimipaikka']}"
@@ -519,23 +519,48 @@ async def generate_report(kohde_id: str):
     
         def draw_pts_table(pdf, x, y, rows, col_widths):
             """
-            Draws a PTS‑style table with:
-            - #C3D9E8 header background
-            - alternating rows (#FFFFFF / #F2F7FA)
-            - #D0D0D0 gridlines
+            Draws a PTS-style 2-column table with:
+            - wrapped text
+            - dynamic row height
+            - proper alignment
             """
-            row_h = 22
+        
             cur_y = y
-    
+            LINE_HEIGHT = 14
+            BASE_ROW_HEIGHT = 22
+        
             for idx, (left, right) in enumerate(rows):
                 is_header = (idx == 0)
-    
-                # Background
+        
+                # --- FONT ---
+                font_name = "Arial-Bold" if is_header else "Arial"
+                font_size = 11 if is_header else 10
+        
+                pdf.setFont(font_name, font_size)
+                pdf.setFillColor(COLOR_TEXT)
+        
+                # --- WRAP TEXT (vain oikea sarake tarvitsee) ---
+                right_text = str(right or "").replace("\n", " ")
+                right_lines = wrap_text(
+                    right_text,
+                    font_name,
+                    font_size,
+                    col_widths[1] - 12
+                )
+        
+                # vasen sarake yleensä lyhyt → yksi rivi riittää
+                left_text = str(left or "")
+        
+                # --- RIVIKORKEUS ---
+                content_height = max(1, len(right_lines)) * LINE_HEIGHT
+                row_h = max(BASE_ROW_HEIGHT, content_height + 8)
+        
+                # --- TAUSTA ---
                 if is_header:
                     pdf.setFillColor(COLOR_TABLE_HEADER)
                 else:
                     pdf.setFillColor(COLOR_ROW_ALT if idx % 2 == 1 else COLOR_ROW_WHITE)
-                    
+        
                 pdf.rect(
                     x,
                     cur_y - row_h,
@@ -544,68 +569,44 @@ async def generate_report(kohde_id: str):
                     fill=1,
                     stroke=0
                 )
-                
-                # Text
-                pdf.setFillColor(COLOR_TEXT)
-                if is_header:
-                    pdf.setFont("Arial-Bold", 11)
-                else:
-                    pdf.setFont("Arial", 10)
-               
-                # ✅ VASEN SARKE
-                if left:
-                    pdf.drawString(
-                        x + 6,
-                        cur_y - 15,
-                        str(left)
-                    )
         
-                # ✅ OIKEA SARKE
-                if right:
-                    pdf.drawString(
-                        x + col_widths[0] + 6,
-                        cur_y - 15,
-                        str(right)
-                    )
-
-                lines = wrap_text(
-                    str(right),
-                    "Arial-Bold" if is_header else "Arial",
-                    10,
-                    col_widths[1] - 12
+                # tekstiväri takaisin
+                pdf.setFillColor(COLOR_TEXT)
+                pdf.setFont(font_name, font_size)
+        
+                # --- VASEN SARKE ---
+                pdf.drawString(
+                    x + 6,
+                    cur_y - 15,
+                    left_text
                 )
-                
-                LINE_HEIGHT = 14
-                
+        
+                # --- OIKEA SARKE (WRAPPED) ---
                 text_y = cur_y - 15
-                
-                for line in lines:
+        
+                for line in right_lines:
                     pdf.drawString(
                         x + col_widths[0] + 6,
                         text_y,
                         line
                     )
                     text_y -= LINE_HEIGHT
-                
-                # kasvatetaan rivikorkeutta jos needed
-                extra_lines = len(lines) - 1
-                if extra_lines > 0:
-                    cur_y -= extra_lines * LINE_HEIGHT
-    
-                # Gridline
+        
+                # --- GRID ---
                 pdf.setStrokeColor(COLOR_GRID)
                 pdf.setLineWidth(0.5)
-
                 pdf.line(
                     x,
                     cur_y - row_h,
                     x + col_widths[0] + col_widths[1],
                     cur_y - row_h
                 )
-    
+        
+                # 👇 siirrytään seuraavaan riviin
                 cur_y -= row_h
-    
+        
             return cur_y
+
     
     
         # ======================================================
