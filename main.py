@@ -982,6 +982,22 @@ async def generate_report(kohde_id: str):
                 rows,
                 col_widths
             )
+            
+            # ✅ Hae käyttöikä
+            kayttoika = data.get("kayttoika_jaljella", "–")
+            
+            # ✅ Tekstin aloitus vähän taulukon alapuolelta
+            text_y = table_y - 20
+            
+            pdf.setFont("Arial", 11)
+            pdf.setFillColor(COLOR_TEXT)
+            
+            pdf.drawString(
+                TABLE_X,   # ✅ sama vasen reuna kuin taulukossa
+                text_y,
+                f"Arvioitu jäljellä oleva käyttöikä on {kayttoika}"
+            )
+
             # ==================================================
             # FOOTER + PAGE NUMBER
             # ==================================================
