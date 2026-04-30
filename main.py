@@ -975,7 +975,7 @@ async def generate_report(kohde_id: str):
             
                 return cur_y
               
-            draw_pts_table_3col(
+            table3_y = draw_pts_table_3col(
                 pdf,
                 TABLE_X,
                 TABLE_START_Y,
@@ -987,7 +987,7 @@ async def generate_report(kohde_id: str):
             kayttoika = data.get("kayttoika_jaljella", "–")
             
             # ✅ Tekstin aloitus vähän taulukon alapuolelta
-            text_y = table_y - 20
+            text_y = table3_y - 20
             
             pdf.setFont("Arial", 11)
             pdf.setFillColor(COLOR_TEXT)
