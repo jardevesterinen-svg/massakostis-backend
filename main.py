@@ -917,7 +917,7 @@ async def generate_report(kohde_id: str):
             
                     # --- ENSIN LASKETAAN RIVIN TARVITSEMA KORKEUS ---
                     _cells = []
-                    FONT_SIZE = 10
+                    FONT_SIZE = 9
                     LEADING = 14          # riviväli
                     CELL_PADDING = 6      # ylä- ja alamarginaali
 
@@ -926,7 +926,7 @@ async def generate_report(kohde_id: str):
                             lines = wrap_text(
                                 str(cell),
                                 "Arial",
-                                10,
+                                9,
                                 col_widths[i] - 12
                             )
                             _cells.append(lines)                            
