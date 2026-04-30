@@ -825,7 +825,7 @@ async def generate_report(kohde_id: str):
             
             draw_material_block(
                 "Lämpöputket",
-                [data.get("pintarakenteiden_ika", "–")],
+                lampoputket or ["–"],
                 40 + COL_W + COL_GAP,
                 MAT_ROW2_Y
             )
