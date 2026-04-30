@@ -438,16 +438,17 @@ async def generate_report(kohde_id: str):
         # ---- Title Block ----
         pdf.setFillColor(COLOR_TEXT)
         pdf.setFont("Arial-Bold", 26)
-        (40, h - 140, "Märkätilojen kosteuskartoitus")
+        pdf.drawString(40, h - 140, "Märkätilojen kosteuskartoitus")
     
         # ---- Kohde nimi ----
         pdf.setFont("Arial-Bold", 20)
-        (40, h - 180, kohde["nimi"])
+        pdf.drawString(40, h - 180, kohde["nimi"])
     
         # ---- Kohteen osoite ----
         pdf.setFont("Arial", 14)
-        (40, h - 205, kohde["osoite"])
-        (
+        pdf.drawString(40, h - 205, kohde["osoite"])
+       
+        pdf.drawString(
             40,
             h - 225,
             f"{kohde['postinumero']} {kohde['postitoimipaikka']}"
