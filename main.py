@@ -936,7 +936,7 @@ async def generate_report(kohde_id: str):
                             _cells.append([str(cell)])
                     
                     if is_header:
-                       row_height = max(row_height, 28)
+                       row_height = max(row_height, 26)
 
                     # --- TAUSTA ---
                     pdf.rect(
