@@ -918,8 +918,8 @@ async def generate_report(kohde_id: str):
                     # --- ENSIN LASKETAAN RIVIN TARVITSEMA KORKEUS ---
                     _cells = []
                     FONT_SIZE = 9
-                    LEADING = 14          # riviväli
-                    CELL_PADDING = 6      # ylä- ja alamarginaali
+                    LEADING = 12          # riviväli
+                    CELL_PADDING = 4      # ylä- ja alamarginaali
 
                     for i, cell in enumerate(row):
                         if i == 2 and not is_header:
