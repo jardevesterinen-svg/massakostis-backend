@@ -752,13 +752,44 @@ async def generate_report(kohde_id: str):
             elif img2:
                 draw_scaled_image(pdf, img2, CONTENT_X, y_img, MAX_IMG_W*2 + 20)
           
-            if apartmentData.get("ei_tarkastettu"):
-                html += "<h2 style='color:red;'>EI TARKASTETTU</h2>"
+            # ✅ EI TARKASTETTU CASE
+            if data.get("ei_tarkastettu"):
             
-                if apartmentData.get("ei_tarkastettu_syy"):
-                    html += f"<p><strong>Syy:</strong> {apartmentData['ei_tarkastettu_syy']}</p>"
+                y_text = IMAGES_TOP_Y - IMAGES_MAX_HEIGHT - 30
             
-            continue
+                pdf.setFont("Arial-Bold", 16)
+                pdf.setFillColor(HexColor("#b00000"))
+                pdf.drawString(CONTENT_X, y_text, "EI TARKASTETTU")
+            
+                pdf.setFont("Arial", 12)
+                pdf.setFillColor(COLOR_TEXT)
+            
+                syy = data.get("ei_tarkastettu_syy")
+                if syy:
+                    y_text -= 20
+            
+                    lines = wrap_text(
+                        f"Syy: {syy}",
+                        "Arial",
+                        12,
+                        CONTENT_WIDTH
+                    )
+            
+                    for line in lines:
+                        pdf.drawString(CONTENT_X, y_text, line)
+                        y_text -= 14
+            
+                # ✅ footer tähän pageen
+                pdf.setFont("Arial", 10)
+                pdf.setFillColor(COLOR_TEXT)
+            
+                pdf.drawString(40, 30, "Rakmentor Oy")
+                pdf.drawRightString(555, 30, str(current_page))
+            
+                pdf.showPage()
+                current_page += 1
+            
+            continue   # 🔥 tärkein
             
             # ======================
             # PINTARAKENTEIDEN MATERIAALIT
