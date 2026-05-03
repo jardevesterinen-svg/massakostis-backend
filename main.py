@@ -1035,6 +1035,12 @@ async def generate_report(kohde_id: str):
                 text_y,
                 f"Arvioitu jäljellä oleva käyttöikä on {kayttoika}"
             )
+            
+            pdf.drawRightString(
+                TABLE_X + TABLE_WIDTH,
+                text_y,
+                f"Kokonaiskuntoluokka: {kokonaiskunto}"
+            )
 
             # ==================================================
             # FOOTER + PAGE NUMBER
