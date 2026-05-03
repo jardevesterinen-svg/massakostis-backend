@@ -683,6 +683,140 @@ async def generate_report(kohde_id: str):
     
         pdf.showPage()
         current_page += 1
+
+        # =========================
+        # DATA YHTEENVETOA VARTEN
+        # =========================
+        kunto_counts = {"1":0, "2":0, "3":0, "4":0}
+        kunto_lists = {"1":[], "2":[], "3":[], "4":[]}
+        ei_tark_lista = []
+        
+        for apt in huoneistot:
+            data = apt_data.get(apt, {})
+        
+            # ✅ kuntoluokka
+            k = str(data.get("kokonaiskunto") or "")
+            if k in kunto_counts:
+                kunto_counts[k] += 1
+                kunto_lists[k].append(apt)
+        
+            # ✅ ei tarkastettu
+            if data.get("ei_tarkastettu"):
+                syy = data.get("ei_tarkastettu_syy") or "–"
+                ei_tark_lista.append((apt, syy))
+                
+        # =========================
+        # YHTEENVETO SIVU
+        # =========================
+        
+        draw_stone_header(pdf, w, h)
+        
+        pdf.setFillColor(COLOR_TEXT)
+        
+        # -------- OTSIKKO --------
+        pdf.setFont("Arial-Bold", 20)
+        pdf.drawString(40, h - HEADER_HEIGHT - 40, "Yhteenveto")
+        
+        # =========================
+        # KUNTOLUOKKAJAKAUMA
+        # =========================
+        
+        pdf.setFont("Arial-Bold", 14)
+        pdf.drawString(40, h - HEADER_HEIGHT - 80, "Kuntoluokkajakauma")
+        
+        y = h - HEADER_HEIGHT - 110
+        
+        # värit kuntoluokille
+        colors = {
+            "1": HexColor("#2ecc71"),  # vihreä
+            "2": HexColor("#f1c40f"),  # keltainen
+            "3": HexColor("#e67e22"),  # oranssi
+            "4": HexColor("#e74c3c"),  # punainen
+        }
+        
+        max_count = max(kunto_counts.values()) if kunto_counts else 1
+        
+        for k in ["1","2","3","4"]:
+            count = kunto_counts[k]
+        
+            # skaalattu palkki
+            bar_width = 0
+            if max_count > 0:
+                bar_width = (count / max_count) * 200
+        
+            pdf.setFillColor(colors[k])
+            pdf.rect(40, y - 5, bar_width, 10, fill=1, stroke=0)
+        
+            pdf.setFillColor(COLOR_TEXT)
+            pdf.setFont("Arial", 11)
+            pdf.drawString(40 + 210, y - 2, f"{k}: {count} kpl")
+        
+            y -= 20
+        
+        # =========================
+        # HUONEISTOLISTAT
+        # =========================
+        
+        y -= 10
+        pdf.setFont("Arial-Bold", 12)
+        
+        for k in ["1","2","3","4"]:
+            if kunto_lists[k]:
+                pdf.setFont("Arial-Bold", 11)
+                pdf.drawString(40, y, f"Kuntoluokka {k}:")
+        
+                y -= 14
+                pdf.setFont("Arial", 10)
+        
+                lista = ", ".join(kunto_lists[k])
+        
+                # wrapataan teksti ettei mene yli
+                lines = wrap_text(lista, "Arial", 10, CONTENT_WIDTH - 20)
+        
+                for line in lines:
+                    pdf.drawString(60, y, line)
+                    y -= 12
+        
+                y -= 6
+        
+        # =========================
+        # EI TARKASTETUT
+        # =========================
+        
+        if ei_tark_lista:
+            y -= 10
+        
+            pdf.setFont("Arial-Bold", 14)
+            pdf.drawString(40, y, "Tarkastamatta jääneet huoneistot")
+        
+            y -= 18
+            pdf.setFont("Arial", 11)
+        
+            for apt, syy in ei_tark_lista:
+        
+                lines = wrap_text(
+                    f"{apt} – {syy}",
+                    "Arial",
+                    11,
+                    CONTENT_WIDTH
+                )
+        
+                for line in lines:
+                    pdf.drawString(40, y, line)
+                    y -= 14
+        
+        # =========================
+        # FOOTER
+        # =========================
+        
+        pdf.setFont("Arial", 10)
+        pdf.setFillColor(COLOR_TEXT)
+        
+        pdf.drawString(40, 30, "Rakmentor Oy")
+        pdf.drawRightString(555, 30, str(current_page))
+        
+        pdf.showPage()
+        current_page += 1                
         # ======================================================
         # ===============  HUONEISTO-SIVUT  ====================
         # ======================================================
