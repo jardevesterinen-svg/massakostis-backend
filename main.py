@@ -753,7 +753,7 @@ async def generate_report(kohde_id: str):
                 draw_scaled_image(pdf, img2, CONTENT_X, y_img, MAX_IMG_W*2 + 20)
           
             # ✅ EI TARKASTETTU CASE
-            if data.get("ei_tarkastettu"):
+            if str(data.get("ei_tarkastettu")).lower() == "true":
             
                 y_text = IMAGES_TOP_Y - IMAGES_MAX_HEIGHT - 30
             
