@@ -1023,6 +1023,7 @@ async def generate_report(kohde_id: str):
             
             # ✅ Hae käyttöikä
             kayttoika = data.get("kayttoika_jaljella", "–")
+            kokonaiskunto = data.get("kokonaiskunto", "–")
             
             # ✅ Tekstin aloitus vähän taulukon alapuolelta
             text_y = table3_y - 20
