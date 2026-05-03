@@ -789,7 +789,7 @@ async def generate_report(kohde_id: str):
                 pdf.showPage()
                 current_page += 1
             
-            continue   # 🔥 tärkein
+                continue   # 🔥 tärkein
             
             # ======================
             # PINTARAKENTEIDEN MATERIAALIT
