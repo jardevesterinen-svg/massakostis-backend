@@ -752,13 +752,13 @@ async def generate_report(kohde_id: str):
             elif img2:
                 draw_scaled_image(pdf, img2, CONTENT_X, y_img, MAX_IMG_W*2 + 20)
           
-            if (apartmentData.ei_tarkastettu_syy) {
-                html += `
-                    <p><strong>Syy:</strong> ${apartmentData.ei_tarkastettu_syy}</p>
-                `;
-            }
+            if apartmentData.get("ei_tarkastettu"):
+                html += "<h2 style='color:red;'>EI TARKASTETTU</h2>"
             
-            continue;
+                if apartmentData.get("ei_tarkastettu_syy"):
+                    html += f"<p><strong>Syy:</strong> {apartmentData['ei_tarkastettu_syy']}</p>"
+            
+            continue
             
             # ======================
             # PINTARAKENTEIDEN MATERIAALIT
