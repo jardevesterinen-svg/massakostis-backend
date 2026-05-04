@@ -382,6 +382,21 @@ async def generate_report(kohde_id: str):
         tilaaja = metadata["tilaaja"]
         kohde = metadata["kohde"]
         huoneistot = metadata["huoneistot"]
+
+        # ==================================================
+        # TARKASTUSKOHTEET (SIIRRETTY GLOBAALIKSI)
+        # ==================================================
+        
+        TARKASTUSKOHTEET = [
+            ("seinien_kosteus", "Seinien kosteus"),
+            ("läpiviennit", "Läpiviennit"),
+            ("pinnat", "Pinnat ja saumat"),
+            ("vesikalusteet", "Vesikalusteet"),
+            ("ilmanvaihto", "Ilmanvaihto"),
+            ("ovikynnys", "Ovikynnys"),
+            ("lattiakaivo", "Lattiakaivo"),
+            ("lattiakallistukset", "Lattiakallistukset"),
+        ]
     
         # ---- LOAD HUONEISTOT ----
         apt_data = {}
@@ -1155,17 +1170,6 @@ async def generate_report(kohde_id: str):
             # ==================================================
             #  HUONEISTON TIEDOT (PTS TABLE)
             # ==================================================
-                      
-            TARKASTUSKOHTEET = [
-                ("seinien_kosteus", "Seinien kosteus"),
-                ("läpiviennit", "Läpiviennit"),
-                ("pinnat", "Pinnat ja saumat"),
-                ("vesikalusteet", "Vesikalusteet"),
-                ("ilmanvaihto", "Ilmanvaihto"),
-                ("ovikynnys", "Ovikynnys"),
-                ("lattiakaivo", "Lattiakaivo"),
-                ("lattiakallistukset", "Lattiakallistukset"),
-            ]
           
             rows = [
                 ["Tarkastuskohde", "Kuntoluokka", "Havainnot ja toimenpiteet"]
