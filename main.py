@@ -789,7 +789,7 @@ async def generate_report(kohde_id: str):
         
         if ei_tark_lista:
         
-            y -= 20
+            y -= 30
         
             pdf.setFont("Arial-Bold", 14)
             pdf.drawString(40, y, "Tarkastamatta jääneet huoneistot")
