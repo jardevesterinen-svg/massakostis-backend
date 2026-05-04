@@ -112,20 +112,53 @@ def wrap_text(text, font_name, font_size, max_width):
         lines.append(current)
 
     return lines
+    
+def draw_table_with_paging(pdf, rows, col_widths, y_start, title=None):
+    global current_page
 
-def ensure_space(pdf, y, needed_space=120):
-    if y < 80:  # jos tila loppu
-        pdf.showPage()
-        draw_stone_header(pdf, w, h)
+    y = y_start
 
-        pdf.setFont("Arial", 10)
-        pdf.setFillColor(COLOR_TEXT)
-        pdf.drawString(40, 30, "Rakmentor Oy")
-        pdf.drawRightString(555, 30, str(current_page))
+    if title:
+        pdf.setFont("Arial-Bold", 16)
 
-        return h - HEADER_HEIGHT - 60, True
+        if y < 120:  # ei tilaa otsikolle
+            pdf.showPage()
+            current_page += 1
+            draw_stone_header(pdf, w, h)
+            y = h - HEADER_HEIGHT - 40
 
-    return y, False
+        pdf.drawString(40, y, title)
+        y -= 30
+
+    chunk = [["", ""]]  # placeholder
+
+    i = 0
+    while i < len(rows):
+
+        # lisää header vain ensimmäisellä kierroksella
+        if i == 0:
+            chunk = [rows[0]]
+
+        # lisää rivi
+        chunk.append(rows[i])
+
+        # jos chunk täyttyy → piirrä
+        if len(chunk) >= 15 or i == len(rows) - 1:
+
+            if y < 120:
+                pdf.showPage()
+                current_page += 1
+                draw_stone_header(pdf, w, h)
+                y = h - HEADER_HEIGHT - 40
+
+            y = draw_pts_table(pdf, TABLE_X, y, chunk, col_widths)
+            y -= 20
+
+            chunk = [rows[0]]  # uusi page jatkaa headerilla
+
+        i += 1
+
+    return y
     
 # ==========================================================
 #  1) SAVE METADATA
@@ -637,8 +670,7 @@ async def generate_report(kohde_id: str):
                 cur_y -= row_h
         
             return cur_y
-
-    
+   
     
         # ======================================================
         #  PERUSTIEDOT — BUILD ROWS (PTS STYLE)
@@ -893,12 +925,15 @@ async def generate_report(kohde_id: str):
             TABLE_WIDTH * 0.30,
             TABLE_WIDTH * 0.70
         ]
+                
+        y = draw_table_with_paging(
+            pdf,
+            rows,
+            col_widths,
+            y,
+            title="Huoneistojen arvioidut käyttöiät"
+        )
         
-        y = draw_pts_table(pdf, TABLE_X, y, rows, col_widths)
-        
-        pdf.showPage()
-        current_page += 1        
-
         draw_stone_header(pdf, w, h)
 
         pdf.setFont("Arial-Bold", 16)
@@ -906,32 +941,19 @@ async def generate_report(kohde_id: str):
         
         y = h - HEADER_HEIGHT - 70
         
-        rows = [
-            ["Huoneistot", "Havainto"]
-        ]
+        rows = [["Huoneistot", "Havainto"]]
         
         for teksti, apts in havainnot_map.items():
+            rows.append([", ".join(apts), teksti])
         
-            rivitext = ", ".join(apts)
-            rows.append([rivitext, teksti])
+        y = draw_table_with_paging(
+            pdf,
+            rows,
+            col_widths,
+            y,
+            title="Havainnot huoneistoittain"
+        )
         
-            # ✅ jos rivit kasvaa liikaa → piirrä osa ja jatka
-            if len(rows) > 15:
-                y = draw_pts_table(pdf, TABLE_X, y, rows, col_widths)
-                pdf.showPage()
-                current_page += 1
-                draw_stone_header(pdf, w, h)
-                y = h - HEADER_HEIGHT - 40
-        
-                rows = [["Huoneistot", "Havainto"]]
-        
-        # viimeiset
-        if len(rows) > 1:
-            y = draw_pts_table(pdf, TABLE_X, y, rows, col_widths)
-        
-        pdf.showPage()
-        current_page += 1
-
         draw_stone_header(pdf, w, h)
 
         pdf.setFont("Arial-Bold", 16)
@@ -939,29 +961,18 @@ async def generate_report(kohde_id: str):
         
         y = h - HEADER_HEIGHT - 70
         
-        rows = [
-            ["Huoneistot", "Toimenpide"]
-        ]
+        rows = [["Huoneistot", "Toimenpide"]]
         
         for teksti, apts in toimenpiteet_map.items():
+            rows.append([", ".join(apts), teksti])
         
-            rivitext = ", ".join(apts)
-            rows.append([rivitext, teksti])
-        
-            if len(rows) > 15:
-                y = draw_pts_table(pdf, TABLE_X, y, rows, col_widths)
-                pdf.showPage()
-                current_page += 1
-                draw_stone_header(pdf, w, h)
-                y = h - HEADER_HEIGHT - 40
-        
-                rows = [["Huoneistot", "Toimenpide"]]
-        
-        if len(rows) > 1:
-            y = draw_pts_table(pdf, TABLE_X, y, rows, col_widths)
-        
-        pdf.showPage()
-        current_page += 1
+        y = draw_table_with_paging(
+            pdf,
+            rows,
+            col_widths,
+            y,
+            title="Toimenpide-ehdotukset"
+        )
 
         # =========================
         # FOOTER
