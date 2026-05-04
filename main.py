@@ -1352,7 +1352,9 @@ async def generate_report(kohde_id: str):
         return {"status": "ok", "url": pdf_url}
 
     except Exception as e:
-        print("PDF GENERATION ERROR:", type(e).__name__, str(e))
+        import traceback
+        print("🔥 PDF ERROR:")
+        traceback.print_exc()
         raise
 
 ###############################################################################
