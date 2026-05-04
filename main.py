@@ -760,24 +760,27 @@ async def generate_report(kohde_id: str):
         y -= 10
         pdf.setFont("Arial-Bold", 12)
         
+        # =========================
+        # KUNTOLUOKKALISTA TAULUKKONA
+        # =========================
+        
+        y -= 10
+        
+        rows = [
+            ["Kuntoluokka", "Huoneistot"]
+        ]
+        
         for k in ["1","2","3","4"]:
             if kunto_lists[k]:
-                pdf.setFont("Arial-Bold", 11)
-                pdf.drawString(40, y, f"Kuntoluokka {k}:")
-        
-                y -= 14
-                pdf.setFont("Arial", 10)
-        
                 lista = ", ".join(kunto_lists[k])
+                rows.append([k, lista])
         
-                # wrapataan teksti ettei mene yli
-                lines = wrap_text(lista, "Arial", 10, CONTENT_WIDTH - 20)
+        col_widths = [
+            TABLE_WIDTH * 0.20,
+            TABLE_WIDTH * 0.80
+        ]
         
-                for line in lines:
-                    pdf.drawString(60, y, line)
-                    y -= 12
-        
-                y -= 6
+        y = draw_pts_table(pdf, TABLE_X, y, rows, col_widths)
         
         # =========================
         # EI TARKASTETUT
@@ -792,18 +795,33 @@ async def generate_report(kohde_id: str):
             y -= 18
             pdf.setFont("Arial", 11)
         
-            for apt, syy in ei_tark_lista:
-        
-                lines = wrap_text(
-                    f"{apt} – {syy}",
-                    "Arial",
-                    11,
-                    CONTENT_WIDTH
-                )
-        
-                for line in lines:
-                    pdf.drawString(40, y, line)
-                    y -= 14
+            # =========================
+            # EI TARKASTETUT TAULUKKO
+            # =========================
+            
+            if ei_tark_lista:
+            
+                y -= 20
+            
+                pdf.setFont("Arial-Bold", 14)
+                pdf.drawString(40, y, "Tarkastamatta jääneet huoneistot")
+            
+                y -= 15
+            
+                rows = [
+                    ["Huoneisto", "Syy"]
+                ]
+            
+                for apt, syy in ei_tark_lista:
+                    rows.append([apt, syy])
+            
+                col_widths = [
+                    TABLE_WIDTH * 0.25,
+                    TABLE_WIDTH * 0.75
+                ]
+            
+                y = draw_pts_table(pdf, TABLE_X, y, rows, col_widths)
+
         
         # =========================
         # FOOTER
