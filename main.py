@@ -112,7 +112,97 @@ def wrap_text(text, font_name, font_size, max_width):
         lines.append(current)
 
     return lines
-    
+
+def draw_pts_table(pdf, x, y, rows, col_widths):
+    """
+    Draws a PTS-style 2-column table with:
+    - wrapped text
+    - dynamic row height
+    - proper alignment
+    """
+
+    cur_y = y
+    LINE_HEIGHT = 14
+    BASE_ROW_HEIGHT = 22
+
+    for idx, (left, right) in enumerate(rows):
+        is_header = (idx == 0)
+
+        # --- FONT ---
+        font_name = "Arial-Bold" if is_header else "Arial"
+        font_size = 11 if is_header else 10
+
+        pdf.setFont(font_name, font_size)
+        pdf.setFillColor(COLOR_TEXT)
+
+        # --- WRAP TEXT (vain oikea sarake tarvitsee) ---
+        right_text = str(right or "").replace("\n", " ")
+        right_lines = wrap_text(
+            right_text,
+            font_name,
+            font_size,
+            col_widths[1] - 12
+        )
+
+        # vasen sarake yleensä lyhyt → yksi rivi riittää
+        left_text = str(left or "")
+
+        # --- RIVIKORKEUS ---
+        content_height = max(1, len(right_lines)) * LINE_HEIGHT
+        row_h = max(BASE_ROW_HEIGHT, content_height + 8)
+
+        # --- TAUSTA ---
+        if is_header:
+            pdf.setFillColor(COLOR_TABLE_HEADER)
+        else:
+            pdf.setFillColor(COLOR_ROW_ALT if idx % 2 == 1 else COLOR_ROW_WHITE)
+
+        pdf.rect(
+            x,
+            cur_y - row_h,
+            col_widths[0] + col_widths[1],
+            row_h,
+            fill=1,
+            stroke=0
+        )
+
+        # tekstiväri takaisin
+        pdf.setFillColor(COLOR_TEXT)
+        pdf.setFont(font_name, font_size)
+
+        # --- VASEN SARKE ---
+        pdf.drawString(
+            x + 6,
+            cur_y - 15,
+            left_text
+        )
+
+        # --- OIKEA SARKE (WRAPPED) ---
+        text_y = cur_y - 15
+
+        for line in right_lines:
+            pdf.drawString(
+                x + col_widths[0] + 6,
+                text_y,
+                line
+            )
+            text_y -= LINE_HEIGHT
+
+        # --- GRID ---
+        pdf.setStrokeColor(COLOR_GRID)
+        pdf.setLineWidth(0.5)
+        pdf.line(
+            x,
+            cur_y - row_h,
+            x + col_widths[0] + col_widths[1],
+            cur_y - row_h
+        )
+
+        # 👇 siirrytään seuraavaan riviin
+        cur_y -= row_h
+
+    return cur_y
+            
 def draw_table_with_paging(pdf, rows, col_widths, y_start, title=None):
     global current_page
 
@@ -575,102 +665,7 @@ async def generate_report(kohde_id: str):
         pdf.drawString(40, h - HEADER_HEIGHT - 40, "Perustiedot")
     
         current_page = 2
-    
-        
-        # ======================================================
-        #  TABLE DRAW FUNCTION (PTS STYLE)
-        # ======================================================
-    
-        def draw_pts_table(pdf, x, y, rows, col_widths):
-            """
-            Draws a PTS-style 2-column table with:
-            - wrapped text
-            - dynamic row height
-            - proper alignment
-            """
-        
-            cur_y = y
-            LINE_HEIGHT = 14
-            BASE_ROW_HEIGHT = 22
-        
-            for idx, (left, right) in enumerate(rows):
-                is_header = (idx == 0)
-        
-                # --- FONT ---
-                font_name = "Arial-Bold" if is_header else "Arial"
-                font_size = 11 if is_header else 10
-        
-                pdf.setFont(font_name, font_size)
-                pdf.setFillColor(COLOR_TEXT)
-        
-                # --- WRAP TEXT (vain oikea sarake tarvitsee) ---
-                right_text = str(right or "").replace("\n", " ")
-                right_lines = wrap_text(
-                    right_text,
-                    font_name,
-                    font_size,
-                    col_widths[1] - 12
-                )
-        
-                # vasen sarake yleensä lyhyt → yksi rivi riittää
-                left_text = str(left or "")
-        
-                # --- RIVIKORKEUS ---
-                content_height = max(1, len(right_lines)) * LINE_HEIGHT
-                row_h = max(BASE_ROW_HEIGHT, content_height + 8)
-        
-                # --- TAUSTA ---
-                if is_header:
-                    pdf.setFillColor(COLOR_TABLE_HEADER)
-                else:
-                    pdf.setFillColor(COLOR_ROW_ALT if idx % 2 == 1 else COLOR_ROW_WHITE)
-        
-                pdf.rect(
-                    x,
-                    cur_y - row_h,
-                    col_widths[0] + col_widths[1],
-                    row_h,
-                    fill=1,
-                    stroke=0
-                )
-        
-                # tekstiväri takaisin
-                pdf.setFillColor(COLOR_TEXT)
-                pdf.setFont(font_name, font_size)
-        
-                # --- VASEN SARKE ---
-                pdf.drawString(
-                    x + 6,
-                    cur_y - 15,
-                    left_text
-                )
-        
-                # --- OIKEA SARKE (WRAPPED) ---
-                text_y = cur_y - 15
-        
-                for line in right_lines:
-                    pdf.drawString(
-                        x + col_widths[0] + 6,
-                        text_y,
-                        line
-                    )
-                    text_y -= LINE_HEIGHT
-        
-                # --- GRID ---
-                pdf.setStrokeColor(COLOR_GRID)
-                pdf.setLineWidth(0.5)
-                pdf.line(
-                    x,
-                    cur_y - row_h,
-                    x + col_widths[0] + col_widths[1],
-                    cur_y - row_h
-                )
-        
-                # 👇 siirrytään seuraavaan riviin
-                cur_y -= row_h
-        
-            return cur_y
-   
+     
     
         # ======================================================
         #  PERUSTIEDOT — BUILD ROWS (PTS STYLE)
