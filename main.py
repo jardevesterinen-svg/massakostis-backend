@@ -112,6 +112,21 @@ def wrap_text(text, font_name, font_size, max_width):
         lines.append(current)
 
     return lines
+
+def ensure_space(pdf, y, needed_space=120):
+    if y < 80:  # jos tila loppu
+        pdf.showPage()
+        draw_stone_header(pdf, w, h)
+
+        pdf.setFont("Arial", 10)
+        pdf.setFillColor(COLOR_TEXT)
+        pdf.drawString(40, 30, "Rakmentor Oy")
+        pdf.drawRightString(555, 30, str(current_page))
+
+        return h - HEADER_HEIGHT - 60, True
+
+    return y, False
+    
 # ==========================================================
 #  1) SAVE METADATA
 # ==========================================================
@@ -704,7 +719,42 @@ async def generate_report(kohde_id: str):
             if data.get("ei_tarkastettu"):
                 syy = data.get("ei_tarkastettu_syy") or "–"
                 ei_tark_lista.append((apt, syy))
-                
+        
+        kayttoika_map = {}
+        havainnot_map = {}
+        toimenpiteet_map = {}
+        
+        for apt in huoneistot:
+            data = apt_data.get(apt, {})
+        
+            # ✅ käyttöikä
+            k = data.get("kayttoika_jaljella")
+            if k:
+                kayttoika_map.setdefault(k, []).append(apt)
+        
+            # ✅ havainnot + toimenpiteet (yhdistettynä tekstiin)
+            for key, label in TARKASTUSKOHTEET:
+        
+                hav = (
+                    data.get(f"{key}_havainnot_textarea") or
+                    data.get(f"{key}_havainnot_select") or
+                    ""
+                ).strip()
+        
+                toimenp = (
+                    data.get(f"{key}_toimenpiteet_textarea") or
+                    data.get(f"{key}_toimenpiteet_select") or
+                    ""
+                ).strip()
+        
+                # --- HAVAINNOT
+                if hav:
+                    havainnot_map.setdefault(hav, []).append(apt)
+        
+                # --- TOIMENPITEET
+                if toimenp:
+                    toimenpiteet_map.setdefault(toimenp, []).append(apt)
+                    
         # =========================
         # YHTEENVETO SIVU
         # =========================
@@ -810,7 +860,94 @@ async def generate_report(kohde_id: str):
         
             y = draw_pts_table(pdf, TABLE_X, y, rows, col_widths)
 
+        draw_stone_header(pdf, w, h)
         
+        pdf.setFont("Arial-Bold", 16)
+        pdf.drawString(40, h - HEADER_HEIGHT - 40, "Huoneistojen arvioidut käyttöiät")
+        
+        y = h - HEADER_HEIGHT - 70
+        
+        rows = [
+            ["Käyttöikä", "Huoneistot"]
+        ]
+        
+        for k, apts in kayttoika_map.items():
+            rows.append([k, ", ".join(apts)])
+        
+        col_widths = [
+            TABLE_WIDTH * 0.30,
+            TABLE_WIDTH * 0.70
+        ]
+        
+        y = draw_pts_table(pdf, TABLE_X, y, rows, col_widths)
+        
+        pdf.showPage()
+        current_page += 1        
+
+        draw_stone_header(pdf, w, h)
+
+        pdf.setFont("Arial-Bold", 16)
+        pdf.drawString(40, h - HEADER_HEIGHT - 40, "Havainnot huoneistoittain")
+        
+        y = h - HEADER_HEIGHT - 70
+        
+        rows = [
+            ["Huoneistot", "Havainto"]
+        ]
+        
+        for teksti, apts in havainnot_map.items():
+        
+            rivitext = ", ".join(apts)
+            rows.append([rivitext, teksti])
+        
+            # ✅ jos rivit kasvaa liikaa → piirrä osa ja jatka
+            if len(rows) > 15:
+                y = draw_pts_table(pdf, TABLE_X, y, rows, col_widths)
+                pdf.showPage()
+                current_page += 1
+                draw_stone_header(pdf, w, h)
+                y = h - HEADER_HEIGHT - 40
+        
+                rows = [["Huoneistot", "Havainto"]]
+        
+        # viimeiset
+        if len(rows) > 1:
+            y = draw_pts_table(pdf, TABLE_X, y, rows, col_widths)
+        
+        pdf.showPage()
+        current_page += 1
+
+        draw_stone_header(pdf, w, h)
+
+        pdf.setFont("Arial-Bold", 16)
+        pdf.drawString(40, h - HEADER_HEIGHT - 40, "Toimenpide-ehdotukset")
+        
+        y = h - HEADER_HEIGHT - 70
+        
+        rows = [
+            ["Huoneistot", "Toimenpide"]
+        ]
+        
+        for teksti, apts in toimenpiteet_map.items():
+        
+            rivitext = ", ".join(apts)
+            rows.append([rivitext, teksti])
+        
+            if len(rows) > 15:
+                y = draw_pts_table(pdf, TABLE_X, y, rows, col_widths)
+                pdf.showPage()
+                current_page += 1
+                draw_stone_header(pdf, w, h)
+                y = h - HEADER_HEIGHT - 40
+        
+                rows = [["Huoneistot", "Toimenpide"]]
+        
+        if len(rows) > 1:
+            y = draw_pts_table(pdf, TABLE_X, y, rows, col_widths)
+        
+        pdf.showPage()
+        current_page += 1
+
         # =========================
         # FOOTER
         # =========================
