@@ -782,45 +782,33 @@ async def generate_report(kohde_id: str):
         
         y = draw_pts_table(pdf, TABLE_X, y, rows, col_widths)
         
+       
         # =========================
-        # EI TARKASTETUT
+        # EI TARKASTETUT TAULUKKO
         # =========================
         
         if ei_tark_lista:
-            y -= 10
+        
+            y -= 20
         
             pdf.setFont("Arial-Bold", 14)
             pdf.drawString(40, y, "Tarkastamatta jääneet huoneistot")
         
-            y -= 18
-            pdf.setFont("Arial", 11)
+            y -= 15
         
-            # =========================
-            # EI TARKASTETUT TAULUKKO
-            # =========================
-            
-            if ei_tark_lista:
-            
-                y -= 20
-            
-                pdf.setFont("Arial-Bold", 14)
-                pdf.drawString(40, y, "Tarkastamatta jääneet huoneistot")
-            
-                y -= 15
-            
-                rows = [
-                    ["Huoneisto", "Syy"]
-                ]
-            
-                for apt, syy in ei_tark_lista:
-                    rows.append([apt, syy])
-            
-                col_widths = [
-                    TABLE_WIDTH * 0.25,
-                    TABLE_WIDTH * 0.75
-                ]
-            
-                y = draw_pts_table(pdf, TABLE_X, y, rows, col_widths)
+            rows = [
+                ["Huoneisto", "Syy"]
+            ]
+        
+            for apt, syy in ei_tark_lista:
+                rows.append([apt, syy])
+        
+            col_widths = [
+                TABLE_WIDTH * 0.25,
+                TABLE_WIDTH * 0.75
+            ]
+        
+            y = draw_pts_table(pdf, TABLE_X, y, rows, col_widths)
 
         
         # =========================
