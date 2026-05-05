@@ -212,52 +212,37 @@ def maybe_new_page(pdf, y, current_page, min_space=MIN_SPACE):
         return h - HEADER_HEIGHT - 70, current_page
     return y, current_page
     
-def draw_table_with_paging(pdf, rows, col_widths, y_start, title=None):
-    global current_page
-
+def draw_table_with_paging(pdf, rows, col_widths, y_start, current_page, title=None):
     y = y_start
 
     if title:
         pdf.setFont("Arial-Bold", 16)
-
-        if y < 120:  # ei tilaa otsikolle
+        if y < 120:
             pdf.showPage()
             current_page += 1
             draw_stone_header(pdf, w, h)
             y = h - HEADER_HEIGHT - 40
-
         pdf.drawString(40, y, title)
         y -= 30
 
-    chunk = [["", ""]]  # placeholder
-
+    chunk = [["", ""]]
     i = 0
     while i < len(rows):
-
-        # lisää header vain ensimmäisellä kierroksella
         if i == 0:
             chunk = [rows[0]]
-
-        # lisää rivi
         chunk.append(rows[i])
-
-        # jos chunk täyttyy → piirrä
         if len(chunk) >= 15 or i == len(rows) - 1:
-
             if y < 120:
                 pdf.showPage()
                 current_page += 1
                 draw_stone_header(pdf, w, h)
                 y = h - HEADER_HEIGHT - 40
-
             y = draw_pts_table(pdf, TABLE_X, y, chunk, col_widths)
             y -= 20
-
-            chunk = [rows[0]]  # uusi page jatkaa headerilla
-
+            chunk = [rows[0]]
         i += 1
 
-    return y, current_page
+    return y, current_page  # ← palauttaa molemmat
     
 # ==========================================================
 #  1) SAVE METADATA
