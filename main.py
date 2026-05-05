@@ -202,7 +202,18 @@ def draw_pts_table(pdf, x, y, rows, col_widths):
         cur_y -= row_h
 
     return cur_y
-            
+
+MIN_SPACE = 150  # minimaalinen tila uudelle taulukolle
+
+def maybe_new_page(pdf, y, min_space=MIN_SPACE):
+    global current_page
+    if y < min_space:
+        pdf.showPage()
+        current_page += 1
+        draw_stone_header(pdf, w, h)
+        return h - HEADER_HEIGHT - 70
+    return y
+    
 def draw_table_with_paging(pdf, rows, col_widths, y_start, title=None):
     global current_page
 
