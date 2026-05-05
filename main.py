@@ -950,8 +950,9 @@ async def generate_report(kohde_id: str):
         
         for teksti, apts in havainnot_map.items():
             rows.append([", ".join(apts), teksti])
-       y = maybe_new_page(pdf, y) 
-       y = draw_table_with_paging(
+            
+        y = maybe_new_page(pdf, y) 
+        y = draw_table_with_paging(
             pdf,
             rows,
             col_widths,
