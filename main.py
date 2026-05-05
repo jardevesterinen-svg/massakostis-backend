@@ -257,7 +257,7 @@ def draw_table_with_paging(pdf, rows, col_widths, y_start, title=None):
 
         i += 1
 
-    return y
+    return y, current_page
     
 # ==========================================================
 #  1) SAVE METADATA
