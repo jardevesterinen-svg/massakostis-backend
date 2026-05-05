@@ -912,7 +912,7 @@ async def generate_report(kohde_id: str):
         
             y = draw_table_with_paging(pdf, rows, col_widths, y)
 
-        draw_stone_header(pdf, w, h)
+        # draw_stone_header(pdf, w, h)
         
         pdf.setFont("Arial-Bold", 16)
         pdf.drawString(40, h - HEADER_HEIGHT - 40, "Huoneistojen arvioidut käyttöiät")
@@ -939,7 +939,7 @@ async def generate_report(kohde_id: str):
             title="Huoneistojen arvioidut käyttöiät"
         )
         
-        draw_stone_header(pdf, w, h)
+        # draw_stone_header(pdf, w, h)
 
         pdf.setFont("Arial-Bold", 16)
         pdf.drawString(40, h - HEADER_HEIGHT - 40, "Havainnot huoneistoittain")
@@ -960,7 +960,7 @@ async def generate_report(kohde_id: str):
             title="Havainnot huoneistoittain"
         )
         
-        draw_stone_header(pdf, w, h)
+        # draw_stone_header(pdf, w, h)
 
         pdf.setFont("Arial-Bold", 16)
         pdf.drawString(40, h - HEADER_HEIGHT - 40, "Toimenpide-ehdotukset")
