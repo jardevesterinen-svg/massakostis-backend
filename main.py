@@ -204,14 +204,13 @@ def draw_pts_table(pdf, x, y, rows, col_widths):
 
     return cur_y
 
-def maybe_new_page(pdf, y, min_space=MIN_SPACE):
-    global current_page
+def maybe_new_page(pdf, y, current_page, min_space=MIN_SPACE):
     if y < min_space:
         pdf.showPage()
         current_page += 1
         draw_stone_header(pdf, w, h)
-        return h - HEADER_HEIGHT - 70
-    return y
+        return h - HEADER_HEIGHT - 70, current_page
+    return y, current_page
     
 def draw_table_with_paging(pdf, rows, col_widths, y_start, title=None):
     global current_page
@@ -930,7 +929,7 @@ async def generate_report(kohde_id: str):
             TABLE_WIDTH * 0.30,
             TABLE_WIDTH * 0.70
         ]
-        y = maybe_new_page(pdf, y)        
+        y, current_page = maybe_new_page(pdf, y, current_page)        
         y = draw_table_with_paging(
             pdf,
             rows,
@@ -951,7 +950,7 @@ async def generate_report(kohde_id: str):
         for teksti, apts in havainnot_map.items():
             rows.append([", ".join(apts), teksti])
             
-        y = maybe_new_page(pdf, y) 
+        y, current_page = maybe_new_page(pdf, y, current_page) 
         y = draw_table_with_paging(
             pdf,
             rows,
@@ -972,7 +971,7 @@ async def generate_report(kohde_id: str):
         for teksti, apts in toimenpiteet_map.items():
             rows.append([", ".join(apts), teksti])
         
-        y = maybe_new_page(pdf, y)
+        y, current_page = maybe_new_page(pdf, y, current_page)
         y = draw_table_with_paging(
             pdf,
             rows,
