@@ -872,7 +872,7 @@ async def generate_report(kohde_id: str):
             TABLE_WIDTH * 0.80
         ]
         
-        y = draw_pts_table(pdf, TABLE_X, y, rows, col_widths)
+        y = raw_table_with_paging(pdf, TABLE_X, y, rows, col_widths)
         
        
         # =========================
@@ -900,7 +900,7 @@ async def generate_report(kohde_id: str):
                 TABLE_WIDTH * 0.75
             ]
         
-            y = draw_pts_table(pdf, TABLE_X, y, rows, col_widths)
+            y = raw_table_with_paging(pdf, TABLE_X, y, rows, col_widths)
 
         draw_stone_header(pdf, w, h)
         
