@@ -972,7 +972,7 @@ async def generate_report(kohde_id: str):
             rows.append([", ".join(apts), teksti])
         
         y, current_page = maybe_new_page(pdf, y, current_page)
-        y = draw_table_with_paging(
+        y, current_page = draw_table_with_paging(
             pdf,
             rows,
             col_widths,
