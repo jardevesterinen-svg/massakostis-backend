@@ -914,10 +914,10 @@ async def generate_report(kohde_id: str):
 
         # draw_stone_header(pdf, w, h)
         
-        pdf.setFont("Arial-Bold", 16)
-        pdf.drawString(40, h - HEADER_HEIGHT - 40, "Huoneistojen arvioidut käyttöiät")
+        # pdf.setFont("Arial-Bold", 16)
+        # pdf.drawString(40, h - HEADER_HEIGHT - 40, "Huoneistojen arvioidut käyttöiät")
         
-        y = h - HEADER_HEIGHT - 70
+        # y = h - HEADER_HEIGHT - 70
         
         rows = [
             ["Käyttöikä", "Huoneistot"]
@@ -941,10 +941,10 @@ async def generate_report(kohde_id: str):
         
         # draw_stone_header(pdf, w, h)
 
-        pdf.setFont("Arial-Bold", 16)
-        pdf.drawString(40, h - HEADER_HEIGHT - 40, "Havainnot huoneistoittain")
+        # pdf.setFont("Arial-Bold", 16)
+        # pdf.drawString(40, h - HEADER_HEIGHT - 40, "Havainnot huoneistoittain")
         
-        y = h - HEADER_HEIGHT - 70
+        # y = h - HEADER_HEIGHT - 70
         
         rows = [["Huoneistot", "Havainto"]]
         
@@ -962,10 +962,10 @@ async def generate_report(kohde_id: str):
         
         # draw_stone_header(pdf, w, h)
 
-        pdf.setFont("Arial-Bold", 16)
-        pdf.drawString(40, h - HEADER_HEIGHT - 40, "Toimenpide-ehdotukset")
+        # pdf.setFont("Arial-Bold", 16)
+        # pdf.drawString(40, h - HEADER_HEIGHT - 40, "Toimenpide-ehdotukset")
         
-        y = h - HEADER_HEIGHT - 70
+        # y = h - HEADER_HEIGHT - 70
         
         rows = [["Huoneistot", "Toimenpide"]]
         
