@@ -931,7 +931,7 @@ async def generate_report(kohde_id: str):
             TABLE_WIDTH * 0.30,
             TABLE_WIDTH * 0.70
         ]
-                
+        y = maybe_new_page(pdf, y)        
         y = draw_table_with_paging(
             pdf,
             rows,
@@ -951,8 +951,8 @@ async def generate_report(kohde_id: str):
         
         for teksti, apts in havainnot_map.items():
             rows.append([", ".join(apts), teksti])
-        
-        y = draw_table_with_paging(
+       y = maybe_new_page(pdf, y) 
+       y = draw_table_with_paging(
             pdf,
             rows,
             col_widths,
@@ -972,6 +972,7 @@ async def generate_report(kohde_id: str):
         for teksti, apts in toimenpiteet_map.items():
             rows.append([", ".join(apts), teksti])
         
+        y = maybe_new_page(pdf, y)
         y = draw_table_with_paging(
             pdf,
             rows,
