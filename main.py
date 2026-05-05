@@ -31,6 +31,7 @@ HEADER_HEIGHT = 48
 IMAGES_MAX_HEIGHT = 220
 # MATERIALS_HEIGHT = 120
 PUBLIC_URL = "https://pub-9f421e06dc9f4bd49ae0adcf5690c438.r2.dev"
+MIN_SPACE = 150  # minimaalinen tila uudelle taulukolle
 
 KOSTEUSKARTOITUS_TEKSTI = """
 Märkätilojen kosteuskartoituksessa tarkastellaan tilojen pintarakenteita, liitoksia ja läpivientejä aistinvaraisesti sekä tarvittaessa pintakosteusmittauksin. Kartoitus ei sisällä rakenteiden avaamista eikä rakenteiden sisäisiä mittauksia. Mahdolliset mittaustulokset ovat suuntaa-antavia. Kartoituksessa ei arvioida rakenteiden teknistä käyttöikää eikä energiatehokkuutta. Havaitut puutteet ja riskit kirjataan raporttiin. Raportti ei ole rakenteellinen kuntotutkimus. Tarvittaessa suositellaan tarkempia tutkimuksia. Kartoitus perustuu tarkastushetken havaintoihin.
@@ -202,8 +203,6 @@ def draw_pts_table(pdf, x, y, rows, col_widths):
         cur_y -= row_h
 
     return cur_y
-
-MIN_SPACE = 150  # minimaalinen tila uudelle taulukolle
 
 def maybe_new_page(pdf, y, min_space=MIN_SPACE):
     global current_page
