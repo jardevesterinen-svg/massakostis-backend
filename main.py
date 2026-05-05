@@ -916,11 +916,9 @@ async def generate_report(kohde_id: str):
         ]
         y, current_page = maybe_new_page(pdf, y, current_page)        
         y, current_page = draw_table_with_paging(
-            pdf,
-            rows,
-            col_widths,
-            y,
+            pdf, rows, col_widths, y, current_page,
             title="Huoneistojen arvioidut käyttöiät"
+        )
         )
         
         # draw_stone_header(pdf, w, h)
@@ -935,12 +933,9 @@ async def generate_report(kohde_id: str):
         for teksti, apts in havainnot_map.items():
             rows.append([", ".join(apts), teksti])
             
-        y, current_page = maybe_new_page(pdf, y, current_page) 
+        y, current_page = maybe_new_page(pdf, y, current_page)
         y, current_page = draw_table_with_paging(
-            pdf,
-            rows,
-            col_widths,
-            y,
+            pdf, rows, col_widths, y, current_page,
             title="Havainnot huoneistoittain"
         )
         
@@ -958,10 +953,7 @@ async def generate_report(kohde_id: str):
         
         y, current_page = maybe_new_page(pdf, y, current_page)
         y, current_page = draw_table_with_paging(
-            pdf,
-            rows,
-            col_widths,
-            y,
+            pdf, rows, col_widths, y, current_page,
             title="Toimenpide-ehdotukset"
         )
 
