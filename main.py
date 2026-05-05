@@ -881,7 +881,7 @@ async def generate_report(kohde_id: str):
             TABLE_WIDTH * 0.80
         ]
         
-        y, current_page = draw_table_with_paging(pdf, rows, col_widths, y)
+        y, current_page = draw_table_with_paging(pdf, rows, col_widths, y, current_page)
         
        
         # =========================
@@ -909,7 +909,7 @@ async def generate_report(kohde_id: str):
                 TABLE_WIDTH * 0.75
             ]
         
-            y, current_page = draw_table_with_paging(pdf, rows, col_widths, y)
+            y, current_page = draw_table_with_paging(pdf, rows, col_widths, y, current_page)
 
         # draw_stone_header(pdf, w, h)
         
