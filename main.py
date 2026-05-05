@@ -919,8 +919,7 @@ async def generate_report(kohde_id: str):
             pdf, rows, col_widths, y, current_page,
             title="Huoneistojen arvioidut käyttöiät"
         )
-        )
-        
+                
         # draw_stone_header(pdf, w, h)
 
         # pdf.setFont("Arial-Bold", 16)
