@@ -59,7 +59,8 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://massakostis-frontend.pages.dev"
+        "https://massakostis-frontend.pages.dev",
+        "https://4daf5243.massakostis-frontend.pages.dev"
     ],
     allow_methods=["*"],
     allow_headers=["*"],
