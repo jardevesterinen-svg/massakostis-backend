@@ -30,7 +30,7 @@ R2_ENDPOINT = os.getenv("R2_ENDPOINT")
 HEADER_HEIGHT = 48
 IMAGES_MAX_HEIGHT = 220
 # MATERIALS_HEIGHT = 120
-PUBLIC_URL = "https://pub-9f421e06dc9f4bd49ae0adcf5690c438.r2.dev"
+PUBLIC_URL = os.getenv("PUBLIC_URL")
 MIN_SPACE = 150  # minimaalinen tila uudelle taulukolle
 
 KOSTEUSKARTOITUS_TEKSTI = """
