@@ -65,7 +65,7 @@ def startup():
 # 🔥 LISÄÄ TÄMÄ TÄHÄN
 @app.get("/debug")
 def debug():
-    print("DEBUG ENDPOINT CALLED")
+    print("DEBUG ENDPOINT CALLED2")
     return {
         "PUBLIC_URL": os.getenv("PUBLIC_URL"),
         "BUCKET": os.getenv("R2_BUCKET_NAME")
@@ -346,20 +346,20 @@ async def upload_image(
         ContentType=file.content_type
     )
     return {"status": "ok", "saved": key}
-    # ==========================================================
+# ==========================================================
 #  5) KOHDELISTA (R2 TRUE LIST)
 # ==========================================================
 
-@app.get("/list-kohteet")
-
 @app.get("/debug")
 def debug():
-    print("🔥 DEBUG CALLED")
+    print("🔥 DEBUG CALLED2")
     return {
         "PUBLIC_URL": os.getenv("PUBLIC_URL"),
         "BUCKET": os.getenv("R2_BUCKET_NAME")
     }
 
+
+@app.get("/list-kohteet")
 async def list_kohteet():
     kohteet = set()
     continuation = None
@@ -369,24 +369,30 @@ async def list_kohteet():
             "Bucket": R2_BUCKET,
             "Prefix": "kohteet/"
         }
+
         if continuation:
             params["ContinuationToken"] = continuation
 
         resp = s3.list_objects_v2(**params)
-        contents = resp.get("Contents", [])
 
-        for obj in contents:
-            key = obj["Key"]
+        for obj in resp.get("Contents", []):
+            key = obj.get("Key")
+
+            # Esim: kohteet/kohde123/metadata.json
             parts = key.split("/")
+
             if len(parts) >= 3:
-                cid = parts[1]
-                if cid.strip():
-                    kohteet.add(cid)
+                kohde = parts[1]
+
+                if kohde.strip():
+                    kohteet.add(kohde)
 
         if resp.get("IsTruncated"):
             continuation = resp.get("NextContinuationToken")
         else:
             break
+
+    print("✅ LÖYDETYT KOHTEET:", kohteet)
 
     return {"kohteet": sorted(kohteet)}
 
