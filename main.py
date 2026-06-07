@@ -390,7 +390,7 @@ async def list_kohteet():
 
     return {"kohteet": sorted(kohteet)}
 
-resp = client.list_objects_v2(
+resp = s3.list_objects_v2(
     Bucket=os.getenv("R2_BUCKET_NAME"),
     Prefix="kohteet/"
 )
