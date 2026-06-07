@@ -1195,7 +1195,7 @@ async def generate_report(kohde_id: str):
             # ==================================================
           
             rows = [
-                ["Tarkastuskohde", "Kuntoluokka", "Havainnot ja toimenpiteet"]
+                ["Tarkastuskohde", "KL", "Havainnot ja toimenpiteet"]
             ]
             col_widths = [
                 float(TABLE_WIDTH) * 0.15,   # Tarkastuskohde
