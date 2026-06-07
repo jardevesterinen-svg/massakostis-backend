@@ -534,6 +534,7 @@ async def generate_report(kohde_id: str):
         # ==================================================
         
         TARKASTUSKOHTEET = [
+            ("lattian_kosteus", "Lattian kosteus"),
             ("seinien_kosteus", "Seinien kosteus"),
             ("läpiviennit", "Läpiviennit"),
             ("pinnat", "Pinnat ja saumat"),
