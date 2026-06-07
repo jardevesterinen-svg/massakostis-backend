@@ -65,7 +65,7 @@ def startup():
 # 🔥 LISÄÄ TÄMÄ TÄHÄN
 @app.get("/debug")
 def debug():
-    print("DEBUG ENDPOINT CALLED")
+    print("DEBUG ENDPOINT CALLED2")
     return {
         "PUBLIC_URL": os.getenv("PUBLIC_URL"),
         "BUCKET": os.getenv("R2_BUCKET_NAME")
