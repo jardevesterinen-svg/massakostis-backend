@@ -56,11 +56,6 @@ s3 = session.client(
 
 app = FastAPI()
 
-@app.on_event("startup")
-def startup():
-    print("PUBLIC_URL =", os.getenv("PUBLIC_URL"))
-    print("BUCKET =", os.getenv("R2_BUCKET_NAME"))
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -367,6 +362,17 @@ async def list_kohteet():
             continuation = resp.get("NextContinuationToken")
         else:
             break
+    @app.on_event("startup")
+    def startup():
+        print("PUBLIC_URL =", os.getenv("PUBLIC_URL"))
+        print("BUCKET =", os.getenv("R2_BUCKET_NAME"))
+
+    @app.get("/debug")
+    def debug():
+        return {
+            "PUBLIC_URL": os.getenv("PUBLIC_URL"),
+            "BUCKET": os.getenv("R2_BUCKET_NAME")
+        }
 
     return {"kohteet": sorted(kohteet)}
 
