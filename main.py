@@ -65,7 +65,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://massakostis-frontend.pages.dev",
-        "https://e0a3bb3c.massakostis-frontend.pages.dev/"
+        "https://e0a3bb3c.massakostis-frontend.pages.dev"
     ],
     allow_methods=["*"],
     allow_headers=["*"],
