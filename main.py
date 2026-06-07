@@ -63,10 +63,7 @@ def startup():
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://massakostis-frontend.pages.dev",
-        "https://e0a3bb3c.massakostis-frontend.pages.dev"
-    ],
+    allow_origins=["*"]
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=True
