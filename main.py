@@ -351,6 +351,15 @@ async def upload_image(
 # ==========================================================
 
 @app.get("/list-kohteet")
+
+@app.get("/debug")
+def debug():
+    print("🔥 DEBUG CALLED")
+    return {
+        "PUBLIC_URL": os.getenv("PUBLIC_URL"),
+        "BUCKET": os.getenv("R2_BUCKET_NAME")
+    }
+
 async def list_kohteet():
     kohteet = set()
     continuation = None
