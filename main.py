@@ -55,8 +55,12 @@ s3 = session.client(
 # ==========================================================
 
 app = FastAPI()
-print("PUBLIC_URL =", os.getenv("PUBLIC_URL"))
-print("BUCKET =", os.getenv("R2_BUCKET_NAME"))
+
+@app.on_event("startup")
+def startup():
+    print("PUBLIC_URL =", os.getenv("PUBLIC_URL"))
+    print("BUCKET =", os.getenv("R2_BUCKET_NAME"))
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
