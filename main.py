@@ -346,7 +346,7 @@ async def upload_image(
         ContentType=file.content_type
     )
     return {"status": "ok", "saved": key}
-    # ==========================================================
+# ==========================================================
 #  5) KOHDELISTA (R2 TRUE LIST)
 # ==========================================================
 
@@ -395,9 +395,19 @@ resp = s3.list_objects_v2(
     Prefix="kohteet/"
 )
 
-print("FULL RESP:", resp)
-print("CONTENTS:", resp.get("Contents"))
-print("COMMON PREFIXES:", resp.get("CommonPrefixes"))
+kohteet = set()
+
+for obj in resp.get("Contents", []):
+    key = obj.get("Key")  # esim: kohteet/koy-mallila-2026-04-27/metadata.json
+    
+    # otetaan kohteen nimi
+    parts = key.split("/")
+    
+    if len(parts) > 1:
+        kohde = parts[1]
+        kohteet.add(kohde)
+
+return {"kohteet": list(kohteet)}
 
 # ==========================================================
 #  6) HUONEISTOPOHJAT
