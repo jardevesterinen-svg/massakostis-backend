@@ -33,6 +33,9 @@ IMAGES_MAX_HEIGHT = 220
 PUBLIC_URL = os.getenv("PUBLIC_URL")
 MIN_SPACE = 150  # minimaalinen tila uudelle taulukolle
 
+print("PUBLIC_URL =", os.getenv("PUBLIC_URL"))
+print("BUCKET =", os.getenv("R2_BUCKET_NAME"))
+
 KOSTEUSKARTOITUS_TEKSTI = """
 Märkätilojen kosteuskartoituksessa tarkastellaan tilojen pintarakenteita, liitoksia ja läpivientejä aistinvaraisesti sekä tarvittaessa pintakosteusmittauksin. Kartoitus ei sisällä rakenteiden avaamista eikä rakenteiden sisäisiä mittauksia. Mahdolliset mittaustulokset ovat suuntaa-antavia. Kartoituksessa ei arvioida rakenteiden teknistä käyttöikää eikä energiatehokkuutta. Havaitut puutteet ja riskit kirjataan raporttiin. Raportti ei ole rakenteellinen kuntotutkimus. Tarvittaessa suositellaan tarkempia tutkimuksia. Kartoitus perustuu tarkastushetken havaintoihin.
 """
