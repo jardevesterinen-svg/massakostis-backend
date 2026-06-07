@@ -1334,10 +1334,15 @@ async def generate_report(kohde_id: str):
             pdf.setFont("Arial", 11)
             pdf.setFillColor(COLOR_TEXT)
             
+            if kayttoika in ["saneerattava", "saneerattava välittömästi"]:
+                teksti = kayttoika
+            else:
+                teksti = f"Arvioitu jäljellä oleva käyttöikä on {kayttoika}"
+            
             pdf.drawString(
-                TABLE_X,   # ✅ sama vasen reuna kuin taulukossa
+                TABLE_X,
                 text_y,
-                f"Arvioitu jäljellä oleva käyttöikä on {kayttoika}"
+                teksti
             )
             
             pdf.drawRightString(
