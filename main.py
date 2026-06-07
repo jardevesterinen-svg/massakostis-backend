@@ -390,6 +390,14 @@ async def list_kohteet():
 
     return {"kohteet": sorted(kohteet)}
 
+resp = client.list_objects_v2(
+    Bucket=os.getenv("R2_BUCKET_NAME"),
+    Prefix="kohteet/"
+)
+
+print("FULL RESP:", resp)
+print("CONTENTS:", resp.get("Contents"))
+print("COMMON PREFIXES:", resp.get("CommonPrefixes"))
 
 # ==========================================================
 #  6) HUONEISTOPOHJAT
