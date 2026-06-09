@@ -952,7 +952,7 @@ async def generate_report(kohde_id: str):
                 
         # draw_stone_header(pdf, w, h)
 
-        # pdf.setFont("Arial-Bold", 14)
+        pdf.setFont("Arial-Bold", 14)
         # pdf.drawString(40, h - HEADER_HEIGHT - 40, "Havainnot huoneistoittain")
         
         # y = h - HEADER_HEIGHT - 70
