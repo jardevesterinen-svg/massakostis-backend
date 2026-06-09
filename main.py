@@ -166,7 +166,7 @@ def draw_pts_table(pdf, x, y, rows, col_widths):
             font_name,
             font_size,
             col_widths[0] - 12
-
+        )
         # --- RIVIKORKEUS ---
         max_lines = max(len(left_lines), len(right_lines))
         content_height = max_lines * LINE_HEIGHT
