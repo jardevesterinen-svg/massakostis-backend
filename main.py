@@ -185,41 +185,23 @@ def draw_pts_table(pdf, x, y, rows, col_widths):
         pdf.setFillColor(COLOR_TEXT)
         pdf.setFont(font_name, font_size)
 
-        # --- WRAP molemmat sarakkeet ---
-        left_lines = wrap_text(left_text, col_widths[0] - 12, pdf)
-        right_lines = wrap_text(right_text, col_widths[1] - 12, pdf)
-        
-        # --- Rivin korkeus (määräytyy pidemmän mukaan) ---
-        max_lines = max(len(left_lines), len(right_lines))
-        row_height = max_lines * LINE_HEIGHT + 10  # padding
-        
-        cur_y -= row_height
-        
-        # --- Piirrä taustarivi (jos käytät) ---
-        # pdf.rect(x, cur_y, TABLE_WIDTH, row_height)
-        
-        # --- VASEN SARake ---
-        text_y_left = cur_y + row_height - 15
-        
-        for line in left_lines:
-            pdf.drawString(
-                x + 6,
-                text_y_left,
-                line
-            )
-            text_y_left -= LINE_HEIGHT
-        
-        
-        # --- OIKEA SARAKE ---
-        text_y_right = cur_y + row_height - 15
-        
+        # --- VASEN SARAKE ---
+        pdf.drawString(
+            x + 6,
+            cur_y - 15,
+            left_text
+        )
+
+        # --- OIKEA SARKE (WRAPPED) ---
+        text_y = cur_y - 15
+
         for line in right_lines:
             pdf.drawString(
                 x + col_widths[0] + 6,
-                text_y_right,
+                text_y,
                 line
             )
-            text_y_right -= LINE_HEIGHT
+            text_y -= LINE_HEIGHT
 
         # --- GRID ---
         pdf.setStrokeColor(COLOR_GRID)
