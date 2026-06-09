@@ -1057,15 +1057,50 @@ async def generate_report(kohde_id: str):
             MAX_IMG_W = (CONTENT_WIDTH - CONTENT_GAP) / 2
             y_img = IMAGES_TOP_Y
             
+            def get_ratio(img_reader):
+                try:
+                    img = Image.open(io.BytesIO(img_reader._image.fp.read()))
+                    w, h = img.size
+                    return w / h
+                except:
+                    return 1.33  # fallback
+            
+            def is_wide(r):
+                return r > 1.6  # ~16:9
+            
+            
+            r1 = get_ratio(img1) if img1 else None
+            r2 = get_ratio(img2) if img2 else None
+            
+            # ---- määritä leveydet ----
+            def get_width(r):
+                if r and is_wide(r):
+                    return MAX_IMG_W * 0.85   # 👉 pienennetään leveää kuvaa
+                return MAX_IMG_W
+            
+            
+            w1 = get_width(r1)
+            w2 = get_width(r2)
+            
+            # keskitys jos leveydet pienempiä
+            total_width = w1 + w2 + CONTENT_GAP
+            start_x = CONTENT_X + (CONTENT_WIDTH - total_width) / 2
+            
+            # ---- render ----
             if img1 and img2:
-                draw_scaled_image(pdf, img1, CONTENT_X, y_img, MAX_IMG_W)
-                draw_scaled_image(pdf, img2, CONTENT_X + MAX_IMG_W + 20, y_img, MAX_IMG_W)
-                        
+                draw_scaled_image(pdf, img1, start_x, y_img, w1)
+                draw_scaled_image(pdf, img2, start_x + w1 + CONTENT_GAP, y_img, w2)
+            
             elif img1:
-                draw_scaled_image(pdf, img1, CONTENT_X, y_img, MAX_IMG_W*2 + 20)
-                        
+                # yksi kuva → keskitä
+                single_w = get_width(r1) * 1.5
+                x = CONTENT_X + (CONTENT_WIDTH - single_w) / 2
+                draw_scaled_image(pdf, img1, x, y_img, single_w)
+            
             elif img2:
-                draw_scaled_image(pdf, img2, CONTENT_X, y_img, MAX_IMG_W*2 + 20)
+                single_w = get_width(r2) * 1.5
+                x = CONTENT_X + (CONTENT_WIDTH - single_w) / 2
+                draw_scaled_image(pdf, img2, x, y_img, single_w)
           
             # ✅ EI TARKASTETTU CASE
             if str(data.get("ei_tarkastettu")).lower() == "true":
