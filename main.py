@@ -230,7 +230,7 @@ def draw_table_with_paging(pdf, rows, col_widths, y_start, current_page, title=N
     y = y_start
 
     if title:
-        pdf.setFont("Arial-Bold", 16)
+        pdf.setFont("Arial-Bold", 14)
         if y < 120:
             pdf.showPage()
             current_page += 1
@@ -928,7 +928,7 @@ async def generate_report(kohde_id: str):
 
         # draw_stone_header(pdf, w, h)
         
-        # pdf.setFont("Arial-Bold", 16)
+        # pdf.setFont("Arial-Bold", 14)
         # pdf.drawString(40, h - HEADER_HEIGHT - 40, "Huoneistojen arvioidut käyttöiät")
         
         # y = h - HEADER_HEIGHT - 70
@@ -952,7 +952,7 @@ async def generate_report(kohde_id: str):
                 
         # draw_stone_header(pdf, w, h)
 
-        # pdf.setFont("Arial-Bold", 16)
+        # pdf.setFont("Arial-Bold", 14)
         # pdf.drawString(40, h - HEADER_HEIGHT - 40, "Havainnot huoneistoittain")
         
         # y = h - HEADER_HEIGHT - 70
