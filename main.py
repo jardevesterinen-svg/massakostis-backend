@@ -159,11 +159,17 @@ def draw_pts_table(pdf, x, y, rows, col_widths):
             col_widths[1] - 12
         )
 
-        # vasen sarake yleensä lyhyt → yksi rivi riittää
+        # vasen sarake wrapataan myös
         left_text = str(left or "")
+        left_lines = wrap_text(
+            left_text,
+            font_name,
+            font_size,
+            col_widths[0] - 12
 
         # --- RIVIKORKEUS ---
-        content_height = max(1, len(right_lines)) * LINE_HEIGHT
+        max_lines = max(len(left_lines), len(right_lines))
+        content_height = max_lines * LINE_HEIGHT
         row_h = max(BASE_ROW_HEIGHT, content_height + 8)
 
         # --- TAUSTA ---
@@ -185,14 +191,18 @@ def draw_pts_table(pdf, x, y, rows, col_widths):
         pdf.setFillColor(COLOR_TEXT)
         pdf.setFont(font_name, font_size)
 
-        # --- VASEN SARAKE ---
-        pdf.drawString(
-            x + 6,
-            cur_y - 15,
-            left_text
-        )
+        # --- VASEN SARAKE (WRAPPED) ---
+        text_y_left = cur_y - 15
+        
+        for line in left_lines:
+            pdf.drawString(
+                x + 6,
+                text_y_left,
+                line
+            )
+            text_y_left -= LINE_HEIGHT
 
-        # --- OIKEA SARKE (WRAPPED) ---
+        # --- OIKEA SARAKE (WRAPPED) ---
         text_y = cur_y - 15
 
         for line in right_lines:
