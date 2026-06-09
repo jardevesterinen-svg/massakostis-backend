@@ -140,7 +140,15 @@ def draw_pts_table(pdf, x, y, rows, col_widths):
     LINE_HEIGHT = 14
     BASE_ROW_HEIGHT = 22
 
-    for idx, (left, right) in enumerate(rows):
+    
+    for idx, row in enumerate(rows):
+        
+        # 🔥 turvallinen purku
+        if isinstance(row, (list, tuple)) and len(row) >= 2:
+            left, right = row[0], row[1]
+        else:
+        left, right = str(row), ""
+
         is_header = (idx == 0)
 
         # --- FONT ---
@@ -212,7 +220,7 @@ def draw_pts_table(pdf, x, y, rows, col_widths):
                 line
             )
             text_y -= LINE_HEIGHT
-
+        print("ROW:", row)
         # --- GRID ---
         pdf.setStrokeColor(COLOR_GRID)
         pdf.setLineWidth(0.5)
