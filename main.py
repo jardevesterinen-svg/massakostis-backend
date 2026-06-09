@@ -186,8 +186,8 @@ def draw_pts_table(pdf, x, y, rows, col_widths):
         pdf.setFont(font_name, font_size)
 
         # --- WRAP molemmat sarakkeet ---
-        left_lines = split_text(left_text, col_widths[0] - 12, pdf)
-        right_lines = split_text(right_text, col_widths[1] - 12, pdf)
+        left_lines = wrap_text(left_text, col_widths[0] - 12, pdf)
+        right_lines = wrap_text(right_text, col_widths[1] - 12, pdf)
         
         # --- Rivin korkeus (määräytyy pidemmän mukaan) ---
         max_lines = max(len(left_lines), len(right_lines))
