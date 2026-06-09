@@ -1091,16 +1091,17 @@ async def generate_report(kohde_id: str):
                 draw_scaled_image(pdf, img1, start_x, y_img, w1)
                 draw_scaled_image(pdf, img2, start_x + w1 + CONTENT_GAP, y_img, w2)
             
+
             elif img1:
-                # yksi kuva → keskitä
-                single_w = get_width(r1) * 1.5
+                single_w = get_width(r1)
                 x = CONTENT_X + (CONTENT_WIDTH - single_w) / 2
                 draw_scaled_image(pdf, img1, x, y_img, single_w)
             
             elif img2:
-                single_w = get_width(r2) * 1.5
+                single_w = get_width(r2)
                 x = CONTENT_X + (CONTENT_WIDTH - single_w) / 2
                 draw_scaled_image(pdf, img2, x, y_img, single_w)
+
           
             # ✅ EI TARKASTETTU CASE
             if str(data.get("ei_tarkastettu")).lower() == "true":
