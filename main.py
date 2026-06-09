@@ -160,7 +160,7 @@ def draw_pts_table(pdf, x, y, rows, col_widths):
         )
 
         # vasen sarake wrapataan myös
-        left_text = str(left or "")
+        left_text = str(left or "").replace("\n", " ")
         left_lines = wrap_text(
             left_text,
             font_name,
@@ -168,7 +168,7 @@ def draw_pts_table(pdf, x, y, rows, col_widths):
             col_widths[0] - 12
         )
         # --- RIVIKORKEUS ---
-        max_lines = max(len(left_lines), len(right_lines))
+        max_lines = max(len(left_lines) or 1, len(right_lines) or 1)
         content_height = max_lines * LINE_HEIGHT
         row_h = max(BASE_ROW_HEIGHT, content_height + 8)
 
