@@ -225,7 +225,7 @@ def draw_pts_table(pdf, TABLE_X, y, rows, col_widths, current_page):
             TABLE_X + col_widths[0] + col_widths[1],
             cur_y - row_h
         )
-        
+        cur_y -= row_h    
     return cur_y, current_page
     
 # ==========================================================
