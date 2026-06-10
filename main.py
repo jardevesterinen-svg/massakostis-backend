@@ -185,8 +185,8 @@ def draw_pts_table(pdf, TABLE_X, y, rows, col_widths, current_page):
             header = rows[0]
             pdf.setFont("Arial-Bold", 11)
         
-            pdf.drawString(x + 6, cur_y - 15, str(header[0]))
-            pdf.drawString(x + col_widths[0] + 6, cur_y - 15, str(header[1]))
+            pdf.drawString(TABLE_X + 6, cur_y - 15, str(header[0]))
+            pdf.drawString(TABLE_X + col_widths[0] + 6, cur_y - 15, str(header[1]))
         
             cur_y -= BASE_ROW_HEIGHT
         
@@ -196,7 +196,7 @@ def draw_pts_table(pdf, TABLE_X, y, rows, col_widths, current_page):
             pdf.setFillColor(COLOR_ROW_ALT if idx % 2 else COLOR_ROW_WHITE)
         
         pdf.rect(
-            x,
+            TABLE_X,
             cur_y - row_h,
             col_widths[0] + col_widths[1],
             row_h,
@@ -209,24 +209,24 @@ def draw_pts_table(pdf, TABLE_X, y, rows, col_widths, current_page):
         
         text_y = cur_y - 15
         for line in left_lines:
-            pdf.drawString(x + 6, text_y, line)
+            pdf.drawString(TABLE_X + 6, text_y, line)
             text_y -= LINE_HEIGHT
         
         text_y = cur_y - 15
         for line in right_lines:
-            pdf.drawString(x + col_widths[0] + 6, text_y, line)
+            pdf.drawString(TABLE_X + col_widths[0] + 6, text_y, line)
             text_y -= LINE_HEIGHT
         
         pdf.setStrokeColor(COLOR_GRID)
         pdf.setLineWidth(0.5)
         pdf.line(
-            x,
+            TABLE_X,
             cur_y - row_h,
             x + col_widths[0] + col_widths[1],
             cur_y - row_h
         )
         
-        cur_y -= row_h
+return cur_y, current_page
     
 # ==========================================================
 #  1) SAVE METADATA
