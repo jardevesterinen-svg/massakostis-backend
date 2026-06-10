@@ -147,7 +147,7 @@ def draw_pts_table(pdf, x, y, rows, col_widths):
         if isinstance(row, (list, tuple)) and len(row) >= 2:
             left, right = row[0], row[1]
         else:
-        left, right = str(row), ""
+            left, right = str(row), ""
 
         is_header = (idx == 0)
 
