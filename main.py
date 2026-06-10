@@ -978,7 +978,7 @@ async def generate_report(kohde_id: str):
             
         y, current_page = maybe_new_page(pdf, y, current_page)
         y, current_page = draw_pts_table(
-            pdf, TABLE_X, y, rows, col_widths, current_page
+            pdf, TABLE_X, y, rows, col_widths, current_page,
             title="Havainnot huoneistoittain"
         )
         
