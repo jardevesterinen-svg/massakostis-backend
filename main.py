@@ -128,7 +128,7 @@ def wrap_text(text, font_name, font_size, max_width):
 
     return lines
 
-def draw_pts_table(pdf, x, y, rows, col_widths):
+def draw_pts_table(pdf, x, y, rows, col_widths, current_page):
     """
     Draws a PTS-style 2-column table with:
     - wrapped text
@@ -234,7 +234,7 @@ def draw_pts_table(pdf, x, y, rows, col_widths):
         # 👇 siirrytään seuraavaan riviin
         cur_y -= row_h
 
-    return cur_y
+    return cur_y, current_page
 
 def maybe_new_page(pdf, y, current_page, min_space=MIN_SPACE):
     if y < min_space:
@@ -256,23 +256,6 @@ def draw_table_with_paging(pdf, rows, col_widths, y_start, current_page, title=N
             y = h - HEADER_HEIGHT - 40
         pdf.drawString(40, y, title)
         y -= 30
-
-    chunk = [["", ""]]
-    i = 0
-    while i < len(rows):
-        if i == 0:
-            chunk = [rows[0]]
-        chunk.append(rows[i])
-        if len(chunk) >= 15 or i == len(rows) - 1:
-            if y < 120:
-                pdf.showPage()
-                current_page += 1
-                draw_stone_header(pdf, w, h)
-                y = h - HEADER_HEIGHT - 40
-            y = draw_pts_table(pdf, TABLE_X, y, chunk, col_widths)
-            y -= 20
-            chunk = [rows[0]]
-        i += 1
 
     return y, current_page  # ← palauttaa molemmat
     
@@ -974,15 +957,28 @@ async def generate_report(kohde_id: str):
         # pdf.drawString(40, h - HEADER_HEIGHT - 40, "Havainnot huoneistoittain")
         
         # y = h - HEADER_HEIGHT - 70
+        MIN_BOTTOM_MARGIN = 80
+
+        # ennen rect + drawString
+        if cur_y - row_h < MIN_BOTTOM_MARGIN:
+            pdf.showPage()
+            current_page += 1
+            draw_stone_header(pdf, w, h)
+            cur_y = h - HEADER_HEIGHT - 70
         
+            # 🔥 piirrä otsikkorivi uudelleen
+            header_row = rows[0]
+            draw_pts_table(pdf, x, cur_y, [header_row], col_widths, current_page)
+            cur_y -= BASE_ROW_HEIGHT
+
         rows = [["Huoneistot", "Havainto"]]
         
         for teksti, apts in havainnot_map.items():
             rows.append([", ".join(apts), teksti])
             
         y, current_page = maybe_new_page(pdf, y, current_page)
-        y, current_page = draw_table_with_paging(
-            pdf, rows, col_widths, y, current_page,
+        y, current_page = draw_pts_table(
+            pdf, TABLE_X, y, rows, col_widths, current_page
             title="Havainnot huoneistoittain"
         )
         
