@@ -934,7 +934,7 @@ async def generate_report(kohde_id: str):
             rows.append([", ".join(apts), teksti])
         
        
-        y, current_page = draw_pts_table
+        y, current_page = draw_pts_table(
             pdf, TABLE_X, y, rows, col_widths, y, current_page
         )
 
