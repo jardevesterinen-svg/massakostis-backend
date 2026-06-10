@@ -129,142 +129,47 @@ def wrap_text(text, font_name, font_size, max_width):
     return lines
 
 def draw_pts_table(pdf, x, y, rows, col_widths, current_page):
-    print("START TABLE")
-    """
-    Draws a PTS-style 2-column table with:
-    - wrapped text
-    - dynamic row height
-    - proper alignment
-    """
-
     cur_y = y
+
     LINE_HEIGHT = 14
     BASE_ROW_HEIGHT = 22
+    MIN_BOTTOM_MARGIN = 80
 
-    
     for idx, row in enumerate(rows):
-        
-        # 🔥 turvallinen purku
+
+        # ✅ turvallinen unpack
         if isinstance(row, (list, tuple)) and len(row) >= 2:
             left, right = row[0], row[1]
         else:
             left, right = str(row), ""
 
-        is_header = (idx == 0) or page_break_happened
+        is_header = (idx == 0)
 
-        # --- FONT ---
+        # ✅ font
         font_name = "Arial-Bold" if is_header else "Arial"
         font_size = 11 if is_header else 10
 
         pdf.setFont(font_name, font_size)
         pdf.setFillColor(COLOR_TEXT)
 
-        # --- WRAP TEXT (vain oikea sarake tarvitsee) ---
-        right_text = str(right or "").replace("\n", " ")
+        # ✅ wrap
+        left_lines = wrap_text(
+            str(left).replace("\n", " "),
+            font_name,
+            font_size,
+            col_widths[0] - 12
+        )
+
         right_lines = wrap_text(
-            right_text,
+            str(right).replace("\n", " "),
             font_name,
             font_size,
             col_widths[1] - 12
         )
 
-        # vasen sarake wrapataan myös
-        left_text = str(left or "").replace("\n", " ")
-        left_lines = wrap_text(
-            left_text,
-            font_name,
-            font_size,
-            col_widths[0] - 12
-        )
-        # --- RIVIKORKEUS ---
+        # ✅ rivikorkeus
         max_lines = max(len(left_lines) or 1, len(right_lines) or 1)
-        content_height = max_lines * LINE_HEIGHT
-        row_h = max(BASE_ROW_HEIGHT, content_height + 8)
-
-        # --- TAUSTA ---
-        if is_header:
-            pdf.setFillColor(COLOR_TABLE_HEADER)
-        else:
-            pdf.setFillColor(COLOR_ROW_ALT if idx % 2 == 1 else COLOR_ROW_WHITE)
-        MIN_BOTTOM_MARGIN = 80
-        
-        print("CHECK PAGE:", cur_y, row_h)
-        
-        if cur_y - row_h < MIN_BOTTOM_MARGIN:
-            pdf.showPage()
-            current_page += 1
-            draw_stone_header(pdf, w, h)
-        
-            cur_y = h - HEADER_HEIGHT - 70
-        
-            # ✅ tärkeä reset
-            pdf.setFont("Arial", 10)
-            pdf.setFillColor(COLOR_TEXT)
-        
-            # ✅ PIIRRÄ HEADER UUDELLE SIVULLE
-            header = rows[0]
-        
-            pdf.setFont("Arial-Bold", 11)
-        
-            left_header = str(header[0])
-            right_header = str(header[1])
-        
-            pdf.drawString(x + 6, cur_y - 15, left_header)
-            pdf.drawString(x + col_widths[0] + 6, cur_y - 15, right_header)
-        
-            cur_y -= BASE_ROW_HEIGHT
-
-        pdf.rect(
-            x,
-            cur_y - row_h,
-            col_widths[0] + col_widths[1],
-            row_h,
-            fill=1,
-            stroke=0
-        )
-
-        # tekstiväri takaisin
-        pdf.setFillColor(COLOR_TEXT)
-        pdf.setFont(font_name, font_size)
-
-        # --- VASEN SARAKE (WRAPPED) ---
-        text_y_left = cur_y - 15
-        
-        for line in left_lines:
-            pdf.drawString(
-                x + 6,
-                text_y_left,
-                line
-            )
-            text_y_left -= LINE_HEIGHT
-
-        # --- OIKEA SARAKE (WRAPPED) ---
-        text_y = cur_y - 15
-
-        for line in right_lines:
-            pdf.drawString(
-                x + col_widths[0] + 6,
-                text_y,
-                line
-            )
-            text_y -= LINE_HEIGHT
-            
-        
-        # --- GRID ---
-        pdf.setStrokeColor(COLOR_GRID)
-        pdf.setLineWidth(0.5)
-        pdf.line(
-            x,
-            cur_y - row_h,
-            x + col_widths[0] + col_widths[1],
-            cur_y - row_h
-        )
-
-        # 👇 siirrytään seuraavaan riviin
-        cur_y -= row_h
-    print("END TABLE", cur_y)
-    return cur_y, current_page
-   
+  
     
 # ==========================================================
 #  1) SAVE METADATA
@@ -722,8 +627,15 @@ async def generate_report(kohde_id: str):
             TABLE_WIDTH * 0.40,
             TABLE_WIDTH * 0.60
         ]
-
-        table_y = draw_pts_table(pdf, TABLE_X, table_y, rows, col_widths_2col, current_page)
+        
+        table_y, current_page = draw_pts_table(
+            pdf,
+            TABLE_X,
+            table_y,
+            rows,
+            col_widths_2col,
+            current_page
+        )
                
         TEXT_START_Y = table_y - 30
         TEXT_WIDTH = TABLE_WIDTH
@@ -760,8 +672,15 @@ async def generate_report(kohde_id: str):
             ["3", """Rakenteissa on selkeitä puutteita tai vaurioita. Korjaustoimenpiteet suositellaan tehtäväksi lähivuosina."""] ,
             ["4", """Rakenteissa on merkittäviä vaurioita tai kosteusriski. Korjaustoimenpiteet ovat kiireellisiä."""] ,
         ]
-        
-        kunto_y = draw_pts_table(pdf, TABLE_X, kunto_y, rows, col_widths_kunto, current_page)
+                
+        kunto_y, current_page = draw_pts_table(
+            pdf,
+            TABLE_X,
+            kunto_y,
+            rows,
+            col_widths_kunto,
+            current_page
+        )
     
         # Footer + Page Number
         pdf.setFont("Arial", 10)
@@ -903,9 +822,16 @@ async def generate_report(kohde_id: str):
             TABLE_WIDTH * 0.20,
             TABLE_WIDTH * 0.80
         ]
-        
-        y, current_page = draw_pts_table(pdf, X, y, rows, col_widths, current_page)
-        
+               
+        y, current_page = draw_pts_table(
+            pdf,
+            TABLE_X,
+            y,
+            rows,
+            col_widths,
+            current_page
+        )
+      
        
         # =========================
         # EI TARKASTETUT TAULUKKO
@@ -932,7 +858,15 @@ async def generate_report(kohde_id: str):
                 TABLE_WIDTH * 0.75
             ]
         
-            y, current_page = draw_pts_table(pdf, TABLE_X, y, rows, col_widths, y, current_page)
+            
+            y, current_page = draw_pts_table(
+                pdf,
+                TABLE_X,
+                y,
+                rows,
+                col_widths,
+                current_page
+            )
 
         # draw_stone_header(pdf, w, h)
         
@@ -954,8 +888,7 @@ async def generate_report(kohde_id: str):
         ]
                 
         y, current_page = draw_pts_table(
-            pdf, TABLE_X, y, rows, col_widths, y, current_page,
-            title="Huoneistojen arvioidut käyttöiät"
+            pdf, TABLE_X, y, rows, col_widths, y, current_page
         )
                 
         # draw_stone_header(pdf, w, h)
@@ -985,8 +918,7 @@ async def generate_report(kohde_id: str):
             
         
         y, current_page = draw_pts_table(
-            pdf, TABLE_X, y, rows, col_widths, current_page,
-            title="Havainnot huoneistoittain"
+            pdf, TABLE_X, y, rows, col_widths, current_page            
         )
         
         # draw_stone_header(pdf, w, h)
@@ -1002,9 +934,8 @@ async def generate_report(kohde_id: str):
             rows.append([", ".join(apts), teksti])
         
        
-        y, current_page = draw_pts_table(
-            pdf, TABLE_X, y, rows, col_widths, y, current_page,
-            title="Toimenpide-ehdotukset"
+        y, current_page = draw_pts_table
+            pdf, TABLE_X, y, rows, col_widths, y, current_page
         )
 
         # =========================
