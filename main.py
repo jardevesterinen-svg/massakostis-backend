@@ -140,7 +140,15 @@ def draw_pts_table(pdf, x, y, rows, col_widths):
     LINE_HEIGHT = 14
     BASE_ROW_HEIGHT = 22
 
-    for idx, (left, right) in enumerate(rows):
+    
+    for idx, row in enumerate(rows):
+        
+        # 🔥 turvallinen purku
+        if isinstance(row, (list, tuple)) and len(row) >= 2:
+            left, right = row[0], row[1]
+        else:
+            left, right = str(row), ""
+
         is_header = (idx == 0)
 
         # --- FONT ---
@@ -159,11 +167,17 @@ def draw_pts_table(pdf, x, y, rows, col_widths):
             col_widths[1] - 12
         )
 
-        # vasen sarake yleensä lyhyt → yksi rivi riittää
-        left_text = str(left or "")
-
+        # vasen sarake wrapataan myös
+        left_text = str(left or "").replace("\n", " ")
+        left_lines = wrap_text(
+            left_text,
+            font_name,
+            font_size,
+            col_widths[0] - 12
+        )
         # --- RIVIKORKEUS ---
-        content_height = max(1, len(right_lines)) * LINE_HEIGHT
+        max_lines = max(len(left_lines) or 1, len(right_lines) or 1)
+        content_height = max_lines * LINE_HEIGHT
         row_h = max(BASE_ROW_HEIGHT, content_height + 8)
 
         # --- TAUSTA ---
@@ -185,14 +199,18 @@ def draw_pts_table(pdf, x, y, rows, col_widths):
         pdf.setFillColor(COLOR_TEXT)
         pdf.setFont(font_name, font_size)
 
-        # --- VASEN SARKE ---
-        pdf.drawString(
-            x + 6,
-            cur_y - 15,
-            left_text
-        )
+        # --- VASEN SARAKE (WRAPPED) ---
+        text_y_left = cur_y - 15
+        
+        for line in left_lines:
+            pdf.drawString(
+                x + 6,
+                text_y_left,
+                line
+            )
+            text_y_left -= LINE_HEIGHT
 
-        # --- OIKEA SARKE (WRAPPED) ---
+        # --- OIKEA SARAKE (WRAPPED) ---
         text_y = cur_y - 15
 
         for line in right_lines:
@@ -202,7 +220,7 @@ def draw_pts_table(pdf, x, y, rows, col_widths):
                 line
             )
             text_y -= LINE_HEIGHT
-
+        print("ROW:", row)
         # --- GRID ---
         pdf.setStrokeColor(COLOR_GRID)
         pdf.setLineWidth(0.5)
@@ -230,7 +248,7 @@ def draw_table_with_paging(pdf, rows, col_widths, y_start, current_page, title=N
     y = y_start
 
     if title:
-        pdf.setFont("Arial-Bold", 16)
+        pdf.setFont("Arial-Bold", 14)
         if y < 120:
             pdf.showPage()
             current_page += 1
@@ -534,6 +552,7 @@ async def generate_report(kohde_id: str):
         # ==================================================
         
         TARKASTUSKOHTEET = [
+            ("lattian_kosteus", "Lattian kosteus"),
             ("seinien_kosteus", "Seinien kosteus"),
             ("läpiviennit", "Läpiviennit"),
             ("pinnat", "Pinnat ja saumat"),
@@ -927,7 +946,7 @@ async def generate_report(kohde_id: str):
 
         # draw_stone_header(pdf, w, h)
         
-        # pdf.setFont("Arial-Bold", 16)
+        # pdf.setFont("Arial-Bold", 14)
         # pdf.drawString(40, h - HEADER_HEIGHT - 40, "Huoneistojen arvioidut käyttöiät")
         
         # y = h - HEADER_HEIGHT - 70
@@ -951,7 +970,7 @@ async def generate_report(kohde_id: str):
                 
         # draw_stone_header(pdf, w, h)
 
-        # pdf.setFont("Arial-Bold", 16)
+        pdf.setFont("Arial-Bold", 14)
         # pdf.drawString(40, h - HEADER_HEIGHT - 40, "Havainnot huoneistoittain")
         
         # y = h - HEADER_HEIGHT - 70
@@ -1056,15 +1075,51 @@ async def generate_report(kohde_id: str):
             MAX_IMG_W = (CONTENT_WIDTH - CONTENT_GAP) / 2
             y_img = IMAGES_TOP_Y
             
+            def get_ratio(img_reader):
+                try:
+                    img = Image.open(io.BytesIO(img_reader._image.fp.read()))
+                    w, h = img.size
+                    return w / h
+                except:
+                    return 1.33  # fallback
+            
+            def is_wide(r):
+                return r > 1.6  # ~16:9
+            
+            
+            r1 = get_ratio(img1) if img1 else None
+            r2 = get_ratio(img2) if img2 else None
+            
+            # ---- määritä leveydet ----
+            def get_width(r):
+                if r and is_wide(r):
+                    return MAX_IMG_W * 0.85   # 👉 pienennetään leveää kuvaa
+                return MAX_IMG_W
+            
+            
+            w1 = get_width(r1)
+            w2 = get_width(r2)
+            
+            # keskitys jos leveydet pienempiä
+            total_width = w1 + w2 + CONTENT_GAP
+            start_x = CONTENT_X + (CONTENT_WIDTH - total_width) / 2
+            
+            # ---- render ----
             if img1 and img2:
-                draw_scaled_image(pdf, img1, CONTENT_X, y_img, MAX_IMG_W)
-                draw_scaled_image(pdf, img2, CONTENT_X + MAX_IMG_W + 20, y_img, MAX_IMG_W)
-                        
+                draw_scaled_image(pdf, img1, start_x, y_img, w1)
+                draw_scaled_image(pdf, img2, start_x + w1 + CONTENT_GAP, y_img, w2)
+            
+
             elif img1:
-                draw_scaled_image(pdf, img1, CONTENT_X, y_img, MAX_IMG_W*2 + 20)
-                        
+                single_w = get_width(r1)
+                x = CONTENT_X + (CONTENT_WIDTH - single_w) / 2
+                draw_scaled_image(pdf, img1, x, y_img, single_w)
+            
             elif img2:
-                draw_scaled_image(pdf, img2, CONTENT_X, y_img, MAX_IMG_W*2 + 20)
+                single_w = get_width(r2)
+                x = CONTENT_X + (CONTENT_WIDTH - single_w) / 2
+                draw_scaled_image(pdf, img2, x, y_img, single_w)
+
           
             # ✅ EI TARKASTETTU CASE
             if str(data.get("ei_tarkastettu")).lower() == "true":
@@ -1194,7 +1249,7 @@ async def generate_report(kohde_id: str):
             # ==================================================
           
             rows = [
-                ["Tarkastuskohde", "Kuntoluokka", "Havainnot ja toimenpiteet"]
+                ["Tarkastuskohde", "KL", "Havainnot ja toimenpiteet"]
             ]
             col_widths = [
                 float(TABLE_WIDTH) * 0.15,   # Tarkastuskohde
@@ -1334,10 +1389,15 @@ async def generate_report(kohde_id: str):
             pdf.setFont("Arial", 11)
             pdf.setFillColor(COLOR_TEXT)
             
+            if kayttoika in ["saneerattava", "saneerattava välittömästi"]:
+                teksti = kayttoika
+            else:
+                teksti = f"Arvioitu jäljellä oleva käyttöikä on {kayttoika}"
+            
             pdf.drawString(
-                TABLE_X,   # ✅ sama vasen reuna kuin taulukossa
+                TABLE_X,
                 text_y,
-                f"Arvioitu jäljellä oleva käyttöikä on {kayttoika}"
+                teksti
             )
             
             pdf.drawRightString(
