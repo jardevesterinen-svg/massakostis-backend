@@ -1344,9 +1344,7 @@ async def generate_report(kohde_id: str):
                         x + sum(col_widths),
                         cur_y - row_height
                     )
-                    cur_y -= row_h
-                    
-                    # 👇 SIIRRY SEURAAVAAN RIVIIN
+                  
                     cur_y -= row_height
             
                 return cur_y
