@@ -904,7 +904,7 @@ async def generate_report(kohde_id: str):
             TABLE_WIDTH * 0.80
         ]
         
-        y, current_page = draw_table_with_paging(pdf, rows, col_widths, y, current_page)
+        y, current_page = draw_pts_table(pdf, X, y, rows, col_widths, current_page)
         
        
         # =========================
@@ -932,7 +932,7 @@ async def generate_report(kohde_id: str):
                 TABLE_WIDTH * 0.75
             ]
         
-            y, current_page = draw_table_with_paging(pdf, rows, col_widths, y, current_page)
+            y, current_page = draw_pts_table(pdf, TABLE_X, y, rows, col_widths, y, current_page)
 
         # draw_stone_header(pdf, w, h)
         
@@ -953,8 +953,8 @@ async def generate_report(kohde_id: str):
             TABLE_WIDTH * 0.70
         ]
                 
-        y, current_page = draw_table_with_paging(
-            pdf, rows, col_widths, y, current_page,
+        y, current_page = draw_pts_table(
+            pdf, TABLE_X, y, rows, col_widths, y, current_page,
             title="Huoneistojen arvioidut käyttöiät"
         )
                 
@@ -1002,8 +1002,8 @@ async def generate_report(kohde_id: str):
             rows.append([", ".join(apts), teksti])
         
        
-        y, current_page = draw_table_with_paging(
-            pdf, rows, col_widths, y, current_page,
+        y, current_page = draw_pts_table(
+            pdf, TABLE_X, y, rows, col_widths, y, current_page,
             title="Toimenpide-ehdotukset"
         )
 
