@@ -710,7 +710,7 @@ async def generate_report(kohde_id: str):
             TABLE_WIDTH * 0.60
         ]
 
-        table_y = draw_pts_table(pdf, TABLE_X, table_y, rows, col_widths_2col)
+        table_y = draw_pts_table(pdf, TABLE_X, table_y, rows, col_widths_2col, current_page)
                
         TEXT_START_Y = table_y - 30
         TEXT_WIDTH = TABLE_WIDTH
@@ -748,7 +748,7 @@ async def generate_report(kohde_id: str):
             ["4", """Rakenteissa on merkittäviä vaurioita tai kosteusriski. Korjaustoimenpiteet ovat kiireellisiä."""] ,
         ]
         
-        kunto_y = draw_pts_table(pdf, TABLE_X, kunto_y, rows, col_widths_kunto)
+        kunto_y = draw_pts_table(pdf, TABLE_X, kunto_y, rows, col_widths_kunto, current_page)
     
         # Footer + Page Number
         pdf.setFont("Arial", 10)
