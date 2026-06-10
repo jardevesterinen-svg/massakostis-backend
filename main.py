@@ -222,7 +222,7 @@ def draw_pts_table(pdf, TABLE_X, y, rows, col_widths, current_page):
         pdf.line(
             TABLE_X,
             cur_y - row_h,
-            x + col_widths[0] + col_widths[1],
+            TABLE_X + col_widths[0] + col_widths[1],
             cur_y - row_h
         )
         
@@ -1344,7 +1344,8 @@ async def generate_report(kohde_id: str):
                         x + sum(col_widths),
                         cur_y - row_height
                     )
-            
+                    cur_y -= row_h
+                    
                     # 👇 SIIRRY SEURAAVAAN RIVIIN
                     cur_y -= row_height
             
