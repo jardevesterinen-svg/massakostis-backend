@@ -226,7 +226,7 @@ def draw_pts_table(pdf, TABLE_X, y, rows, col_widths, current_page):
             cur_y - row_h
         )
         
-return cur_y, current_page
+    return cur_y, current_page
     
 # ==========================================================
 #  1) SAVE METADATA
