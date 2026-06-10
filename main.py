@@ -1419,9 +1419,15 @@ async def generate_report(kohde_id: str):
 
     except Exception as e:
         import traceback
+    
+        error_text = traceback.format_exc()
         print("🔥 PDF ERROR:")
-        traceback.print_exc()
-        raise
+        print(error_text)
+    
+        return {
+            "error": str(e),
+            "traceback": error_text
+        }
 
 ###############################################################################
 # END OF FILE — main.py v7
