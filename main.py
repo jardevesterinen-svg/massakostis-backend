@@ -128,7 +128,7 @@ def wrap_text(text, font_name, font_size, max_width):
 
     return lines
 
-def draw_pts_table(pdf, x, y, rows, col_widths, current_page):
+def draw_pts_table(pdf, TABLE_X, y, rows, col_widths, current_page):
     cur_y = y
 
     LINE_HEIGHT = 14
@@ -169,7 +169,64 @@ def draw_pts_table(pdf, x, y, rows, col_widths, current_page):
 
         # ✅ rivikorkeus
         max_lines = max(len(left_lines) or 1, len(right_lines) or 1)
-  
+          row_h = max(BASE_ROW_HEIGHT, max_lines * LINE_HEIGHT + 8)
+        
+        if cur_y - row_h < MIN_BOTTOM_MARGIN:
+            pdf.showPage()
+            current_page += 1
+        
+            draw_stone_header(pdf, w, h)
+        
+            cur_y = h - HEADER_HEIGHT - 70
+        
+            pdf.setFont("Arial", 10)
+            pdf.setFillColor(COLOR_TEXT)
+        
+            header = rows[0]
+            pdf.setFont("Arial-Bold", 11)
+        
+            pdf.drawString(x + 6, cur_y - 15, str(header[0]))
+            pdf.drawString(x + col_widths[0] + 6, cur_y - 15, str(header[1]))
+        
+            cur_y -= BASE_ROW_HEIGHT
+        
+        if is_header:
+            pdf.setFillColor(COLOR_TABLE_HEADER)
+        else:
+            pdf.setFillColor(COLOR_ROW_ALT if idx % 2 else COLOR_ROW_WHITE)
+        
+        pdf.rect(
+            x,
+            cur_y - row_h,
+            col_widths[0] + col_widths[1],
+            row_h,
+            fill=1,
+            stroke=0
+        )
+        
+        pdf.setFillColor(COLOR_TEXT)
+        pdf.setFont(font_name, font_size)
+        
+        text_y = cur_y - 15
+        for line in left_lines:
+            pdf.drawString(x + 6, text_y, line)
+            text_y -= LINE_HEIGHT
+        
+        text_y = cur_y - 15
+        for line in right_lines:
+            pdf.drawString(x + col_widths[0] + 6, text_y, line)
+            text_y -= LINE_HEIGHT
+        
+        pdf.setStrokeColor(COLOR_GRID)
+        pdf.setLineWidth(0.5)
+        pdf.line(
+            x,
+            cur_y - row_h,
+            x + col_widths[0] + col_widths[1],
+            cur_y - row_h
+        )
+        
+        cur_y -= row_h
     
 # ==========================================================
 #  1) SAVE METADATA
@@ -888,7 +945,7 @@ async def generate_report(kohde_id: str):
         ]
                 
         y, current_page = draw_pts_table(
-            pdf, TABLE_X, y, rows, col_widths, y, current_page
+            pdf, TABLE_X, y, rows, col_widths, current_page
         )
                 
         # draw_stone_header(pdf, w, h)
@@ -898,18 +955,6 @@ async def generate_report(kohde_id: str):
         
         # y = h - HEADER_HEIGHT - 70
         MIN_BOTTOM_MARGIN = 80
-
-        # ennen rect + drawString
-        if cur_y - row_h < MIN_BOTTOM_MARGIN:
-            pdf.showPage()
-            current_page += 1
-            draw_stone_header(pdf, w, h)
-            cur_y = h - HEADER_HEIGHT - 70
-        
-            # 🔥 piirrä otsikkorivi uudelleen
-            header_row = rows[0]
-            draw_pts_table(pdf, x, cur_y, [header_row], col_widths, current_page)
-            cur_y -= BASE_ROW_HEIGHT
 
         rows = [["Huoneistot", "Havainto"]]
         
@@ -935,7 +980,7 @@ async def generate_report(kohde_id: str):
         
        
         y, current_page = draw_pts_table(
-            pdf, TABLE_X, y, rows, col_widths, y, current_page
+            pdf, TABLE_X, y, rows, col_widths, current_page
         )
 
         # =========================
