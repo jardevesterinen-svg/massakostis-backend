@@ -150,7 +150,7 @@ def draw_pts_table(pdf, x, y, rows, col_widths, current_page):
         else:
             left, right = str(row), ""
 
-        is_header = (idx == 0)
+        is_header = (idx == 0) or page_break_happened
 
         # --- FONT ---
         font_name = "Arial-Bold" if is_header else "Arial"
