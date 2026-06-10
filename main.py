@@ -185,6 +185,14 @@ def draw_pts_table(pdf, x, y, rows, col_widths, current_page):
             pdf.setFillColor(COLOR_TABLE_HEADER)
         else:
             pdf.setFillColor(COLOR_ROW_ALT if idx % 2 == 1 else COLOR_ROW_WHITE)
+        MIN_BOTTOM_MARGIN = 80
+
+        if cur_y - row_h < MIN_BOTTOM_MARGIN:
+            pdf.showPage()
+            current_page += 1
+            draw_stone_header(pdf, w, h)
+        
+            cur_y = h - HEADER_HEIGHT - 70
 
         pdf.rect(
             x,
@@ -244,20 +252,6 @@ def maybe_new_page(pdf, y, current_page, min_space=MIN_SPACE):
         return h - HEADER_HEIGHT - 70, current_page
     return y, current_page
     
-def draw_table_with_paging(pdf, rows, col_widths, y_start, current_page, title=None):
-    y = y_start
-
-    if title:
-        pdf.setFont("Arial-Bold", 14)
-        if y < 120:
-            pdf.showPage()
-            current_page += 1
-            draw_stone_header(pdf, w, h)
-            y = h - HEADER_HEIGHT - 40
-        pdf.drawString(40, y, title)
-        y -= 30
-
-    return y, current_page  # ← palauttaa molemmat
     
 # ==========================================================
 #  1) SAVE METADATA
