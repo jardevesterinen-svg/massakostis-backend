@@ -169,7 +169,7 @@ def draw_pts_table(pdf, TABLE_X, y, rows, col_widths, current_page):
 
         # ✅ rivikorkeus
         max_lines = max(len(left_lines) or 1, len(right_lines) or 1)
-          row_h = max(BASE_ROW_HEIGHT, max_lines * LINE_HEIGHT + 8)
+        row_h = max(BASE_ROW_HEIGHT, max_lines * LINE_HEIGHT + 8)
         
         if cur_y - row_h < MIN_BOTTOM_MARGIN:
             pdf.showPage()
