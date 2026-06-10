@@ -187,15 +187,32 @@ def draw_pts_table(pdf, x, y, rows, col_widths, current_page):
         else:
             pdf.setFillColor(COLOR_ROW_ALT if idx % 2 == 1 else COLOR_ROW_WHITE)
         MIN_BOTTOM_MARGIN = 80
+        
         print("CHECK PAGE:", cur_y, row_h)
+        
         if cur_y - row_h < MIN_BOTTOM_MARGIN:
             pdf.showPage()
             current_page += 1
             draw_stone_header(pdf, w, h)
         
             cur_y = h - HEADER_HEIGHT - 70
+        
+            # ✅ tärkeä reset
             pdf.setFont("Arial", 10)
             pdf.setFillColor(COLOR_TEXT)
+        
+            # ✅ PIIRRÄ HEADER UUDELLE SIVULLE
+            header = rows[0]
+        
+            pdf.setFont("Arial-Bold", 11)
+        
+            left_header = str(header[0])
+            right_header = str(header[1])
+        
+            pdf.drawString(x + 6, cur_y - 15, left_header)
+            pdf.drawString(x + col_widths[0] + 6, cur_y - 15, right_header)
+        
+            cur_y -= BASE_ROW_HEIGHT
 
         pdf.rect(
             x,
