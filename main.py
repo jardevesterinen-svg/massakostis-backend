@@ -264,15 +264,7 @@ def draw_pts_table(pdf, x, y, rows, col_widths, current_page):
         cur_y -= row_h
     print("END TABLE", cur_y)
     return cur_y, current_page
-
-def maybe_new_page(pdf, y, current_page, min_space=MIN_SPACE):
-    if y < min_space:
-        pdf.showPage()
-        current_page += 1
-        draw_stone_header(pdf, w, h)
-        return h - HEADER_HEIGHT - 70, current_page
-    return y, current_page
-    
+   
     
 # ==========================================================
 #  1) SAVE METADATA
@@ -960,7 +952,7 @@ async def generate_report(kohde_id: str):
             TABLE_WIDTH * 0.30,
             TABLE_WIDTH * 0.70
         ]
-        y, current_page = maybe_new_page(pdf, y, current_page)        
+                
         y, current_page = draw_table_with_paging(
             pdf, rows, col_widths, y, current_page,
             title="Huoneistojen arvioidut käyttöiät"
@@ -991,7 +983,7 @@ async def generate_report(kohde_id: str):
         for teksti, apts in havainnot_map.items():
             rows.append([", ".join(apts), teksti])
             
-        y, current_page = maybe_new_page(pdf, y, current_page)
+        
         y, current_page = draw_pts_table(
             pdf, TABLE_X, y, rows, col_widths, current_page,
             title="Havainnot huoneistoittain"
@@ -1009,7 +1001,7 @@ async def generate_report(kohde_id: str):
         for teksti, apts in toimenpiteet_map.items():
             rows.append([", ".join(apts), teksti])
         
-        y, current_page = maybe_new_page(pdf, y, current_page)
+       
         y, current_page = draw_table_with_paging(
             pdf, rows, col_widths, y, current_page,
             title="Toimenpide-ehdotukset"
