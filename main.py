@@ -129,6 +129,7 @@ def wrap_text(text, font_name, font_size, max_width):
     return lines
 
 def draw_pts_table(pdf, x, y, rows, col_widths, current_page):
+    print("START TABLE")
     """
     Draws a PTS-style 2-column table with:
     - wrapped text
@@ -186,7 +187,7 @@ def draw_pts_table(pdf, x, y, rows, col_widths, current_page):
         else:
             pdf.setFillColor(COLOR_ROW_ALT if idx % 2 == 1 else COLOR_ROW_WHITE)
         MIN_BOTTOM_MARGIN = 80
-
+        print("CHECK PAGE:", cur_y, row_h)
         if cur_y - row_h < MIN_BOTTOM_MARGIN:
             pdf.showPage()
             current_page += 1
@@ -228,7 +229,8 @@ def draw_pts_table(pdf, x, y, rows, col_widths, current_page):
                 line
             )
             text_y -= LINE_HEIGHT
-        print("ROW:", row)
+            
+        
         # --- GRID ---
         pdf.setStrokeColor(COLOR_GRID)
         pdf.setLineWidth(0.5)
@@ -241,7 +243,7 @@ def draw_pts_table(pdf, x, y, rows, col_widths, current_page):
 
         # 👇 siirrytään seuraavaan riviin
         cur_y -= row_h
-
+    print("END TABLE", cur_y)
     return cur_y, current_page
 
 def maybe_new_page(pdf, y, current_page, min_space=MIN_SPACE):
