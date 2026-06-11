@@ -743,7 +743,7 @@ async def generate_report(kohde_id: str):
         
         y_text = TEXT_START_Y - 18
       
-        kunto_y = y_text - 30
+        kunto_y = y_text - 300
                        
         col_widths_kunto = [
             TABLE_WIDTH * 0.20,
