@@ -195,7 +195,7 @@ def draw_pts_table(pdf, TABLE_X, y, rows, col_widths, current_page):
                 fill=1,
                 stroke=0
             )
-            pdf.setFont("Arial", 10)
+            # pdf.setFont("Arial", 10)
             pdf.setFillColor(COLOR_TEXT)
             
             pdf.drawString(TABLE_X + 6, cur_y - 15, str(header[0]))
