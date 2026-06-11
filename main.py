@@ -1170,7 +1170,7 @@ async def generate_report(kohde_id: str):
             
             MAT_TITLE_Y = MATERIALS_TOP_Y
             MAT_ROW1_Y  = MAT_TITLE_Y - 24
-            MAT_ROW2_Y  = MAT_ROW1_Y - 50
+            MAT_ROW2_Y  = MAT_ROW1_Y - 34
     
             pdf.setFont("Arial-Bold", 14)
             pdf.setFillColor(COLOR_TEXT)
