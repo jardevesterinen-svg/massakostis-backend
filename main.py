@@ -551,7 +551,7 @@ async def generate_report(kohde_id: str):
         HEADER_BOTTOM_Y = h - HEADER_HEIGHT
              
         IMAGES_TOP_Y = HEADER_BOTTOM_Y - 15
-        MATERIALS_TOP_Y = IMAGES_TOP_Y - IMAGES_MAX_HEIGHT - 5
+        MATERIALS_TOP_Y = IMAGES_TOP_Y - IMAGES_MAX_HEIGHT + 5
         
         # ======================================================
         # =============  PAGE 1 — KANSILEHTI  ==================
@@ -1170,7 +1170,7 @@ async def generate_report(kohde_id: str):
             
             MAT_TITLE_Y = MATERIALS_TOP_Y
             MAT_ROW1_Y  = MAT_TITLE_Y - 24
-            MAT_ROW2_Y  = MAT_ROW1_Y - 44
+            MAT_ROW2_Y  = MAT_ROW1_Y - 50
     
             pdf.setFont("Arial-Bold", 14)
             pdf.setFillColor(COLOR_TEXT)
