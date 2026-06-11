@@ -177,7 +177,7 @@ def draw_pts_table(pdf, TABLE_X, y, rows, col_widths, current_page):
         
             draw_stone_header(pdf, w, h)
         
-            cur_y = h - HEADER_HEIGHT - 70
+            cur_y = h - HEADER_HEIGHT - 60
         
             pdf.setFont("Arial", 10)
             pdf.setFillColor(COLOR_TEXT)
