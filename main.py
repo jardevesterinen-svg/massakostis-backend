@@ -951,13 +951,18 @@ async def generate_report(kohde_id: str):
         y, current_page = draw_pts_table(
             pdf, TABLE_X, y, rows, col_widths, current_page
         )
-                
-        # draw_stone_header(pdf, w, h)
 
+        # ↓ spacing ennen uutta blokkia
+        y -= 30  
+                
+        # ✅ OTSIKKO
         pdf.setFont("Arial-Bold", 14)
-        # pdf.drawString(40, h - HEADER_HEIGHT - 40, "Havainnot huoneistoittain")
+        pdf.setFillColor(COLOR_TEXT)
+        pdf.drawString(TABLE_X, y, "Havainnot huoneistoittain")
         
-        # y = h - HEADER_HEIGHT - 70
+        # ↓ siirry seuraavalle riville otsikon alta
+        y -= 20
+        
         MIN_BOTTOM_MARGIN = 80
 
         rows = [["Huoneistot", "Havainto"]]
@@ -970,19 +975,22 @@ async def generate_report(kohde_id: str):
             pdf, TABLE_X, y, rows, col_widths, current_page            
         )
         
-        # draw_stone_header(pdf, w, h)
-
-        # pdf.setFont("Arial-Bold", 16)
-        # pdf.drawString(40, h - HEADER_HEIGHT - 40, "Toimenpide-ehdotukset")
+        # ↓ spacing ennen uutta blokkia
+        y -= 30  
+                
+        # ✅ OTSIKKO
+        pdf.setFont("Arial-Bold", 14)
+        pdf.setFillColor(COLOR_TEXT)
+        pdf.drawString(TABLE_X, y, "Toimenpide-ehdotukset")
         
-        # y = h - HEADER_HEIGHT - 70
+        # ↓ siirry seuraavalle riville otsikon alta
+        y -= 20
         
         rows = [["Huoneistot", "Toimenpide"]]
         
         for teksti, apts in toimenpiteet_map.items():
             rows.append([", ".join(apts), teksti])
-        
-       
+               
         y, current_page = draw_pts_table(
             pdf, TABLE_X, y, rows, col_widths, current_page
         )
