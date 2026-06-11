@@ -925,12 +925,16 @@ async def generate_report(kohde_id: str):
                 current_page
             )
 
-        # draw_stone_header(pdf, w, h)
-        
-        # pdf.setFont("Arial-Bold", 14)
-        # pdf.drawString(40, h - HEADER_HEIGHT - 40, "Huoneistojen arvioidut käyttöiät")
-        
-        # y = h - HEADER_HEIGHT - 70
+            # ↓ spacing ennen uutta blokkia
+            y -= 30  
+            
+            # ✅ OTSIKKO
+            pdf.setFont("Arial-Bold", 14)
+            pdf.setFillColor(COLOR_TEXT)
+            pdf.drawString(TABLE_X, y, "Huoneistojen arvioidut käyttöiät")
+            
+            # ↓ siirry seuraavalle riville otsikon alta
+            y -= 20
         
         rows = [
             ["Käyttöikä", "Huoneistot"]
