@@ -721,12 +721,25 @@ async def generate_report(kohde_id: str):
         
         pdf.setFont("Arial", 10)
         
-        lines = wrap_text(
-            KOSTEUSKARTOITUS_TEKSTI.strip(),
-            "Arial",
-            10,
-            TEXT_WIDTH
-        )
+        paragraphs = KOSTEUSKARTOITUS_TEKSTI.strip().split("\n\n")
+        
+        y_text = TEXT_START_Y - 18
+        
+        for para in paragraphs:
+        
+            lines = wrap_text(
+                para.strip(),
+                "Arial",
+                10,
+                TEXT_WIDTH
+            )
+        
+            for line in lines:
+                pdf.drawString(TABLE_X, y_text, line)
+                y_text -= 14
+        
+            # ✅ väli kappaleiden väliin
+            y_text -= 10
         
         y_text = TEXT_START_Y - 18
         
