@@ -34,7 +34,10 @@ PUBLIC_URL = os.getenv("PUBLIC_URL")
 MIN_SPACE = 150  # minimaalinen tila uudelle taulukolle
 
 KOSTEUSKARTOITUS_TEKSTI = """
-Märkätilojen kosteuskartoituksessa tarkastellaan tilojen pintarakenteita, liitoksia ja läpivientejä aistinvaraisesti sekä tarvittaessa pintakosteusmittauksin. Kartoitus ei sisällä rakenteiden avaamista eikä rakenteiden sisäisiä mittauksia. Mahdolliset mittaustulokset ovat suuntaa-antavia. Kartoituksessa ei arvioida rakenteiden teknistä käyttöikää eikä energiatehokkuutta. Havaitut puutteet ja riskit kirjataan raporttiin. Raportti ei ole rakenteellinen kuntotutkimus. Tarvittaessa suositellaan tarkempia tutkimuksia. Kartoitus perustuu tarkastushetken havaintoihin.
+Tämä raportti on laadittu ensisijaisesti kohteen märkätilojen kunnon arvioimiseksi sekä mahdollisten korjaustarpeiden ja toimenpiteiden kiireellisyyden määrittämiseksi. Tarkastuksessa kosteutta mitattiin erityisesti tyypillisistä riskialueista, kuten suihkutiloista, lattiakaivon läheisyydestä ja wc-istuimen ympäriltä. Lisäksi mittauksia tehtiin pistokoeluonteisesti myös muista kohdista.
+Pintakosteusmittausten avulla voidaan arvioida, esiintyykö rakenteissa tavanomaista korkeampaa kosteutta ja ovatko mitatut arvot rakenteiden toimivuuden kannalta merkittäviä. Samalla voidaan tunnistaa mahdollinen tarve tarkemmille jatkotutkimuksille. Mittaustulosten tulkinnassa on huomioitava useita epävarmuustekijöitä, kuten rakenteissa olevat metalliosat, putkistot sekä tilojen käyttöön liittyvät tekijät, kuten veden käyttö juuri ennen mittausta.
+On tärkeää huomioida, että pintakosteusmittaus antaa ainoastaan suuntaa-antavan arvion mittauskohteen kosteustilanteesta mittaushetkellä. Mittaus aloitetaan vertaamalla tuloksia oletettuun kuivaan rakenteeseen, minkä jälkeen saadut arvot suhteutetaan tarkasteltavaan kohtaan.
+Pintakosteusmittaus ei kuitenkaan yksilöi kosteuden tarkkaa sijaintia rakenteen sisällä. Erityisesti laatoitetuissa märkätiloissa on varmistuttava vedeneristyksen olemassaolosta ja kunnosta. Toimiva vedeneristys laatoituksen alla voi aiheuttaa mittauksissa kohonneita arvoja ilman, että rakenteessa on varsinaista vauriota, sillä kosteus voi sijaita laatoituksen ja vedeneristyksen välissä.
 """
 
 # ==========================================================
