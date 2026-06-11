@@ -731,8 +731,8 @@ async def generate_report(kohde_id: str):
         kunto_y = y_text - 30
                        
         col_widths_kunto = [
-            TABLE_WIDTH * 0.15,
-            TABLE_WIDTH * 0.85
+            TABLE_WIDTH * 0.20,
+            TABLE_WIDTH * 0.80
         ]
         pdf.setFont("Arial", 9)
         rows = [
