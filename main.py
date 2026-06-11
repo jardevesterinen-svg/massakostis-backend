@@ -1387,9 +1387,9 @@ async def generate_report(kohde_id: str):
             kokonaiskunto = data.get("kokonaiskunto", "–")
             
             # ✅ Tekstin aloitus vähän taulukon alapuolelta
-            text_y = table3_y - 20
+            text_y = table3_y - 15
             
-            pdf.setFont("Arial", 11)
+            pdf.setFont("Arial", 10)
             pdf.setFillColor(COLOR_TEXT)
             
             if kayttoika in ["saneerattava", "saneerattava välittömästi"]:
