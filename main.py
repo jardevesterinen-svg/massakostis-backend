@@ -742,11 +742,7 @@ async def generate_report(kohde_id: str):
             y_text -= 10
         
         y_text = TEXT_START_Y - 18
-        
-        for line in lines:
-            pdf.drawString(TABLE_X, y_text, line)
-            y_text -= 14
-       
+      
         kunto_y = y_text - 30
                        
         col_widths_kunto = [
