@@ -952,16 +952,16 @@ async def generate_report(kohde_id: str):
             pdf, TABLE_X, y, rows, col_widths, current_page
         )
 
-        # ↓ spacing ennen uutta blokkia
-        y -= 30  
-                
-        # ✅ OTSIKKO
-        pdf.setFont("Arial-Bold", 14)
-        pdf.setFillColor(COLOR_TEXT)
-        pdf.drawString(TABLE_X, y, "Havainnot huoneistoittain")
-        
-        # ↓ siirry seuraavalle riville otsikon alta
-        y -= 20
+            # ↓ spacing ennen uutta blokkia
+            y -= 30  
+                    
+            # ✅ OTSIKKO
+            pdf.setFont("Arial-Bold", 14)
+            pdf.setFillColor(COLOR_TEXT)
+            pdf.drawString(TABLE_X, y, "Havainnot huoneistoittain")
+            
+            # ↓ siirry seuraavalle riville otsikon alta
+            y -= 20
         
         MIN_BOTTOM_MARGIN = 80
 
@@ -975,16 +975,16 @@ async def generate_report(kohde_id: str):
             pdf, TABLE_X, y, rows, col_widths, current_page            
         )
         
-        # ↓ spacing ennen uutta blokkia
-        y -= 30  
-                
-        # ✅ OTSIKKO
-        pdf.setFont("Arial-Bold", 14)
-        pdf.setFillColor(COLOR_TEXT)
-        pdf.drawString(TABLE_X, y, "Toimenpide-ehdotukset")
-        
-        # ↓ siirry seuraavalle riville otsikon alta
-        y -= 20
+            # ↓ spacing ennen uutta blokkia
+            y -= 30  
+                    
+            # ✅ OTSIKKO
+            pdf.setFont("Arial-Bold", 14)
+            pdf.setFillColor(COLOR_TEXT)
+            pdf.drawString(TABLE_X, y, "Toimenpide-ehdotukset")
+            
+            # ↓ siirry seuraavalle riville otsikon alta
+            y -= 20
         
         rows = [["Huoneistot", "Toimenpide"]]
         
