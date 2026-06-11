@@ -902,8 +902,8 @@ async def generate_report(kohde_id: str):
                 rows.append([k, lista])
         
         col_widths = [
-            TABLE_WIDTH * 0.25,
-            TABLE_WIDTH * 0.75
+            TABLE_WIDTH * 0.30,
+            TABLE_WIDTH * 0.70
         ]
                
         y, current_page = draw_pts_table(
@@ -937,8 +937,8 @@ async def generate_report(kohde_id: str):
                 rows.append([apt, syy])
         
             col_widths = [
-                TABLE_WIDTH * 0.25,
-                TABLE_WIDTH * 0.75
+                TABLE_WIDTH * 0.30,
+                TABLE_WIDTH * 0.70
             ]
         
             
