@@ -71,10 +71,13 @@ def debug():
         "BUCKET": os.getenv("R2_BUCKET_NAME")
     }
 
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://massakostis-frontend.pages.dev",
+        "https://de933d40.massakostis-frontend.pages.dev"
+    ],
+    allow_origin_regex=r"https://.*\.massakostis-frontend\.pages\.dev",
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=True
