@@ -951,16 +951,16 @@ async def generate_report(kohde_id: str):
                 current_page
             )
 
-            # ↓ spacing ennen uutta blokkia
-            y -= 30  
-            
-            # ✅ OTSIKKO
-            pdf.setFont("Arial-Bold", 14)
-            pdf.setFillColor(COLOR_TEXT)
-            pdf.drawString(TABLE_X, y, "Huoneistojen arvioidut käyttöiät")
-            
-            # ↓ siirry seuraavalle riville otsikon alta
-            y -= 20
+        # ↓ spacing ennen uutta blokkia
+        y -= 30  
+        
+        # ✅ OTSIKKO
+        pdf.setFont("Arial-Bold", 14)
+        pdf.setFillColor(COLOR_TEXT)
+        pdf.drawString(TABLE_X, y, "Huoneistojen arvioidut käyttöiät")
+        
+        # ↓ siirry seuraavalle riville otsikon alta
+        y -= 20
         
         rows = [
             ["Käyttöikä", "Huoneistot"]
