@@ -383,7 +383,8 @@ def debug():
 async def list_kohteet():
     kohteet = set()
     continuation = None
-
+    print("ENDPOINT:", os.getenv("R2_ENDPOINT_URL"))
+    print("ACCESS_KEY:", os.getenv("R2_ACCESS_KEY_ID", "PUUTTUU"))
     while True:
         params = {
             "Bucket": R2_BUCKET,
