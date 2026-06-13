@@ -830,7 +830,22 @@ async def generate_report(kohde_id: str):
                 # --- TOIMENPITEET
                 if toimenp:
                     toimenpiteet_map.setdefault(toimenp, []).append(apt)
-                    
+        # ✅ järjestys määriteltynä
+        kayttoika_order = {
+            "saneerattava välittömästi": 0,
+            "saneerattava": 1,
+            "< 2 vuotta": 2,
+            "2–5 vuotta": 3,
+            "5–10 vuotta": 4,
+            "> 10 vuotta": 5,
+        }
+
+        # ✅ järjestetään mapista lista oikeaan järjestykseen
+        kayttoika_sorted = sorted(
+            kayttoika_map.items(),
+            key=lambda x: kayttoika_order.get(x[0], 999)
+        )  
+
         # =========================
         # YHTEENVETO SIVU
         # =========================
@@ -951,22 +966,22 @@ async def generate_report(kohde_id: str):
                 current_page
             )
 
-            # ↓ spacing ennen uutta blokkia
-            y -= 30  
-            
-            # ✅ OTSIKKO
-            pdf.setFont("Arial-Bold", 14)
-            pdf.setFillColor(COLOR_TEXT)
-            pdf.drawString(TABLE_X, y, "Huoneistojen arvioidut käyttöiät")
-            
-            # ↓ siirry seuraavalle riville otsikon alta
-            y -= 20
+        # ↓ spacing ennen uutta blokkia
+        y -= 30  
+        
+        # ✅ OTSIKKO
+        pdf.setFont("Arial-Bold", 14)
+        pdf.setFillColor(COLOR_TEXT)
+        pdf.drawString(TABLE_X, y, "Huoneistojen arvioidut käyttöiät")
+        
+        # ↓ siirry seuraavalle riville otsikon alta
+        y -= 20
         
         rows = [
             ["Käyttöikä", "Huoneistot"]
         ]
         
-        for k, apts in kayttoika_map.items():
+        for k, apts in kayttoika_sorted:
             rows.append([k, ", ".join(apts)])
         
         col_widths = [
