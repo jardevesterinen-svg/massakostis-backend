@@ -981,7 +981,7 @@ async def generate_report(kohde_id: str):
             ["Käyttöikä", "Huoneistot"]
         ]
         
-        for k, apts in kayttoika_sorted():
+        for k, apts in kayttoika_sorted:
             rows.append([k, ", ".join(apts)])
         
         col_widths = [
