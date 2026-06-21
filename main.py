@@ -359,8 +359,12 @@ async def delete_image(req: DeleteImageRequest):
     )
     
     print("---- FILES IN R2 ----")
-    for obj in response.get("Contents", []):
+    
+    contents = response.get("Contents") or []
+    
+    for obj in contents:
         print(obj["Key"])
+
     
     key = f"kohteet/{req.kohdeId}/{req.huoneisto}/{req.filename}"
 
