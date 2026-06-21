@@ -358,7 +358,7 @@ async def delete_image(req: DeleteImageRequest):
         print("PREFIX:", prefix)
 
         response = s3.list_objects_v2(
-            Bucket=BUCKET,
+            Bucket=R2_BUCKET,
             Prefix=prefix
         )
 
