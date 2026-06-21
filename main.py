@@ -354,7 +354,7 @@ async def delete_image(req: DeleteImageRequest):
     try:
         print("DELETE:", req.kohdeId, req.huoneisto, req.filename)
 
-        prefix = f"kohteet/{req.kohdeId}/{req.huoneisto}"
+        prefix = f"kohteet/{req.kohdeId}/huoneistot/{apt}"
         print("PREFIX:", prefix)
 
         response = s3.list_objects_v2(
