@@ -569,6 +569,8 @@ async def generate_report(kohde_id: str):
             ("ovikynnys", "Ovikynnys"),
             ("lattiakaivo", "Lattiakaivo"),
             ("lattiakallistukset", "Lattiakallistukset"),
+            ("erillis-wc", "Erillis-WC"),
+            ("sauna", "Sauna")
         ]
     
         # ---- LOAD HUONEISTOT ----
