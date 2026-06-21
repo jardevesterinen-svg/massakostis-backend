@@ -4,6 +4,15 @@ print("### MAIN.PY V7 ACTIVE ###")
 ###############################################################################
 
 from fastapi import FastAPI, UploadFile, File, Form, Body, Response
+from pydantic import BaseModel
+
+from botocore.client import Config
+from fastapi.middleware.cors import CORSMiddleware
+import boto3
+import os
+import json
+import io
+from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
 import boto3
 import os
@@ -313,7 +322,7 @@ async def get_apartment(kohde_id: str, huoneisto_slug: str):
 
 
 # ==========================================================
-#  4) HUONEISTON KUVIEN UPLOAD
+#  4) HUONEISTON KUVIEN UPLOAD JA DELETE
 # ==========================================================
 
 @app.post("/upload-image")
@@ -333,6 +342,30 @@ async def upload_image(
         ContentType=file.content_type
     )
     return {"status": "ok", "saved": key}
+
+class DeleteImageRequest(BaseModel):
+    kohdeId: str
+    huoneisto: str
+    filename: str
+
+@app.post("/delete-image")
+async def delete_image(req: DeleteImageRequest):
+
+    print("DELETE:", req.kohdeId, req.huoneisto, req.filename)
+
+    key = f"kohteet/{req.kohdeId}/{req.huoneisto}/{req.filename}"
+
+    try:
+        r2.delete_object(
+            Bucket=BUCKET,
+            Key=key
+        )
+
+        return {"success": True}
+
+    except Exception as e:
+        print("ERROR:", e)
+        return {"error": "Delete failed"}
 # ==========================================================
 #  5) KOHDELISTA (R2 TRUE LIST)
 # ==========================================================
