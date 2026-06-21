@@ -351,34 +351,43 @@ class DeleteImageRequest(BaseModel):
 @app.post("/delete-image")
 async def delete_image(req: DeleteImageRequest):
 
-    print("DELETE:", req.kohdeId, req.huoneisto, req.filename)
-
-    response = r2.list_objects_v2(
-        Bucket=BUCKET,
-        Prefix=f"kohteet/{req.kohdeId}/{req.huoneisto}"
-    )
-    
-    print("---- FILES IN R2 ----")
-    
-    contents = response.get("Contents") or []
-    
-    for obj in contents:
-        print(obj["Key"])
-
-    
-    key = f"kohteet/{req.kohdeId}/{req.huoneisto}/{req.filename}"
-
     try:
+        print("DELETE:", req.kohdeId, req.huoneisto, req.filename)
+
+        prefix = f"kohteet/{req.kohdeId}/{req.huoneisto}"
+        print("PREFIX:", prefix)
+
+        response = r2.list_objects_v2(
+            Bucket=BUCKET,
+            Prefix=prefix
+        )
+
+        print("RAW RESPONSE:", response)
+
+        contents = response.get("Contents")
+        
+        if contents:
+            print("---- FILES IN R2 ----")
+            for obj in contents:
+                print("FOUND:", obj["Key"])
+        else:
+            print("❌ NO FILES FOUND")
+
+        key = f"{prefix}/{req.filename}"
+        print("DELETE KEY:", key)
+
         r2.delete_object(
             Bucket=BUCKET,
             Key=key
         )
 
+        print("✅ DELETE DONE")
+
         return {"success": True}
 
     except Exception as e:
-        print("ERROR:", e)
-        return {"error": "Delete failed"}
+        print("🔥 ERROR:", e)
+        return {"error": str(e)}
 # ==========================================================
 #  5) KOHDELISTA (R2 TRUE LIST)
 # ==========================================================
