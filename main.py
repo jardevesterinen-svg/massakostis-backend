@@ -351,33 +351,17 @@ class DeleteImageRequest(BaseModel):
 @app.post("/delete-image")
 async def delete_image(req: DeleteImageRequest):
 
+    print("DELETE:", req.kohdeId, req.huoneisto, req.filename)
+
     try:
-        print("DELETE:", req.kohdeId, req.huoneisto, req.filename)
+        slug = slugify(req.huoneisto)
 
-        prefix = f"kohteet/{req.kohdeId}/huoneistot/{apt}"
-        print("PREFIX:", prefix)
+        key = f"kohteet/{req.kohdeId}/huoneistot/{slug}/{req.filename}"
 
-        response = s3.list_objects_v2(
-            Bucket=R2_BUCKET,
-            Prefix=prefix
-        )
-
-        print("RAW RESPONSE:", response)
-
-        contents = response.get("Contents")
-        
-        if contents:
-            print("---- FILES IN R2 ----")
-            for obj in contents:
-                print("FOUND:", obj["Key"])
-        else:
-            print("❌ NO FILES FOUND")
-
-        key = f"{prefix}/{req.filename}"
         print("DELETE KEY:", key)
 
         s3.delete_object(
-             Bucket=R2_BUCKET,
+            Bucket=R2_BUCKET,
             Key=key
         )
 
