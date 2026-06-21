@@ -377,7 +377,7 @@ async def delete_image(req: DeleteImageRequest):
         print("DELETE KEY:", key)
 
         s3.delete_object(
-            Bucket=BUCKET,
+             Bucket=R2_BUCKET,
             Key=key
         )
 
