@@ -4,6 +4,15 @@ print("### MAIN.PY V7 ACTIVE ###")
 ###############################################################################
 
 from fastapi import FastAPI, UploadFile, File, Form, Body, Response
+from pydantic import BaseModel
+
+from botocore.client import Config
+from fastapi.middleware.cors import CORSMiddleware
+import boto3
+import os
+import json
+import io
+from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
 import boto3
 import os
@@ -81,7 +90,7 @@ app.add_middleware(
     allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
-    allow_credentials=True
+    allow_credentials=False
 )
 
 # ==========================================================
@@ -313,7 +322,7 @@ async def get_apartment(kohde_id: str, huoneisto_slug: str):
 
 
 # ==========================================================
-#  4) HUONEISTON KUVIEN UPLOAD
+#  4) HUONEISTON KUVIEN UPLOAD JA DELETE
 # ==========================================================
 
 @app.post("/upload-image")
@@ -333,6 +342,36 @@ async def upload_image(
         ContentType=file.content_type
     )
     return {"status": "ok", "saved": key}
+
+class DeleteImageRequest(BaseModel):
+    kohdeId: str
+    huoneisto: str
+    filename: str
+
+@app.post("/delete-image")
+async def delete_image(req: DeleteImageRequest):
+
+    print("DELETE:", req.kohdeId, req.huoneisto, req.filename)
+
+    try:
+        slug = slugify(req.huoneisto)
+
+        key = f"kohteet/{req.kohdeId}/huoneistot/{slug}/{req.filename}"
+
+        print("DELETE KEY:", key)
+
+        s3.delete_object(
+            Bucket=R2_BUCKET,
+            Key=key
+        )
+
+        print("✅ DELETE DONE")
+
+        return {"success": True}
+
+    except Exception as e:
+        print("🔥 ERROR:", e)
+        return {"error": str(e)}
 # ==========================================================
 #  5) KOHDELISTA (R2 TRUE LIST)
 # ==========================================================
@@ -530,6 +569,8 @@ async def generate_report(kohde_id: str):
             ("ovikynnys", "Ovikynnys"),
             ("lattiakaivo", "Lattiakaivo"),
             ("lattiakallistukset", "Lattiakallistukset"),
+            ("erillis-wc", "Erillis-WC"),
+            ("sauna", "Sauna")
         ]
     
         # ---- LOAD HUONEISTOT ----
