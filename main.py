@@ -357,7 +357,7 @@ async def delete_image(req: DeleteImageRequest):
         prefix = f"kohteet/{req.kohdeId}/{req.huoneisto}"
         print("PREFIX:", prefix)
 
-        response = r2.list_objects_v2(
+        response = s3.list_objects_v2(
             Bucket=BUCKET,
             Prefix=prefix
         )
@@ -376,7 +376,7 @@ async def delete_image(req: DeleteImageRequest):
         key = f"{prefix}/{req.filename}"
         print("DELETE KEY:", key)
 
-        r2.delete_object(
+        s3.delete_object(
             Bucket=BUCKET,
             Key=key
         )
