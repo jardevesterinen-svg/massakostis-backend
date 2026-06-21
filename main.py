@@ -353,6 +353,15 @@ async def delete_image(req: DeleteImageRequest):
 
     print("DELETE:", req.kohdeId, req.huoneisto, req.filename)
 
+    response = r2.list_objects_v2(
+        Bucket=BUCKET,
+        Prefix=f"kohteet/{req.kohdeId}/{req.huoneisto}"
+    )
+    
+    print("---- FILES IN R2 ----")
+    for obj in response.get("Contents", []):
+        print(obj["Key"])
+    
     key = f"kohteet/{req.kohdeId}/{req.huoneisto}/{req.filename}"
 
     try:
