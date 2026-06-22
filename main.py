@@ -1333,7 +1333,11 @@ async def generate_report(kohde_id: str):
             for key, label in TARKASTUSKOHTEET:
                 # Kuntoluokka (1, 2 jne.)
                 kuntoluokka = data.get(f"kuntoluokka__{key}", "–")
-            
+                
+                # ✅ JOS sauna TAI erillis-wc → näytä vain jos valittu
+                if key in ["sauna", "erillis-wc"] and not kuntoluokka:
+                    continue
+
                 # Havainnot
                 havainnot = (
                     data.get(f"{key}_havainnot_textarea", "") or
