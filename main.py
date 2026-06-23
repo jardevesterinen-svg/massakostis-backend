@@ -791,10 +791,10 @@ async def generate_report(kohde_id: str):
         pdf.setFont("Arial", 9)
         rows = [
             ["Kuntoluokka", "Kuntoluokan selitys"],
-            ["1", """Rakenteet ovat hyvässä kunnossa eikä merkittäviä puutteita havaittu. Vain normaalia kulumista voi esiintyä."""] ,
-            ["2", """Rakenteissa on havaittavissa vähäisiä puutteita tai kulumaa. Korjaustarpeet eivät ole välittömiä."""] ,
-            ["3", """Rakenteissa on selkeitä puutteita tai vaurioita. Korjaustoimenpiteet suositellaan tehtäväksi lähivuosina."""] ,
-            ["4", """Rakenteissa on merkittäviä vaurioita tai kosteusriski. Korjaustoimenpiteet ovat kiireellisiä."""] ,
+            ["4", """Rakenteet ovat hyvässä kunnossa eikä merkittäviä puutteita havaittu. Vain normaalia kulumista voi esiintyä."""] ,
+            ["3", """Rakenteissa on havaittavissa vähäisiä puutteita tai kulumaa. Korjaustarpeet eivät ole välittömiä."""] ,
+            ["2", """Rakenteissa on selkeitä puutteita tai vaurioita. Korjaustoimenpiteet suositellaan tehtäväksi lähivuosina."""] ,
+            ["1", """Rakenteissa on merkittäviä vaurioita tai kosteusriski. Korjaustoimenpiteet ovat kiireellisiä."""] ,
         ]
                 
         kunto_y, current_page = draw_pts_table(
@@ -910,15 +910,15 @@ async def generate_report(kohde_id: str):
         
         # värit kuntoluokille
         colors = {
-            "1": HexColor("#2ecc71"),  # vihreä
-            "2": HexColor("#f1c40f"),  # keltainen
-            "3": HexColor("#e67e22"),  # oranssi
-            "4": HexColor("#e74c3c"),  # punainen
+            "4": HexColor("#2ecc71"),  # vihreä
+            "3": HexColor("#f1c40f"),  # keltainen
+            "2": HexColor("#e67e22"),  # oranssi
+            "1": HexColor("#e74c3c"),  # punainen
         }
         
         max_count = max(kunto_counts.values()) if kunto_counts else 1
         
-        for k in ["1","2","3","4"]:
+        for k in ["4","3","2","1"]:
             count = kunto_counts[k]
         
             # skaalattu palkki
@@ -952,7 +952,7 @@ async def generate_report(kohde_id: str):
             ["Kuntoluokka", "Huoneistot"]
         ]
         
-        for k in ["1","2","3","4"]:
+        for k in ["4","3","2","1"]:
             if kunto_lists[k]:
                 lista = ", ".join(kunto_lists[k])
                 rows.append([k, lista])
@@ -1013,7 +1013,7 @@ async def generate_report(kohde_id: str):
         # ✅ OTSIKKO
         pdf.setFont("Arial-Bold", 14)
         pdf.setFillColor(COLOR_TEXT)
-        pdf.drawString(TABLE_X, y, "Huoneistojen arvioidut käyttöiät")
+        pdf.drawString(TABLE_X, y, "Huoneistojen arvioidut jäljellä olevat käyttöiät")
         
         # ↓ siirry seuraavalle riville otsikon alta
         y -= 20
