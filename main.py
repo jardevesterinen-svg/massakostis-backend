@@ -918,7 +918,7 @@ async def generate_report(kohde_id: str):
         
         max_count = max(kunto_counts.values()) if kunto_counts else 1
         
-        for k in ["1","2","3","4"]:
+        for k in ["4","3","2","1"]:
             count = kunto_counts[k]
         
             # skaalattu palkki
@@ -952,7 +952,7 @@ async def generate_report(kohde_id: str):
             ["Kuntoluokka", "Huoneistot"]
         ]
         
-        for k in ["1","2","3","4"]:
+        for k in ["4","3","2","1"]:
             if kunto_lists[k]:
                 lista = ", ".join(kunto_lists[k])
                 rows.append([k, lista])
@@ -1013,7 +1013,7 @@ async def generate_report(kohde_id: str):
         # ✅ OTSIKKO
         pdf.setFont("Arial-Bold", 14)
         pdf.setFillColor(COLOR_TEXT)
-        pdf.drawString(TABLE_X, y, "Huoneistojen arvioidut käyttöiät")
+        pdf.drawString(TABLE_X, y, "Huoneistojen arvioidut jäljellä olevat käyttöiät")
         
         # ↓ siirry seuraavalle riville otsikon alta
         y -= 20
