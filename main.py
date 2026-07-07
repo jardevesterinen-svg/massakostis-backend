@@ -949,7 +949,7 @@ async def generate_report(kohde_id: str):
         y -= 10
         
         rows = [
-            ["Kuntoluokka", "Huoneistot"]
+            ["Kuntoluokka", "Tilat"]
         ]
         
         for k in ["4","3","2","1"]:
@@ -1013,13 +1013,13 @@ async def generate_report(kohde_id: str):
         # ✅ OTSIKKO
         pdf.setFont("Arial-Bold", 14)
         pdf.setFillColor(COLOR_TEXT)
-        pdf.drawString(TABLE_X, y, "Huoneistojen arvioidut jäljellä olevat käyttöiät")
+        pdf.drawString(TABLE_X, y, "Märkätilojen arvioidut jäljellä olevat käyttöiät")
         
         # ↓ siirry seuraavalle riville otsikon alta
         y -= 20
         
         rows = [
-            ["Käyttöikä", "Huoneistot"]
+            ["Käyttöikä", "Tilat"]
         ]
         
         for k, apts in kayttoika_sorted:
@@ -1040,14 +1040,14 @@ async def generate_report(kohde_id: str):
         # ✅ OTSIKKO
         pdf.setFont("Arial-Bold", 14)
         pdf.setFillColor(COLOR_TEXT)
-        pdf.drawString(TABLE_X, y, "Havainnot huoneistoittain")
+        pdf.drawString(TABLE_X, y, "Havainnot tiloittain")
         
         # ↓ siirry seuraavalle riville otsikon alta
         y -= 20
         
         MIN_BOTTOM_MARGIN = 80
 
-        rows = [["Huoneistot", "Havainto"]]
+        rows = [["Märkätilat", "Havainto"]]
         
         for teksti, apts in havainnot_map.items():
             rows.append([", ".join(apts), teksti])
@@ -1068,7 +1068,7 @@ async def generate_report(kohde_id: str):
         # ↓ siirry seuraavalle riville otsikon alta
         y -= 20
         
-        rows = [["Huoneistot", "Toimenpide"]]
+        rows = [["Tilat", "Toimenpide"]]
         
         for teksti, apts in toimenpiteet_map.items():
             rows.append([", ".join(apts), teksti])
@@ -1110,7 +1110,7 @@ async def generate_report(kohde_id: str):
             
             y = h - 18
             pdf.setFont("Arial", 11)
-            pdf.drawRightString(info_x - 200, y - 11 , f"Huoneisto {apt}")
+            pdf.drawRightString(info_x - 200, y - 11 , f"Tila {apt}")
             y -= 5
             pdf.setFont("Arial", 9)
             pdf.drawRightString(info_x, y, f"Tarkastuspäivä: {kohde['paiva']}")
