@@ -949,7 +949,7 @@ async def generate_report(kohde_id: str):
         y -= 10
         
         rows = [
-            ["Kuntoluokka", "Tilat"]
+            ["Kuntoluokka", "Huoneistot"]
         ]
         
         for k in ["4","3","2","1"]:
@@ -1019,7 +1019,7 @@ async def generate_report(kohde_id: str):
         y -= 20
         
         rows = [
-            ["Käyttöikä", "Tilat"]
+            ["Käyttöikä", "Huoneistot"]
         ]
         
         for k, apts in kayttoika_sorted:
@@ -1040,14 +1040,14 @@ async def generate_report(kohde_id: str):
         # ✅ OTSIKKO
         pdf.setFont("Arial-Bold", 14)
         pdf.setFillColor(COLOR_TEXT)
-        pdf.drawString(TABLE_X, y, "Havainnot tiloittain")
+        pdf.drawString(TABLE_X, y, "Havainnot huoneistoittain")
         
         # ↓ siirry seuraavalle riville otsikon alta
         y -= 20
         
         MIN_BOTTOM_MARGIN = 80
 
-        rows = [["Märkätilat", "Havainto"]]
+        rows = [["Huoneistot", "Havainto"]]
         
         for teksti, apts in havainnot_map.items():
             rows.append([", ".join(apts), teksti])
@@ -1068,7 +1068,7 @@ async def generate_report(kohde_id: str):
         # ↓ siirry seuraavalle riville otsikon alta
         y -= 20
         
-        rows = [["Tilat", "Toimenpide"]]
+        rows = [["Huoneistot", "Toimenpide"]]
         
         for teksti, apts in toimenpiteet_map.items():
             rows.append([", ".join(apts), teksti])
@@ -1110,7 +1110,7 @@ async def generate_report(kohde_id: str):
             
             y = h - 18
             pdf.setFont("Arial", 11)
-            pdf.drawRightString(info_x - 200, y - 11 , f"Tila {apt}")
+            pdf.drawRightString(info_x - 200, y - 11 , f"Huoneisto {apt}")
             y -= 5
             pdf.setFont("Arial", 9)
             pdf.drawRightString(info_x, y, f"Tarkastuspäivä: {kohde['paiva']}")
