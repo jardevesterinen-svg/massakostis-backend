@@ -570,7 +570,7 @@ async def generate_report(kohde_id: str):
             ("lattiakaivo", "Lattiakaivo"),
             ("lattiakallistukset", "Lattiakallistukset"),
             ("erillis-wc", "Erillis-WC"),
-            ("sauna", "Sauna"),
+            ("", ""),
             ("keittiö", "Keittiö")
         ]
     
@@ -1335,8 +1335,8 @@ async def generate_report(kohde_id: str):
                 # Kuntoluokka (1, 2 jne.)
                 kuntoluokka = data.get(f"kuntoluokka__{key}", "").strip()
                 
-                # ✅ JOS sauna TAI erillis-wc → näytä vain jos valittu
-                if key in ["sauna", "erillis-wc"] and not kuntoluokka:
+                # ✅ JOS sauna TAI erillis-wc TAi keittiö → näytä vain jos valittu
+                if key in ["sauna", "erillis-wc", "keittiö"] and not kuntoluokka:
                     continue
 
                 # Havainnot
