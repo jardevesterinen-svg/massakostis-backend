@@ -1487,29 +1487,29 @@ async def generate_report(kohde_id: str):
             muukommentti = (data.get("muukommentti", "") or "").strip()
             if muukommentti:
 
-            text_y -= 25
+                text_y -= 25
+            
+                pdf.setFont("Arial-Bold", 10)
+                pdf.drawString(
+                    TABLE_X,
+                    text_y,
+                    "Muut havainnot:"
+                )
+            
+                text_y -= 15
+            
+                pdf.setFont("Arial", 10)
+            
+                lines = wrap_text(
+                    muukommentti,
+                    "Arial",
+                    10,
+                    TABLE_WIDTH
+                )
         
-            pdf.setFont("Arial-Bold", 10)
-            pdf.drawString(
-                TABLE_X,
-                text_y,
-                "Muut havainnot:"
-            )
-        
-            text_y -= 15
-        
-            pdf.setFont("Arial", 10)
-        
-            lines = wrap_text(
-                muukommentti,
-                "Arial",
-                10,
-                TABLE_WIDTH
-            )
-        
-            for line in lines:
-                pdf.drawString(TABLE_X, text_y, line)
-                text_y -= 12
+                for line in lines:
+                    pdf.drawString(TABLE_X, text_y, line)
+                    text_y -= 12
 
             # ==================================================
             # FOOTER + PAGE NUMBER
