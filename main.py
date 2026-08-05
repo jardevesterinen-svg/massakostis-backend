@@ -572,6 +572,8 @@ async def generate_report(kohde_id: str):
             ("erillis-wc", "Erillis-WC"),
             ("sauna", "Sauna"),
             ("keittiö", "Keittiö")
+            ("muu", "Muu")
+            
         ]
     
         # ---- LOAD HUONEISTOT ----
