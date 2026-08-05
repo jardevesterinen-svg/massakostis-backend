@@ -570,7 +570,9 @@ async def generate_report(kohde_id: str):
             ("lattiakaivo", "Lattiakaivo"),
             ("lattiakallistukset", "Lattiakallistukset"),
             ("erillis-wc", "Erillis-WC"),
-            ("sauna", "Sauna")
+            ("sauna", "Sauna"),
+            ("keittiö", "Keittiö")
+            
         ]
     
         # ---- LOAD HUONEISTOT ----
@@ -1013,7 +1015,7 @@ async def generate_report(kohde_id: str):
         # ✅ OTSIKKO
         pdf.setFont("Arial-Bold", 14)
         pdf.setFillColor(COLOR_TEXT)
-        pdf.drawString(TABLE_X, y, "Märkätilojen arvioidut jäljellä olevat käyttöiät")
+        pdf.drawString(TABLE_X, y, "Huoneistojen arvioidut jäljellä olevat käyttöiät")
         
         # ↓ siirry seuraavalle riville otsikon alta
         y -= 20
@@ -1334,8 +1336,8 @@ async def generate_report(kohde_id: str):
                 # Kuntoluokka (1, 2 jne.)
                 kuntoluokka = data.get(f"kuntoluokka__{key}", "").strip()
                 
-                # ✅ JOS sauna TAI erillis-wc → näytä vain jos valittu
-                if key in ["sauna", "erillis-wc"] and not kuntoluokka:
+                # ✅ JOS sauna TAI erillis-wc TAi keittiö → näytä vain jos valittu
+                if key in ["sauna", "erillis-wc", "keittiö"] and not kuntoluokka:
                     continue
 
                 # Havainnot
@@ -1481,6 +1483,33 @@ async def generate_report(kohde_id: str):
                 text_y,
                 f"Kokonaiskuntoluokka: {kokonaiskunto}"
             )
+            # ✅ Lisätään muut mahdolliset havainnot
+            muukommentti = (data.get("muukommentti", "") or "").strip()
+            if muukommentti:
+
+                text_y -= 25
+            
+                pdf.setFont("Arial-Bold", 10)
+                pdf.drawString(
+                    TABLE_X,
+                    text_y,
+                    "Muut havainnot:"
+                )
+            
+                text_y -= 15
+            
+                pdf.setFont("Arial", 10)
+            
+                lines = wrap_text(
+                    muukommentti,
+                    "Arial",
+                    10,
+                    TABLE_WIDTH
+                )
+        
+                for line in lines:
+                    pdf.drawString(TABLE_X, text_y, line)
+                    text_y -= 12
 
             # ==================================================
             # FOOTER + PAGE NUMBER
