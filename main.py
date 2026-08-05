@@ -1484,7 +1484,7 @@ async def generate_report(kohde_id: str):
                 f"Kokonaiskuntoluokka: {kokonaiskunto}"
             )
             # ✅ Lisätään muut mahdolliset havainnot
-            muukommentti = data.get("muukommentti", "–")
+            muukommentti = (data.get("muukommentti", "") or "").strip()
             if muukommentti:
 
             text_y -= 25
