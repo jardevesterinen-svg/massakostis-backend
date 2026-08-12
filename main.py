@@ -48,6 +48,8 @@ Tämä raportti on laadittu ensisijaisesti kohteen märkätilojen kunnon arvioim
 Pintakosteusmittausten avulla voidaan arvioida, esiintyykö rakenteissa tavanomaista korkeampaa kosteutta ja ovatko mitatut arvot rakenteiden toimivuuden kannalta merkittäviä. Samalla voidaan tunnistaa mahdollinen tarve tarkemmille jatkotutkimuksille. Mittaustulosten tulkinnassa on huomioitava useita epävarmuustekijöitä, kuten rakenteissa olevat metalliosat, putkistot sekä tilojen käyttöön liittyvät tekijät, kuten veden käyttö juuri ennen mittausta.
 
 Pintakosteusmittaus ei yksilöi kosteuden tarkkaa sijaintia rakenteen sisällä. Erityisesti laatoitetuissa märkätiloissa on varmistuttava vedeneristyksen olemassaolosta ja kunnosta. Toimiva vedeneristys laatoituksen alla voi aiheuttaa mittauksissa kohonneita arvoja ilman, että rakenteessa on varsinaista vauriota, sillä kosteus voi sijaita laatoituksen ja vedeneristyksen välissä.
+
+Seuraava uusi tarkastus suositellaan tehtäväksi viimeistään märkätilojen jäljellä olevan käyttöiän lähestyttäessä loppuaan. Yleisesti RT kortin mukaan märkätilojen suositeltava tarkastusväli on 3 vuotta.
 """
 
 # ==========================================================
