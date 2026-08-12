@@ -730,12 +730,7 @@ async def generate_report(kohde_id: str):
         rows = [
             ["Tilaajan tiedot", ""],
             ["Nimi", f"{tilaaja['etunimi']} {tilaaja['sukunimi']}"],
-            ["Yritys", tilaaja["yritys"]],
-            ["Osoite", tilaaja["osoite"]],
-            ["Postitoimipaikka",
-             f"{tilaaja['postinumero']} {tilaaja['postitoimipaikka']}"],
             ["Sähköposti", tilaaja["sahkoposti"]],
-            ["Puhelin", tilaaja["puhelin"]],
             ["Kohteen nimi", kohde["nimi"]],
             ["Kohteen osoite", kohde["osoite"]],
             ["Tarkastaja", kohde["tarkastaja"]],
@@ -766,7 +761,7 @@ async def generate_report(kohde_id: str):
         
         paragraphs = KOSTEUSKARTOITUS_TEKSTI.strip().split("\n\n")
         
-        y_text = TEXT_START_Y - 18
+        y_text = TEXT_START_Y + 20
         
         for para in paragraphs:
         
@@ -784,9 +779,9 @@ async def generate_report(kohde_id: str):
             # ✅ väli kappaleiden väliin
             y_text -= 10
         
-        y_text = TEXT_START_Y - 18
+        # y_text = TEXT_START_Y - 18
       
-        kunto_y = y_text - 240
+        kunto_y = y_text - 230
                        
         col_widths_kunto = [
             TABLE_WIDTH * 0.20,
