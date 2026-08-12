@@ -730,6 +730,7 @@ async def generate_report(kohde_id: str):
         rows = [
             ["Tilaajan tiedot", ""],
             ["Nimi", f"{tilaaja['etunimi']} {tilaaja['sukunimi']}"],
+            ["Yritys", tilaaja["yritys"]],
             ["Sähköposti", tilaaja["sahkoposti"]],
             ["Kohteen nimi", kohde["nimi"]],
             ["Kohteen osoite", kohde["osoite"]],
@@ -751,7 +752,7 @@ async def generate_report(kohde_id: str):
             current_page
         )
                
-        TEXT_START_Y = table_y - 10
+        TEXT_START_Y = table_y - 30
         TEXT_WIDTH = TABLE_WIDTH
         
         pdf.setFont("Arial-Bold", 12)
@@ -781,7 +782,7 @@ async def generate_report(kohde_id: str):
         
         y_text = TEXT_START_Y - 18
       
-        kunto_y = y_text - 230
+        kunto_y = y_text - 200
                        
         col_widths_kunto = [
             TABLE_WIDTH * 0.20,
