@@ -751,7 +751,7 @@ async def generate_report(kohde_id: str):
             current_page
         )
                
-        TEXT_START_Y = table_y - 30
+        TEXT_START_Y = table_y - 10
         TEXT_WIDTH = TABLE_WIDTH
         
         pdf.setFont("Arial-Bold", 12)
@@ -761,7 +761,7 @@ async def generate_report(kohde_id: str):
         
         paragraphs = KOSTEUSKARTOITUS_TEKSTI.strip().split("\n\n")
         
-        y_text = TEXT_START_Y + 20
+        y_text = TEXT_START_Y - 18
         
         for para in paragraphs:
         
@@ -779,7 +779,7 @@ async def generate_report(kohde_id: str):
             # ✅ väli kappaleiden väliin
             y_text -= 10
         
-        # y_text = TEXT_START_Y - 18
+        y_text = TEXT_START_Y - 18
       
         kunto_y = y_text - 230
                        
